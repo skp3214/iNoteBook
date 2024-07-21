@@ -1,7 +1,9 @@
 const Notes = require('../models/Notes');
 
 exports.findNotesByUser = async (userId) => {
-    return await Notes.find({ user: userId }).populate('user');
+    const notes= await Notes.find({ user: userId }).populate('user');
+    console.log(notes);
+    return notes;
 };
 
 exports.createNote = async (noteData) => {

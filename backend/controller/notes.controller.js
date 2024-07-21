@@ -1,9 +1,10 @@
 const { validationResult } = require('express-validator');
 const notesService = require('../services/notes.service');
-
+const mongoose=require('mongoose');
 exports.fetchAllNotes = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = new mongoose.Types.ObjectId(req.user.id);
+        console.log(userId);
         const notes = await notesService.getAllNotes(userId);
         res.json(notes);
     } catch (err) {
