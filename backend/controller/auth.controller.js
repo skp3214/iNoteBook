@@ -1,5 +1,5 @@
 const authService = require('../services/auth.service');
-
+const {validationResult}=require('express-validator');
 exports.createUser = async (req, res) => {
     let success = false;
     const errors = validationResult(req);
