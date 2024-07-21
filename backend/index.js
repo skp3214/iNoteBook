@@ -7,7 +7,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // Use CORS middleware
-const allowedOrigins = ['http://localhost:3000', '*']; // Add your allowed origins here
+const allowedOrigins = ['https://inotebook-live.vercel.app', '*']; // Add your allowed origins here
 app.use(cors({
     origin: (origin, callback) => {
         // Allow requests with no origin, like mobile apps or curl requests
