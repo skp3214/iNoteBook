@@ -7,11 +7,20 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // Use CORS middleware
+const allowedOrigins = ['http://localhost:3000', '*']; // Add your allowed origins here
 app.use(cors({
-    origin: '*', // Allow requests from all origins
+    origin: (origin, callback) => {
+        // Allow requests with no origin, like mobile apps or curl requests
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true, // Enable this if you need to send cookies or authorization headers
-    allowedHeaders: 'Content-Type, Authorization',
+    credentials: true,
+    allowedHeaders: 'Content-Type, Authorization,authtoken',
     optionsSuccessStatus: 204
 }));
 
@@ -21,8 +30,8 @@ app.use(express.json());
 app.options('*', cors());
 
 // Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/notes', require('./routes/notes'));
+app.use('/api/auth', require('./routes/auth.js'));
+app.use('/api/notes', require('./routes/notes.js'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
