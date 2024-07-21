@@ -19,8 +19,6 @@
 
 #### 👩‍💻 Dive into the world of iNotebook:
 
- 𝐠𝐢𝐭𝐡𝐮𝐛 𝐫𝐞𝐩𝐨: [https://github.com/skp3214/iNoteBook.git](https://github.com/skp3214/iNoteBook.git)
-
 > - 🚀I made this project from CodeWithHarry youtube channel.This project is the best approach to understand software development,from this project you can learn how backend and frontend works.
 
 > - In this project there is still stuffs left for improvement.
@@ -79,7 +77,7 @@ The backend is built with Node.js and Express.js. It includes the following dire
 
 1. **Clone the Repository**:
    ```bash
-   git clone https://github.com/yourusername/inotebook.git
+   git clone https://github.com/skp3214/inotebook.git
    cd inotebook/backend
    ```
 
