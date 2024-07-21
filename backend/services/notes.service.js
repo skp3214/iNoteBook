@@ -1,8 +1,7 @@
 const notesDao = require('../dao/notes.dao');
 
 exports.getAllNotes = async (userId) => {
-    const userObjectId = new mongoose.Types.ObjectId(userId);
-    return await notesDao.findNotesByUser(userObjectId);
+    return await notesDao.findNotesByUser(userId);
 };
 
 exports.createNote = async (noteData) => {

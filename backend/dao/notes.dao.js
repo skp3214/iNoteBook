@@ -1,5 +1,4 @@
 const Notes = require('../models/Notes');
-const mongoose = require('mongoose');
 
 exports.findNotesByUser = async (userId) => {
     return await Notes.find({ user: userId }).populate('user');
