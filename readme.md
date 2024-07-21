@@ -4,6 +4,10 @@
 
 > - 🌐 The backend, crafted with precision using the MEN (MongoDB, Express.js and Node.js) stack, is designed to seamlessly handle data operations, ensuring a robust foundation for our application.
 
+https://github.com/user-attachments/assets/afa0ee96-9d1d-4a46-b459-b64ad3e5dcdb
+
+
+
 ### 🌐𝙞𝙉𝙤𝙩𝙚𝘽𝙤𝙤𝙠 𝘼𝙥𝙞: [https://inotebook-api.vercel.app](https://inotebook-api.vercel.app)
 
 > 🚀 On the frontend, we've harnessed the power of React to deliver a dynamic and user-friendly interface. But here's the twist - the frontend communicates with the backend through a set of APIs, creating a 
