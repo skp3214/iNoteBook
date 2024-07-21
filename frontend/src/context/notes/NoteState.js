@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import noteContext from "./noteContext";
 const NoteState = (props) => {
-    const host = "https://testing-pvsy.onrender.com"
+    const host = "https://inotebook-api.vercel.app"
     const notesInitial = []
 
 

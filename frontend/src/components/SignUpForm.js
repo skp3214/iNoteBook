@@ -18,7 +18,7 @@ const SignUpForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { name, email, password } = formData;
-    const response = await fetch(`https://testing-pvsy.onrender.com/api/auth/createuser`, {
+    const response = await fetch(`https://inotebook-api.vercel.app/api/auth/createuser`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
