@@ -18,7 +18,7 @@ const SignUpForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { name, email, password } = formData;
-    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
     const response = await fetch(`${apiBaseUrl}/api/auth/createuser`, {
       method: "POST",
       headers: {
