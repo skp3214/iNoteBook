@@ -3,13 +3,12 @@ const notesService = require('../services/notes.service');
 const mongoose=require('mongoose');
 exports.fetchAllNotes = async (req, res) => {
     try {
-        const userId = new mongoose.Types.ObjectId(req.user.id);
-        console.log(userId);
+        const userId = req.user.id;
         const notes = await notesService.getAllNotes(userId);
         res.json(notes);
     } catch (err) {
         console.log(err);
-        res.status(401).send("Server Error");
+        res.status(500).send("Server Error");
     }
 };
 

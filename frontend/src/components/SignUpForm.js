@@ -18,7 +18,8 @@ const SignUpForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { name, email, password } = formData;
-    const response = await fetch(`https://inotebook-api.vercel.app/api/auth/createuser`, {
+    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
+    const response = await fetch(`${apiBaseUrl}/api/auth/createuser`, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',

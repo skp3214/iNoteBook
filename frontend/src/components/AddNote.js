@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import noteContext from '../context/notes/noteContext';
 

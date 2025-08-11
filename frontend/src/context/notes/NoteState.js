@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import noteContext from "./noteContext";
 const NoteState = (props) => {
-    const host = "https://inotebook-api.vercel.app"
+    const host = process.env.REACT_APP_API_BASE_URL || "http://localhost:5000"
     const notesInitial = []
 
 
     const [note, setNotes] = useState(notesInitial);
 
-    const getNotes = async () => {
+    const getNotes = useCallback(async () => {
         const response = await fetch(`${host}/api/notes/fetchallnotes`, {
             method: "GET",
             headers: {
@@ -17,8 +17,7 @@ const NoteState = (props) => {
         });
         let data = await response.json();
         setNotes(data);
-
-    }
+    }, [host]);
 
     const addNote = async (title, description, tag) => {
         const response = await fetch(`${host}/api/notes/addnotes`, {
@@ -44,7 +43,7 @@ const NoteState = (props) => {
                 'authtoken': localStorage.getItem('token')
             }
         });
-        const json = await response.json();
+        await response.json();
         setNotes((prevNotes) => prevNotes.filter((note) => note._id !== id));
     }
     const editNote = async (id, title, description, tag) => {
@@ -59,7 +58,7 @@ const NoteState = (props) => {
                 title, description, tag
             })
         });
-        const json = response.json()
+        response.json()
         let newNotes = JSON.parse(JSON.stringify(note))
         for (let index = 0; index < newNotes.length; index++) {
             const element = newNotes[index];

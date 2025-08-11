@@ -1,3 +1,4 @@
+require('dotenv').config();
 const connectToMongo = require('./db.js');
 connectToMongo();
 const express = require('express');
@@ -7,7 +8,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // Use CORS middleware
-const allowedOrigins = ['https://inotebook-live.vercel.app', '*']; // Add your allowed origins here
+const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3000'];
 app.use(cors({
     origin: (origin, callback) => {
         // Allow requests with no origin, like mobile apps or curl requests

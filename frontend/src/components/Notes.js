@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState, useRef } from 'react';
+import { useContext, useEffect, useState, useRef } from 'react';
 import NotesItem from './NotesItem';
 import AddNote from './AddNote';
 import noteContext from '../context/notes/noteContext';

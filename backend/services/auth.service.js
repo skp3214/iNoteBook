@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userDao = require('../dao/auth.dao');
-const JWT_SECRET = "Sachinisagood$boy";
+const JWT_SECRET = process.env.JWT_SECRET || "default-secret-key";
 
 exports.createUser = async (name, email, password) => {
     let userExist = true;
