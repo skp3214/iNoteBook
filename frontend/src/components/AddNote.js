@@ -27,8 +27,8 @@ const AddNote = () => {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent the default form submission
-    handleClick(e); // Call your handleClick function for form submission logic
+    e.preventDefault(); 
+    handleClick(e); 
   };
 
   return (
@@ -61,13 +61,19 @@ const AddNote = () => {
 
         <Form.Group controlId="formTag">
           <Form.Label>Tag</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter tag"
+          <Form.Select
             name="tag"
             value={note.tag}
             onChange={onChange}
-          />
+            required
+          >
+            <option value="">Select tag</option>
+            <option value="Work" style={{ color: '#0d6efd', fontWeight: 'bold' }}>Work</option>
+            <option value="Urgent" style={{ color: '#dc3545', fontWeight: 'bold' }}>Urgent</option>
+            <option value="Completed" style={{ color: '#198754', fontWeight: 'bold' }}>Completed</option>
+            <option value="Important" style={{ color: '#ffc107', fontWeight: 'bold' }}>Important</option>
+            <option value="Personal" style={{ color: '#0dcaf0', fontWeight: 'bold' }}>Personal</option>
+          </Form.Select>
         </Form.Group>
 
         <Button  variant="primary" className="mt-4" type="submit">
