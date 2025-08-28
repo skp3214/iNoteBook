@@ -125,6 +125,7 @@ const Notes = () => {
                 name="etitle"
                 value={notes.etitle}
                 onChange={onChange}
+                className="theme-input"
                 minLength={2}
                 required
               />
@@ -138,6 +139,7 @@ const Notes = () => {
                 name="edescription"
                 value={notes.edescription}
                 onChange={onChange}
+                className="theme-input"
                 minLength={2}
                 required
               />
@@ -148,6 +150,7 @@ const Notes = () => {
                 name="etag"
                 value={notes.etag}
                 onChange={onChange}
+                className="theme-input"
                 required
               >
                 <option value="">Select tag</option>
@@ -172,7 +175,7 @@ const Notes = () => {
             placeholder="Search notes by title or description..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-10"
+            className="w-10 theme-input"
           />
         </div>
         

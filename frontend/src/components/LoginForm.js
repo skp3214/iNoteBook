@@ -55,6 +55,7 @@ const LoginForm = () => {
                                 placeholder="Enter email"
                                 value={formData.email}
                                 onChange={onChange}
+                                className="theme-input"
                                 required
                             />
                         </Form.Group>
@@ -67,6 +68,7 @@ const LoginForm = () => {
                                 placeholder="Password"
                                 value={formData.password}
                                 onChange={onChange}
+                                className="theme-input"
                                 required
                             />
                         </Form.Group>

@@ -3,6 +3,7 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
+import { useTheme } from '../context/theme/ThemeContext';
 
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -13,6 +14,7 @@ import Col from 'react-bootstrap/Col';
 function NavbarComponents() {
   const location = useLocation();
   const [activeNavItem, setActiveNavItem] = useState('');
+  const { isDarkMode, toggleTheme } = useTheme();
   const token = localStorage.getItem('token');
 
   let navigate = useNavigate();
@@ -45,28 +47,36 @@ function NavbarComponents() {
               Home
             </Nav.Link>
           </Nav>
-          {token ? (
-            // If token is present, show logout button
-            <Button variant="outline-secondary" onClick={handleLogOut}>
-              Logout
-            </Button>
-          ) : (
-            // If token is not present, show login and signup buttons
-            <Form inline>
-              <Row>
-                <Col xs="auto">
-                  <Button as={Link} to="/login" variant="outline-danger">
-                    Login
-                  </Button>
-                </Col>
-                <Col xs="auto">
-                  <Button as={Link} to="/signup" variant="outline-primary">
-                    Sign Up
-                  </Button>
-                </Col>
-              </Row>
-            </Form>
-          )}
+          <div className="d-flex align-items-center gap-2">
+            <button 
+              className="theme-toggle" 
+              onClick={toggleTheme}
+              title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {isDarkMode ? '☀️' : '🌙'}
+            </button>
+            
+            {token ? (
+              <Button variant="outline-secondary" onClick={handleLogOut}>
+                Logout
+              </Button>
+            ) : (
+              <Form inline>
+                <Row>
+                  <Col xs="auto">
+                    <Button as={Link} to="/login" variant="outline-danger">
+                      Login
+                    </Button>
+                  </Col>
+                  <Col xs="auto">
+                    <Button as={Link} to="/signup" variant="outline-primary">
+                      Sign Up
+                    </Button>
+                  </Col>
+                </Row>
+              </Form>
+            )}
+          </div>
         </Navbar.Collapse>
       </Container>
     </Navbar>

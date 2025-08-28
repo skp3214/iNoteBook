@@ -42,6 +42,7 @@ const AddNote = () => {
             name="title"
             value={note.title}
             onChange={onChange}
+            className="theme-input"
             required
           />
         </Form.Group>
@@ -55,6 +56,7 @@ const AddNote = () => {
             name="description"
             value={note.description}
             onChange={onChange}
+            className="theme-input"
             required
           />
         </Form.Group>
@@ -65,6 +67,7 @@ const AddNote = () => {
             name="tag"
             value={note.tag}
             onChange={onChange}
+            className="theme-input"
             required
           >
             <option value="">Select tag</option>

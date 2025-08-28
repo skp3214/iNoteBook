@@ -27,11 +27,11 @@ const NotesItem = (props) => {
 
   return (
     <Card
-      className={`me-4 border-2 shadow-sm border-${badgeColor}`}
-      style={{ width: '20rem' }} 
+      className={`me-4 border-2 shadow-sm border-${badgeColor} theme-card`}
+      style={{ width: '18rem' }} 
     >
       <Card.Header
-        className="bg-white border-0 pb-0 d-flex justify-content-between align-items-center"
+        className="border-0 pb-0 d-flex justify-content-between align-items-center"
         style={{ borderTopLeftRadius: '1rem', borderTopRightRadius: '1rem' }}
       >
         {note.tag && tagLabel !== 'No Tag' && (
@@ -50,7 +50,7 @@ const NotesItem = (props) => {
         <Card.Text style={{ minHeight: '60px' }}>{note.description}</Card.Text>
       </Card.Body>
       <Card.Footer
-        className="bg-white border-0 pt-0 d-flex justify-content-between"
+        className="border-0 pt-0 d-flex justify-content-between"
         style={{
           borderBottomLeftRadius: '1rem',
           borderBottomRightRadius: '1rem',
