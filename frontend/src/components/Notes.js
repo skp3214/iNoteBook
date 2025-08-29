@@ -11,7 +11,7 @@ import Form from 'react-bootstrap/Form';
 const Notes = () => {
   let context = useContext(noteContext);
   let navigate = useNavigate();
-  const { note, getNotes, editNote } = context;
+  const { note, getNotes, editNote, isOnline } = context;
   useEffect(() => {
     if (localStorage.getItem('token')) {
       getNotes();
@@ -168,6 +168,18 @@ const Notes = () => {
       </Modal>
       <div className='container'>
         <h2>Your Notes</h2>
+        
+        {/* Online/Offline Status Indicator */}
+        <div className='mb-2'>
+          <span className={`badge ${isOnline ? 'bg-success' : 'bg-warning'}`}>
+            {isOnline ? 'Online' : 'Offline Mode'}
+          </span>
+          {!isOnline && (
+            <small className='text-muted ms-2'>
+              Changes will sync when you're back online
+            </small>
+          )}
+        </div>
         
         <div className='mb-3'>
           <Form.Control

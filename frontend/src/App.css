@@ -1,0 +1,97 @@
+/* Offline Note Styling */
+.offline-note {
+  border-style: dashed !important;
+  opacity: 0.9;
+  background-color: rgba(108, 117, 125, 0.05);
+}
+
+.offline-note .card-body {
+  position: relative;
+}
+
+.offline-note::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(108, 117, 125, 0.1) 10px,
+    rgba(108, 117, 125, 0.1) 20px
+  );
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Network Status Badge */
+.network-status {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+/* Sync Animation */
+.sync-animation {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+/* PWA Install Prompt */
+.pwa-install-prompt {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  background: #007bff;
+  color: white;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Theme support for offline elements */
+[data-bs-theme="dark"] .offline-note {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+[data-bs-theme="dark"] .offline-note::before {
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(255, 255, 255, 0.1) 10px,
+    rgba(255, 255, 255, 0.1) 20px
+  );
+}
+
+/* Loading states */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+[data-bs-theme="dark"] .loading-skeleton {
+  background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
+  background-size: 200% 100%;
+}

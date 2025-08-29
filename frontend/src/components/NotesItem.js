@@ -27,21 +27,34 @@ const NotesItem = (props) => {
 
   return (
     <Card
-      className={`me-4 border-2 shadow-sm border-${badgeColor} theme-card`}
-      style={{ width: '18rem' }} 
+      className={`me-4 border-2 shadow-sm border-${badgeColor} theme-card ${note.isOffline ? 'offline-note' : ''}`}
+      style={{ 
+        width: '18rem',
+        ...(note.isOffline && {
+          borderStyle: 'dashed',
+          opacity: 0.9
+        })
+      }} 
     >
       <Card.Header
         className="border-0 pb-0 d-flex justify-content-between align-items-center"
         style={{ borderTopLeftRadius: '1rem', borderTopRightRadius: '1rem' }}
       >
-        {note.tag && tagLabel !== 'No Tag' && (
-          <Badge
-            bg={badgeColor}
-            style={{ fontSize: '1em', padding: '0.5em 1em' }}
-          >
-            {tagLabel}
-          </Badge>
-        )}
+        <div className="d-flex gap-2 align-items-center">
+          {note.tag && tagLabel !== 'No Tag' && (
+            <Badge
+              bg={badgeColor}
+              style={{ fontSize: '1em', padding: '0.5em 1em' }}
+            >
+              {tagLabel}
+            </Badge>
+          )}
+          {note.isOffline && (
+            <Badge bg="secondary" className="small">
+              Offline
+            </Badge>
+          )}
+        </div>
       </Card.Header>
       <Card.Body>
         <Card.Title className="mb-2" style={{ fontWeight: 600 }}>
