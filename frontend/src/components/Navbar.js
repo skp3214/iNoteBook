@@ -4,6 +4,7 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { useTheme } from '../context/theme/ThemeContext';
+import icon from '../asset/inotebookicon.png';
 
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -35,7 +36,15 @@ function NavbarComponents() {
   return (
     <Navbar expand="lg" className="bg-body-tertiary">
       <Container>
-        <Navbar.Brand as={Link} to="/">iNoteBook</Navbar.Brand>
+        <Navbar.Brand as={Link} to="/"><img
+              alt=""
+              src={icon}
+              width="30"
+              height="30"
+              style={{ borderRadius: '50%' }}
+              className="d-inline-block align-top"
+            />{' '}
+            iNoteBook</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">

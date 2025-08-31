@@ -1,32 +1,42 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Form, Button, Container, Row, Col } from 'react-bootstrap';
+import { Form, Button, Container, Row, Col, Spinner } from 'react-bootstrap';
 
 const LoginForm = () => {
     const [formData, setFormData] = useState({
         password: '',
         email: '',
     });
+    const [isSigningIn, setisSigningIn] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
     const history = useNavigate();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
-        const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: formData.email, password: formData.password }),
-        });
-        const json = await response.json();
+        setisSigningIn(true);
+        setShowAlert(false);
 
-        if (json.success) {
-            localStorage.setItem('token', json.authtoken);
-            history('/');
-        } else {
+        const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
+        try {
+            const response = await fetch(`${apiBaseUrl}/api/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: formData.email, password: formData.password }),
+            });
+            const json = await response.json();
+
+            if (json.success) {
+                localStorage.setItem('token', json.authtoken);
+                history('/');
+            } else {
+                setShowAlert(true);
+            }
+        } catch (error) {
             setShowAlert(true);
+        } finally {
+            setisSigningIn(false);
         }
     };
 
@@ -57,6 +67,7 @@ const LoginForm = () => {
                                 onChange={onChange}
                                 className="theme-input"
                                 required
+                                disabled={isSigningIn}
                             />
                         </Form.Group>
 
@@ -70,11 +81,28 @@ const LoginForm = () => {
                                 onChange={onChange}
                                 className="theme-input"
                                 required
+                                disabled={isSigningIn}
                             />
                         </Form.Group>
 
-                        <Button variant="primary" className="my-3" type="submit">
-                            Login
+                        <Button
+                            variant="primary"
+                            className="my-3"
+                            type="submit"
+                            disabled={isSigningIn}
+                        >
+                            {isSigningIn ? (
+                                <>
+                                    <Spinner
+                                        as="span"
+                                        animation="grow"
+                                        size="sm"
+                                        role="status"
+                                        aria-hidden="true"
+                                    />{' '}
+                                    SigningIn...
+                                </>
+                            ) : 'Login'}
                         </Button>
                     </Form>
                 </Col>
