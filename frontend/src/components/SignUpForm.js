@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Form, Button, Container, Row, Col, Spinner } from 'react-bootstrap';
+import { useNavigate, Link } from 'react-router-dom';
+import { Form, Button, Container, Row, Col, Spinner, Card } from 'react-bootstrap';
 
 const SignUpForm = () => {
   const [formData, setFormData] = useState({
@@ -56,69 +56,119 @@ const SignUpForm = () => {
   };
 
   return (
-    <Container>
-      <Row className="justify-content-center mt-5">
-        <Col md={6}>
-          {userExistAlert && (
-            <div className="alert alert-danger" role="alert">
-              {alertdata}
-            </div>
-          )}
-          <Form onSubmit={handleSubmit}>
-            <Form.Group controlId="formName">
-              <Form.Label>Name</Form.Label>
-              <Form.Control
-                type="text"
-                name="name"
-                placeholder="Enter your name"
-                value={formData.name}
-                onChange={onChange}
-                className="theme-input"
-                required
-              />
-            </Form.Group>
+    <Container className="py-5">
+      <Row className="justify-content-center">
+        <Col md={6} lg={5} xl={4}>
+          <Card className="modern-card-elevated">
+            <Card.Body className="p-5">
+              <div className="text-center mb-4">
+                <div 
+                  className="mx-auto mb-3 d-flex align-items-center justify-content-center"
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    background: 'var(--accent-secondary)',
+                    borderRadius: '16px',
+                    fontSize: '2rem'
+                  }}
+                >
+                  ✨
+                </div>
+                <h3 className="modern-title mb-2">Create Account</h3>
+                <p className="modern-text text-muted">
+                  Join iNoteBook to start organizing your thoughts
+                </p>
+              </div>
 
-            <Form.Group controlId="formEmail">
-              <Form.Label>Email address</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                placeholder="Enter email"
-                value={formData.email}
-                onChange={onChange}
-                className="theme-input"
-                required
-              />
-            </Form.Group>
-
-            <Form.Group controlId="formPassword">
-              <Form.Label>Password</Form.Label>
-              <Form.Control
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={onChange}
-                className="theme-input"
-                required
-              />
-            </Form.Group>
-
-            <Button variant="primary" className="my-3" type="submit" disabled={isSigningUp}>
-              {isSigningUp ? (
-                <>
-                  <Spinner
-                    as="span"
-                    animation="grow"
-                    size="sm"
-                    role="status"
-                    aria-hidden="true"
+              {userExistAlert && (
+                <div className="modern-alert alert-danger mb-4">
+                  <strong>Account exists:</strong> {alertdata}
+                </div>
+              )}
+              
+              <Form onSubmit={handleSubmit}>
+                <Form.Group className="mb-3" controlId="formName">
+                  <Form.Label className="modern-text fw-medium mb-2">Full Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="name"
+                    placeholder="Enter your full name"
+                    value={formData.name}
+                    onChange={onChange}
+                    className="modern-input"
+                    required
+                    disabled={isSigningUp}
                   />
-                  SigningUp...
-                </>
-              ) : 'Sign Up'}
-            </Button>
-          </Form>
+                </Form.Group>
+
+                <Form.Group className="mb-3" controlId="formEmail">
+                  <Form.Label className="modern-text fw-medium mb-2">Email address</Form.Label>
+                  <Form.Control
+                    type="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    value={formData.email}
+                    onChange={onChange}
+                    className="modern-input"
+                    required
+                    disabled={isSigningUp}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-4" controlId="formPassword">
+                  <Form.Label className="modern-text fw-medium mb-2">Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    name="password"
+                    placeholder="Create a strong password"
+                    value={formData.password}
+                    onChange={onChange}
+                    className="modern-input"
+                    required
+                    disabled={isSigningUp}
+                  />
+                </Form.Group>
+
+                <Button 
+                  type="submit" 
+                  className="modern-btn modern-btn-solid w-100 py-3 mb-4" 
+                  disabled={isSigningUp}
+                >
+                  {isSigningUp ? (
+                    <>
+                      <Spinner
+                        as="span"
+                        animation="grow"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                        className="me-2"
+                      />
+                      Creating Account...
+                    </>
+                  ) : (
+                    <>
+                      <span className="me-2">🎉</span>
+                      Create Account
+                    </>
+                  )}
+                </Button>
+              </Form>
+              
+              <div className="text-center">
+                <p className="modern-text text-muted mb-0">
+                  Already have an account?{' '}
+                  <Link 
+                    to="/login" 
+                    className="text-decoration-none fw-medium"
+                    style={{ color: 'var(--accent-primary)' }}
+                  >
+                    Sign in here
+                  </Link>
+                </p>
+              </div>
+            </Card.Body>
+          </Card>
         </Col>
       </Row>
     </Container>

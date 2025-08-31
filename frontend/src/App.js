@@ -1,4 +1,3 @@
-import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
@@ -15,14 +14,13 @@ function App() {
       <ThemeProvider>
         <NoteState>
           <Router>
-
-            <NavbarComponents />
-
-            <div className='container'>
+            <div className="min-vh-100" style={{ background: 'var(--bg-primary)' }}>
+              <NavbarComponents />
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<LoginForm />} />
                 <Route path="/signup" element={<SignUpForm />} />
+                <Route path="*" element={<Home />} />
               </Routes>
             </div>
           </Router>

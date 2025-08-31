@@ -1,5 +1,5 @@
 import { useContext, useState } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Card } from 'react-bootstrap';
 import noteContext from '../context/notes/noteContext';
 
 const AddNote = () => {
@@ -14,7 +14,6 @@ const AddNote = () => {
   const handleClick = (e) => {
     e.preventDefault();
     addNote(note.title, note.description, note.tag);
-    // Optionally, you can clear the form after submitting
     setNote({
       title: '',
       description: '',
@@ -27,63 +26,109 @@ const AddNote = () => {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault(); 
-    handleClick(e); 
+    e.preventDefault();
+    handleClick(e);
   };
 
+  const tagOptions = [
+    { value: 'Work', label: 'Work', variant: 'primary' },
+    { value: 'Urgent', label: 'Urgent', variant: 'danger' },
+    { value: 'Completed', label: 'Completed', variant: 'success' },
+    { value: 'Important', label: 'Important', variant: 'warning' },
+    { value: 'Personal', label: 'Personal', variant: 'info' },
+  ];
+
   return (
-    <div>
-      <Form onSubmit={handleSubmit}>
-        <Form.Group controlId="formTitle">
-          <Form.Label>Title</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Enter title"
-            name="title"
-            value={note.title}
-            onChange={onChange}
-            className="theme-input"
-            required
-          />
-        </Form.Group>
-
-        <Form.Group controlId="formDescription">
-          <Form.Label>Description</Form.Label>
-          <Form.Control
-            as="textarea"
-            rows={3}
-            placeholder="Enter description"
-            name="description"
-            value={note.description}
-            onChange={onChange}
-            className="theme-input"
-            required
-          />
-        </Form.Group>
-
-        <Form.Group controlId="formTag">
-          <Form.Label>Tag</Form.Label>
-          <Form.Select
-            name="tag"
-            value={note.tag}
-            onChange={onChange}
-            className="theme-input"
-            required
+    <Card className="modern-card-elevated mb-4">
+      <Card.Body className="p-4">
+        <div className="d-flex align-items-center mb-4">
+          <div
+            className="me-3 d-flex align-items-center justify-content-center"
+            style={{
+              width: '48px',
+              height: '48px',
+              background: 'var(--accent-primary)',
+              borderRadius: '12px',
+              fontSize: '1.5rem'
+            }}
           >
-            <option value="">Select tag</option>
-            <option value="Work" style={{ color: '#0d6efd', fontWeight: 'bold' }}>Work</option>
-            <option value="Urgent" style={{ color: '#dc3545', fontWeight: 'bold' }}>Urgent</option>
-            <option value="Completed" style={{ color: '#198754', fontWeight: 'bold' }}>Completed</option>
-            <option value="Important" style={{ color: '#ffc107', fontWeight: 'bold' }}>Important</option>
-            <option value="Personal" style={{ color: '#0dcaf0', fontWeight: 'bold' }}>Personal</option>
-          </Form.Select>
-        </Form.Group>
+            ✨
+          </div>
+          <div>
+            <h4 className="modern-title mb-1">Create New Note</h4>
+            <p className="modern-text text-muted mb-0" style={{ fontSize: '0.9rem' }}>
+              Capture your thoughts and ideas
+            </p>
+          </div>
+        </div>
 
-        <Button  variant="primary" className="mt-4" type="submit">
-          Add Note
-        </Button>
-      </Form>
-    </div>
+        <Form onSubmit={handleSubmit}>
+          <Form.Group className="mb-3" controlId="formTitle">
+            <Form.Label className="modern-text fw-medium mb-2">Title</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Enter a descriptive title..."
+              name="title"
+              value={note.title}
+              onChange={onChange}
+              className="modern-input"
+              required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3" controlId="formDescription">
+            <Form.Label className="modern-text fw-medium mb-2">Description</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={4}
+              placeholder="Write your note content here..."
+              name="description"
+              value={note.description}
+              onChange={onChange}
+              className="modern-input"
+              required
+              style={{ resize: 'vertical', minHeight: '100px' }}
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-4" controlId="formTag">
+            <Form.Label className="modern-text fw-medium mb-2">Category</Form.Label>
+            <Form.Select
+              name="tag"
+              value={note.tag}
+              onChange={onChange}
+              className="modern-input"
+              required
+            >
+              <option value="">Choose a category...</option>
+              {tagOptions.map(option => (
+                <option
+                  key={option.value}
+                  value={option.value}
+                  style={{
+                    fontWeight: '500',
+                    padding: '0.5rem'
+                  }}
+                >
+                  {option.label}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+
+          <div className="d-flex justify-content-end">
+            <Button
+              type="submit"
+              className="modern-btn modern-btn-solid px-4 py-2"
+              disabled={!note.title.trim() || !note.description.trim() || !note.tag}
+            >
+              <span className="me-2">📝</span>
+              Add Note
+            </Button>
+          </div>
+        </Form>
+      </Card.Body>
+    </Card>
   );
 };
 

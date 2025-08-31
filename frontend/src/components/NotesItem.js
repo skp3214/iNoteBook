@@ -1,8 +1,9 @@
 import { useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faTrash, faEdit, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import Card from 'react-bootstrap/Card';
 import Badge from 'react-bootstrap/Badge';
+import Dropdown from 'react-bootstrap/Dropdown';
 import noteContext from '../context/notes/noteContext';
 
 const NotesItem = (props) => {
@@ -22,73 +23,113 @@ const NotesItem = (props) => {
     Important: 'warning',
     Personal: 'info',
   };
-  const badgeColor = tagLabelMap[note.tag];
+  
+  const badgeVariant = tagLabelMap[note.tag] || 'secondary';
   const tagLabel = note.tag || 'No Tag';
 
   return (
-    <Card
-      className={`me-4 border-2 shadow-sm border-${badgeColor} theme-card ${note.isOffline ? 'offline-note' : ''}`}
-      style={{ 
-        width: '18rem',
-        ...(note.isOffline && {
-          borderStyle: 'dashed',
-          opacity: 0.9
-        })
-      }} 
-    >
-      <Card.Header
-        className="border-0 pb-0 d-flex justify-content-between align-items-center"
-        style={{ borderTopLeftRadius: '1rem', borderTopRightRadius: '1rem' }}
-      >
+    <Card className="modern-card fade-in note-card-mobile" style={{ width: '320px', minHeight: '200px' }}>
+      <Card.Header className="border-0 pb-2 d-flex justify-content-between align-items-center bg-transparent">
         <div className="d-flex gap-2 align-items-center">
           {note.tag && tagLabel !== 'No Tag' && (
             <Badge
-              bg={badgeColor}
-              style={{ fontSize: '1em', padding: '0.5em 1em' }}
+              bg={badgeVariant}
+              className="px-2 py-1"
+              style={{ 
+                fontSize: '0.75rem',
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}
             >
               {tagLabel}
             </Badge>
           )}
           {note.isOffline && (
-            <Badge bg="secondary" className="small">
+            <Badge bg="secondary" className="px-2 py-1" style={{ fontSize: '0.7rem' }}>
               Offline
             </Badge>
           )}
         </div>
+        
+        {/* Three-dot dropdown menu */}
+        <Dropdown align="end">
+          <Dropdown.Toggle
+            variant="link"
+            id={`dropdown-${note._id}`}
+            className="p-0 border-0 shadow-none modern-dropdown-toggle"
+            style={{
+              color: 'var(--text-muted)',
+              background: 'transparent'
+            }}
+          >
+            <FontAwesomeIcon
+              icon={faEllipsisV}
+              style={{
+                fontSize: '1rem',
+                cursor: 'pointer'
+              }}
+            />
+          </Dropdown.Toggle>
+
+          <Dropdown.Menu className="modern-dropdown-menu shadow-lg">
+            <Dropdown.Item
+              onClick={() => updateNote(note)}
+              className="modern-dropdown-item d-flex align-items-center"
+            >
+              <FontAwesomeIcon
+                icon={faEdit}
+                className="me-2"
+                style={{ color: 'var(--accent-primary)', fontSize: '0.9rem' }}
+              />
+              Edit Note
+            </Dropdown.Item>
+            <Dropdown.Divider />
+            <Dropdown.Item
+              onClick={handleDeleteClick}
+              className="modern-dropdown-item d-flex align-items-center text-danger"
+            >
+              <FontAwesomeIcon
+                icon={faTrash}
+                className="me-2"
+                style={{ fontSize: '0.9rem' }}
+              />
+              Delete Note
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
       </Card.Header>
-      <Card.Body>
-        <Card.Title className="mb-2" style={{ fontWeight: 600 }}>
+      
+      <Card.Body className="pt-0">
+        <Card.Title className="modern-title h5 mb-3" style={{ 
+          fontWeight: 600,
+          lineHeight: 1.3,
+          color: 'var(--text-primary)'
+        }}>
           {note.title}
         </Card.Title>
-        <Card.Text style={{ minHeight: '60px' }}>{note.description}</Card.Text>
+        <Card.Text className="modern-text" style={{ 
+          minHeight: '60px',
+          color: 'var(--text-secondary)',
+          fontSize: '0.95rem',
+          lineHeight: 1.6
+        }}>
+          {note.description}
+        </Card.Text>
       </Card.Body>
-      <Card.Footer
-        className="border-0 pt-0 d-flex justify-content-between"
-        style={{
-          borderBottomLeftRadius: '1rem',
-          borderBottomRightRadius: '1rem',
-        }}
-      >
-        <FontAwesomeIcon
-          icon={faEdit}
-          style={{
-            color: '#0d6efd',
-            cursor: 'pointer',
-            fontSize: '1.2em',
-          }}
-          onClick={() => updateNote(note)}
-          title="Edit Note"
-        />
-        <FontAwesomeIcon
-          icon={faTrash}
-          style={{
-            color: '#dc3545',
-            cursor: 'pointer',
-            fontSize: '1.2em',
-          }}
-          onClick={handleDeleteClick}
-          title="Delete Note"
-        />
+      
+      <Card.Footer className="border-0 pt-0 d-flex justify-content-between align-items-center bg-transparent">
+        <div className="d-flex gap-2">
+          <small className="text-muted" style={{ fontSize: '0.75rem' }}>
+            {note.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'Today'}
+          </small>
+        </div>
+        
+        {note.isOffline && (
+          <small className="text-warning" style={{ fontSize: '0.7rem', fontWeight: '500' }}>
+            Syncing...
+          </small>
+        )}
       </Card.Footer>
     </Card>
   );

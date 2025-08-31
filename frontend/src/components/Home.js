@@ -1,16 +1,10 @@
 import Notes from './Notes';
 
-
 const Home = () => {
-  
-
   return (
-    <>
-      
-      <div  className="mt-4 container">
-        <Notes />
-      </div>
-    </>
+    <div className="min-vh-100" style={{ background: 'var(--bg-primary)' }}>
+      <Notes />
+    </div>
   );
 };
 

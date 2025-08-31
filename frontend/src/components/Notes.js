@@ -6,6 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import ModalForm from './ModalForm';
 import Spinner from 'react-bootstrap/Spinner';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
 
 const Notes = () => {
   const context = useContext(noteContext);
@@ -107,78 +110,117 @@ const Notes = () => {
   ];
 
   return (
-    <div className='row gap-4'>
-      <AddNote />
-      <ModalForm
-        show={showModal}
-        onClose={handleModalClose}
-        onSubmit={handleClick}
-        modalError={modalError}
-        noteData={notes}
-        onChange={(e) => setNote({ ...notes, [e.target.name]: e.target.value })}
-        uniqueTags={uniqueTags}
-      />
-      <div className='container'>
-        <h2>Your Notes</h2>
-
-        {/* Online/Offline Status Indicator */}
-        <div className='mb-2'>
-          <span className={`badge ${isOnline ? 'bg-success' : 'bg-warning'}`}>
-            {isOnline ? 'Online' : 'Offline Mode'}
-          </span>
-          {!isOnline && (
-            <small className='text-muted ms-2'>
-              Changes will sync when you're back online
-            </small>
-          )}
-        </div>
-
-        <div className='mb-3'>
-          <Form.Control
-            type="text"
-            placeholder="Search notes by title or description..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-10 theme-input"
+    <Container fluid className="px-4 py-3">
+      <Row>
+        <Col lg={10} xl={8} className="mx-auto">
+          <AddNote />
+          
+          <ModalForm
+            show={showModal}
+            onClose={handleModalClose}
+            onSubmit={handleClick}
+            modalError={modalError}
+            noteData={notes}
+            onChange={(e) => setNote({ ...notes, [e.target.name]: e.target.value })}
+            uniqueTags={uniqueTags}
           />
-        </div>
-
-        <div className='mb-3 d-flex flex-wrap gap-2'>
-          <button className={`btn btn-outline-primary btn-sm${filterTag === '' ? ' active' : ''}`} onClick={() => setFilterTag('')}>All</button>
-          {uniqueTags.map(item => (
-            <button
-              key={Object.keys(item)[0]}
-              className={`btn btn-outline-${item[Object.keys(item)[0]]} btn-sm${filterTag === Object.keys(item)[0] ? ' active' : ''}`}
-              onClick={() => setFilterTag(Object.keys(item)[0])}
-            >
-              {Object.keys(item)[0]}
-            </button>
-          ))}
-          <button className='btn btn-outline-secondary btn-sm ms-3' onClick={() => setSortAlpha(a => !a)}>
-            Sort {sortAlpha ? 'A-Z' : 'Z-A'}
-          </button>
-        </div>
-
-        <div className='d-flex py-2 flex-wrap position-relative' style={{ minHeight: '100px' }}>
-          {loading && (
-            <div className="position-absolute w-100 h-100 d-flex justify-content-center align-items-center bg-light bg-opacity-75" style={{ zIndex: 10 }}>
-              <Spinner animation="border" role="status" variant="primary">
-                <span className="visually-hidden">Loading...</span>
-              </Spinner>
-            </div>
-          )}
-
-          {filteredNotes.length === 0 && !loading && 'No Notes to display'}
-          {!loading &&
-            filteredNotes.map((n, idx) => (
-              <div key={n._id || idx} className="m-3">
-                <NotesItem note={n} updateNote={updateNote} />
+          
+          <div className="mb-4">
+            <div className="d-flex align-items-center justify-content-between mb-4">
+              <div>
+                <h2 className="modern-title h3 mb-2">Your Notes</h2>
+                <p className="modern-text text-muted mb-0">
+                  {filteredNotes.length} {filteredNotes.length === 1 ? 'note' : 'notes'} found
+                </p>
               </div>
-            ))
-          }
-        </div>
-      </div>
-    </div>
+              
+              <div className={`modern-status ${isOnline ? 'online' : 'offline'}`}>
+                {isOnline ? 'Online' : 'Offline Mode'}
+              </div>
+            </div>
+
+            {!isOnline && (
+              <div className="modern-alert alert-warning mb-4">
+                <strong>Offline Mode:</strong> Changes will sync when you're back online
+              </div>
+            )}
+
+            <div className="modern-search mb-4">
+              <Form.Control
+                type="text"
+                placeholder="Search notes by title or description..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="modern-input"
+              />
+            </div>
+
+            <div className="filter-section">
+              <div className="d-flex align-items-center justify-content-between mb-3">
+                <span className="modern-text fw-medium">Filter by category:</span>
+                <button 
+                  className='modern-filter-btn' 
+                  onClick={() => setSortAlpha(a => !a)}
+                >
+                  Sort {sortAlpha ? 'A-Z' : 'Z-A'}
+                </button>
+              </div>
+              
+              <Row className="g-2">
+                <Col xs={6} sm={4} md={3} lg={2}>
+                  <button 
+                    className={`modern-filter-btn w-100 ${filterTag === '' ? 'active' : ''}`} 
+                    onClick={() => setFilterTag('')}
+                  >
+                    All
+                  </button>
+                </Col>
+                {uniqueTags.map(item => (
+                  <Col xs={6} sm={4} md={3} lg={2} key={Object.keys(item)[0]}>
+                    <button
+                      className={`modern-filter-btn w-100 ${filterTag === Object.keys(item)[0] ? 'active' : ''}`}
+                      onClick={() => setFilterTag(Object.keys(item)[0])}
+                    >
+                      {Object.keys(item)[0]}
+                    </button>
+                  </Col>
+                ))}
+              </Row>
+            </div>
+
+            <div className="position-relative" style={{ minHeight: '200px' }}>
+              {loading && (
+                <div className="position-absolute w-100 h-100 d-flex justify-content-center align-items-center bg-light bg-opacity-75 rounded" style={{ zIndex: 10 }}>
+                  <Spinner animation="border" role="status" className="modern-spinner">
+                    <span className="visually-hidden">Loading...</span>
+                  </Spinner>
+                </div>
+              )}
+
+              {filteredNotes.length === 0 && !loading && (
+                <div className="text-center py-5">
+                  <div className="mb-3" style={{ fontSize: '3rem', opacity: 0.3 }}>📝</div>
+                  <h5 className="modern-title text-muted">No Notes Found</h5>
+                  <p className="modern-text text-muted">
+                    {searchQuery || filterTag ? 'Try adjusting your search or filter' : 'Create your first note to get started'}
+                  </p>
+                </div>
+              )}
+              
+              {!loading && filteredNotes.length > 0 && (
+                <div className="modern-grid">
+                  {filteredNotes.map((n, idx) => (
+                    <div key={n._id || idx} className="fade-in">
+                      <NotesItem note={n} updateNote={updateNote} />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
