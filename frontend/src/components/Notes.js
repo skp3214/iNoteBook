@@ -159,32 +159,53 @@ const Notes = () => {
               <div className="d-flex align-items-center justify-content-between mb-3">
                 <span className="modern-text fw-medium">Filter by category:</span>
                 <button 
-                  className='modern-filter-btn' 
+                  className='gradient-filter-btn sort-btn' 
                   onClick={() => setSortAlpha(a => !a)}
                 >
                   Sort {sortAlpha ? 'A-Z' : 'Z-A'}
                 </button>
               </div>
               
-              <Row className="g-2">
+              <Row className="g-3">
                 <Col xs={6} sm={4} md={3} lg={2}>
                   <button 
-                    className={`modern-filter-btn w-100 ${filterTag === '' ? 'active' : ''}`} 
+                    className={`gradient-filter-btn w-100 ${filterTag === '' ? 'active' : ''}`} 
                     onClick={() => setFilterTag('')}
+                    style={{
+                      background: filterTag === '' ? 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' : 'linear-gradient(135deg, #374151 0%, #1f2937 100%)',
+                      border: `2px solid ${filterTag === '' ? '#3b82f6' : '#4b5563'}`
+                    }}
                   >
                     All
                   </button>
                 </Col>
-                {uniqueTags.map(item => (
-                  <Col xs={6} sm={4} md={3} lg={2} key={Object.keys(item)[0]}>
-                    <button
-                      className={`modern-filter-btn w-100 ${filterTag === Object.keys(item)[0] ? 'active' : ''}`}
-                      onClick={() => setFilterTag(Object.keys(item)[0])}
-                    >
-                      {Object.keys(item)[0]}
-                    </button>
-                  </Col>
-                ))}
+                {uniqueTags.map(item => {
+                  const tagName = Object.keys(item)[0];
+                  const tagColors = {
+                    Work: { gradient: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)', border: '#3b82f6' },
+                    Urgent: { gradient: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)', border: '#ef4444' },
+                    Completed: { gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', border: '#10b981' },
+                    Important: { gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)', border: '#f59e0b' },
+                    Personal: { gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)', border: '#06b6d4' },
+                  };
+                  const tagStyle = tagColors[tagName] || { gradient: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)', border: '#6b7280' };
+                  const isActive = filterTag === tagName;
+                  
+                  return (
+                    <Col xs={6} sm={4} md={3} lg={2} key={tagName}>
+                      <button
+                        className={`gradient-filter-btn w-100 ${isActive ? 'active' : ''}`}
+                        onClick={() => setFilterTag(tagName)}
+                        style={{
+                          background: isActive ? tagStyle.gradient : 'linear-gradient(135deg, #374151 0%, #1f2937 100%)',
+                          border: `2px solid ${isActive ? tagStyle.border : '#4b5563'}`
+                        }}
+                      >
+                        {tagName}
+                      </button>
+                    </Col>
+                  );
+                })}
               </Row>
             </div>
 

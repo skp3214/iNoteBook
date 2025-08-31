@@ -321,7 +321,6 @@ body {
 }
 
 .modern-search::before {
-  content: "🔍";
   position: absolute;
   left: 1rem;
   top: 50%;
@@ -549,6 +548,7 @@ body {
   gap: 2rem;
   padding: 1rem 0;
   justify-items: center;
+  place-items: center;
 }
 
 /* Loading Spinner */
@@ -686,6 +686,94 @@ body {
   }
 }
 
+/* Gradient Note Card Styling */
+.gradient-card-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.gradient-note-card {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.gradient-note-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.gradient-dropdown-toggle:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  transform: scale(1.05);
+}
+
+.gradient-dropdown-toggle:focus {
+  box-shadow: none !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.gradient-dropdown-toggle::after {
+  display: none;
+}
+
+.gradient-dropdown-toggle-footer:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  transform: scale(1.1);
+}
+
+.gradient-dropdown-toggle-footer:focus {
+  box-shadow: none !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.gradient-dropdown-toggle-footer::after {
+  display: none;
+}
+
+/* Gradient Filter Buttons */
+.gradient-filter-btn {
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: white;
+  text-align: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.gradient-filter-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.gradient-filter-btn.sort-btn {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  border: 2px solid #6b7280;
+  min-width: 120px;
+}
+
+.gradient-filter-btn.sort-btn:hover {
+  background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+  border-color: #9ca3af;
+}
+
 /* Mobile Note Card Centering */
 .note-card-mobile {
   margin: 0 auto;
@@ -697,7 +785,17 @@ body {
     grid-template-columns: 1fr;
     gap: 1.5rem;
     justify-items: center;
+    place-items: center;
     padding: 1rem;
+  }
+  
+  .gradient-card-container {
+    width: min(320px, calc(100vw - 2rem));
+    max-width: 320px;
+  }
+  
+  .gradient-note-card {
+    width: 100%;
   }
   
   .modern-card {
@@ -735,6 +833,11 @@ body {
     min-height: 36px;
   }
   
+  .gradient-card-container {
+    width: calc(100vw - 1rem);
+    max-width: 320px;
+  }
+  
   .modern-card {
     width: calc(100vw - 1rem);
     max-width: 320px;
@@ -743,6 +846,19 @@ body {
   .note-card-mobile {
     width: calc(100vw - 1rem);
     max-width: 320px;
+  }
+}
+
+/* Additional Mobile Centering */
+@media (max-width: 480px) {
+  .modern-grid {
+    padding: 0.5rem;
+    gap: 1rem;
+  }
+  
+  .gradient-card-container {
+    width: calc(100vw - 1rem);
+    max-width: 300px;
   }
 }
 

@@ -62,18 +62,6 @@ const SignUpForm = () => {
           <Card className="modern-card-elevated">
             <Card.Body className="p-5">
               <div className="text-center mb-4">
-                <div 
-                  className="mx-auto mb-3 d-flex align-items-center justify-content-center"
-                  style={{
-                    width: '64px',
-                    height: '64px',
-                    background: 'var(--accent-secondary)',
-                    borderRadius: '16px',
-                    fontSize: '2rem'
-                  }}
-                >
-                  ✨
-                </div>
                 <h3 className="modern-title mb-2">Create Account</h3>
                 <p className="modern-text text-muted">
                   Join iNoteBook to start organizing your thoughts
@@ -148,7 +136,6 @@ const SignUpForm = () => {
                     </>
                   ) : (
                     <>
-                      <span className="me-2">🎉</span>
                       Create Account
                     </>
                   )}

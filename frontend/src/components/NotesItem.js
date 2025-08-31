@@ -16,122 +16,176 @@ const NotesItem = (props) => {
     deleteNote(note._id);
   };
 
-  const tagLabelMap = {
-    Work: 'primary',
-    Urgent: 'danger',
-    Completed: 'success',
-    Important: 'warning',
-    Personal: 'info',
+  const tagColorMap = {
+    Work: {
+      borderColor: '#3b82f6',
+      badgeVariant: 'primary',
+      gradient: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%)'
+    },
+    Urgent: {
+      borderColor: '#ef4444',
+      badgeVariant: 'danger',
+      gradient: 'linear-gradient(135deg, #991b1b 0%, #dc2626 50%, #ef4444 100%)'
+    },
+    Completed: {
+      borderColor: '#10b981',
+      badgeVariant: 'success',
+      gradient: 'linear-gradient(135deg, #065f46 0%, #059669 50%, #10b981 100%)'
+    },
+    Important: {
+      borderColor: '#f59e0b',
+      badgeVariant: 'warning',
+      gradient: 'linear-gradient(135deg, #92400e 0%, #d97706 50%, #f59e0b 100%)'
+    },
+    Personal: {
+      borderColor: '#06b6d4',
+      badgeVariant: 'info',
+      gradient: 'linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #06b6d4 100%)'
+    },
   };
   
-  const badgeVariant = tagLabelMap[note.tag] || 'secondary';
+  const tagInfo = tagColorMap[note.tag] || {
+    borderColor: '#6b7280',
+    badgeVariant: 'secondary',
+    gradient: 'linear-gradient(135deg, #374151 0%, #4b5563 50%, #6b7280 100%)'
+  };
+  
   const tagLabel = note.tag || 'No Tag';
 
   return (
-    <Card className="modern-card fade-in note-card-mobile" style={{ width: '320px', minHeight: '200px' }}>
-      <Card.Header className="border-0 pb-2 d-flex justify-content-between align-items-center bg-transparent">
-        <div className="d-flex gap-2 align-items-center">
-          {note.tag && tagLabel !== 'No Tag' && (
-            <Badge
-              bg={badgeVariant}
-              className="px-2 py-1"
+    <div className="gradient-card-container">
+      <Card 
+        className="gradient-note-card"
+        style={{ 
+          background: tagInfo.gradient,
+          border: `2px solid ${tagInfo.borderColor}`,
+          borderRadius: '16px',
+          width: '100%',
+          maxWidth: '320px',
+          minHeight: '200px',
+          position: 'relative',
+          overflow: 'hidden'
+        }}
+      >
+        <Card.Body className="d-flex flex-column justify-content-between h-100 p-4" style={{ paddingTop: '24px' }}>
+          <div>
+            <Card.Title 
+              className="text-white mb-3" 
               style={{ 
-                fontSize: '0.75rem',
-                fontWeight: '600',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px'
+                fontFamily: 'Poppins, sans-serif',
+                fontWeight: 600,
+                fontSize: '1.25rem',
+                lineHeight: 1.3
               }}
             >
-              {tagLabel}
-            </Badge>
-          )}
-          {note.isOffline && (
-            <Badge bg="secondary" className="px-2 py-1" style={{ fontSize: '0.7rem' }}>
-              Offline
-            </Badge>
-          )}
-        </div>
-        
-        {/* Three-dot dropdown menu */}
-        <Dropdown align="end">
-          <Dropdown.Toggle
-            variant="link"
-            id={`dropdown-${note._id}`}
-            className="p-0 border-0 shadow-none modern-dropdown-toggle"
-            style={{
-              color: 'var(--text-muted)',
-              background: 'transparent'
-            }}
-          >
-            <FontAwesomeIcon
-              icon={faEllipsisV}
-              style={{
-                fontSize: '1rem',
-                cursor: 'pointer'
+              {note.title}
+            </Card.Title>
+            <Card.Text 
+              className="text-white mb-4" 
+              style={{ 
+                opacity: 0.9,
+                fontSize: '0.95rem',
+                lineHeight: 1.6,
+                minHeight: '60px'
               }}
-            />
-          </Dropdown.Toggle>
+            >
+              {note.description}
+            </Card.Text>
+          </div>
+          
+          <div className="d-flex justify-content-between align-items-center mt-auto">
+            <div className="d-flex align-items-center gap-2">
+              {note.tag && tagLabel !== 'No Tag' && (
+                <Badge
+                  bg={tagInfo.badgeVariant}
+                  className="px-2 py-1"
+                  style={{ 
+                    fontSize: '0.7rem',
+                    fontWeight: '600',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.5px',
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    color: 'white',
+                    border: '1px solid rgba(255, 255, 255, 0.3)'
+                  }}
+                >
+                  {tagLabel}
+                </Badge>
+              )}
+              {note.isOffline && (
+                <Badge 
+                  className="px-2 py-1" 
+                  style={{ 
+                    fontSize: '0.65rem',
+                    background: 'rgba(245, 158, 11, 0.2)',
+                    color: '#fbbf24',
+                    border: '1px solid rgba(245, 158, 11, 0.3)'
+                  }}
+                >
+                  Offline
+                </Badge>
+              )}
+            </div>
+            
+            {/* Three-dot dropdown menu moved to bottom-right */}
+            <Dropdown align="end">
+              <Dropdown.Toggle
+                variant="link"
+                id={`dropdown-${note._id}`}
+                className="p-0 border-0 shadow-none gradient-dropdown-toggle-footer"
+                style={{
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                <FontAwesomeIcon
+                  icon={faEllipsisV}
+                  style={{
+                    fontSize: '12px',
+                    cursor: 'pointer'
+                  }}
+                />
+              </Dropdown.Toggle>
 
-          <Dropdown.Menu className="modern-dropdown-menu shadow-lg">
-            <Dropdown.Item
-              onClick={() => updateNote(note)}
-              className="modern-dropdown-item d-flex align-items-center"
-            >
-              <FontAwesomeIcon
-                icon={faEdit}
-                className="me-2"
-                style={{ color: 'var(--accent-primary)', fontSize: '0.9rem' }}
-              />
-              Edit Note
-            </Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item
-              onClick={handleDeleteClick}
-              className="modern-dropdown-item d-flex align-items-center text-danger"
-            >
-              <FontAwesomeIcon
-                icon={faTrash}
-                className="me-2"
-                style={{ fontSize: '0.9rem' }}
-              />
-              Delete Note
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
-      </Card.Header>
-      
-      <Card.Body className="pt-0">
-        <Card.Title className="modern-title h5 mb-3" style={{ 
-          fontWeight: 600,
-          lineHeight: 1.3,
-          color: 'var(--text-primary)'
-        }}>
-          {note.title}
-        </Card.Title>
-        <Card.Text className="modern-text" style={{ 
-          minHeight: '60px',
-          color: 'var(--text-secondary)',
-          fontSize: '0.95rem',
-          lineHeight: 1.6
-        }}>
-          {note.description}
-        </Card.Text>
-      </Card.Body>
-      
-      <Card.Footer className="border-0 pt-0 d-flex justify-content-between align-items-center bg-transparent">
-        <div className="d-flex gap-2">
-          <small className="text-muted" style={{ fontSize: '0.75rem' }}>
-            {note.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'Today'}
-          </small>
-        </div>
-        
-        {note.isOffline && (
-          <small className="text-warning" style={{ fontSize: '0.7rem', fontWeight: '500' }}>
-            Syncing...
-          </small>
-        )}
-      </Card.Footer>
-    </Card>
+              <Dropdown.Menu className="modern-dropdown-menu shadow-lg">
+                <Dropdown.Item
+                  onClick={() => updateNote(note)}
+                  className="modern-dropdown-item d-flex align-items-center"
+                >
+                  <FontAwesomeIcon
+                    icon={faEdit}
+                    className="me-2"
+                    style={{ color: 'var(--accent-primary)', fontSize: '0.9rem' }}
+                  />
+                  Edit Note
+                </Dropdown.Item>
+                <Dropdown.Divider />
+                <Dropdown.Item
+                  onClick={handleDeleteClick}
+                  className="modern-dropdown-item d-flex align-items-center text-danger"
+                >
+                  <FontAwesomeIcon
+                    icon={faTrash}
+                    className="me-2"
+                    style={{ fontSize: '0.9rem' }}
+                  />
+                  Delete Note
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
+        </Card.Body>
+      </Card>
+    </div>
   );
 };
 

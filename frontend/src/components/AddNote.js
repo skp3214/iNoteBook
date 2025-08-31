@@ -42,18 +42,7 @@ const AddNote = () => {
     <Card className="modern-card-elevated mb-4">
       <Card.Body className="p-4">
         <div className="d-flex align-items-center mb-4">
-          <div
-            className="me-3 d-flex align-items-center justify-content-center"
-            style={{
-              width: '48px',
-              height: '48px',
-              background: 'var(--accent-primary)',
-              borderRadius: '12px',
-              fontSize: '1.5rem'
-            }}
-          >
-            ✨
-          </div>
+          
           <div>
             <h4 className="modern-title mb-1">Create New Note</h4>
             <p className="modern-text text-muted mb-0" style={{ fontSize: '0.9rem' }}>
@@ -122,7 +111,6 @@ const AddNote = () => {
               className="modern-btn modern-btn-solid px-4 py-2"
               disabled={!note.title.trim() || !note.description.trim() || !note.tag}
             >
-              <span className="me-2">📝</span>
               Add Note
             </Button>
           </div>
