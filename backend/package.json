@@ -9,6 +9,7 @@
   "author": "sachin",
   "license": "ISC",
   "dependencies": {
+    "@google/genai": "^0.7.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",

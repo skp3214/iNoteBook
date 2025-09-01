@@ -33,6 +33,7 @@ app.options('*', cors());
 // Routes
 app.use('/api/auth', require('./routes/auth.js'));
 app.use('/api/notes', require('./routes/notes.js'));
+app.use('/api/ai-agent', require('./routes/ai-agent.js'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

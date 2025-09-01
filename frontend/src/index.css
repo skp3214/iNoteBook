@@ -957,3 +957,173 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
+
+/* Modern AI Chat Specific Styles */
+.ai-chat-modern {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: var(--border-radius-xl);
+  box-shadow: var(--shadow-xl);
+  transition: var(--transition);
+}
+
+.ai-chat-modern:hover {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.message-bubble-user {
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.message-bubble-ai {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow);
+}
+
+.message-bubble-error {
+  background: linear-gradient(135deg, var(--danger), #dc2626);
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+}
+
+.chat-input-modern {
+  background: var(--bg-tertiary) !important;
+  border: 2px solid var(--border-light) !important;
+  border-radius: var(--border-radius) !important;
+  color: var(--text-primary) !important;
+  transition: var(--transition) !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.chat-input-modern:focus {
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+  transform: translateY(-1px);
+}
+
+.chat-send-btn {
+  background: var(--accent-primary) !important;
+  border: none !important;
+  color: white !important;
+  border-radius: 50% !important;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition) !important;
+  box-shadow: var(--shadow);
+}
+
+.chat-send-btn:hover:not(:disabled) {
+  background: var(--accent-hover) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.chat-send-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Responsive Design for AI Chat */
+@media (max-width: 768px) {
+  .ai-chat-modern {
+    margin: 5px !important;
+    height: calc(100vh - 10px) !important;
+    max-height: 85vh !important;
+    border-radius: var(--border-radius) !important;
+  }
+  
+  .message-bubble-user,
+  .message-bubble-ai,
+  .message-bubble-error {
+    max-width: 95% !important;
+    font-size: 0.8rem !important;
+    padding: 0.625rem 0.875rem !important;
+    line-height: 1.4 !important;
+  }
+  
+  .chat-input-modern {
+    font-size: 0.8rem !important; /* Prevents zoom on iOS */
+    padding: 0.5rem 0.75rem !important;
+  }
+  
+  .chat-send-btn {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+  }
+  
+  /* More compact spacing for mobile */
+  .ai-chat-modern .modern-title {
+    font-size: 0.9rem !important;
+  }
+  
+  /* Reduce all margins and padding for mobile */
+  .ai-chat-modern > div {
+    padding: 0.5rem 0.75rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .ai-chat-modern {
+    margin: 2px !important;
+    height: calc(100vh - 4px) !important;
+    max-height: 90vh !important;
+  }
+  
+  .message-bubble-user,
+  .message-bubble-ai,
+  .message-bubble-error {
+    font-size: 0.75rem !important;
+    padding: 0.5rem 0.75rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .chat-input-modern {
+    font-size: 0.75rem !important;
+    min-height: 36px !important;
+    padding: 0.4rem 0.6rem !important;
+  }
+  
+  .chat-send-btn {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+  }
+}
+
+/* Animation keyframes */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slideInUp 0.4s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 1.5s infinite;
+}

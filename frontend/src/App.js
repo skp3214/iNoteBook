@@ -7,6 +7,7 @@ import NoteState from './context/notes/NoteState';
 import ThemeProvider from './context/theme/ThemeProvider';
 import LoginForm from './pages/LoginForm';
 import SignUpForm from './pages/SignUpForm';
+import AiAssistant from './pages/AiAssistant';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
               <NavbarComponents />
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/ai-assistant" element={<AiAssistant />} />
                 <Route path="/login" element={<LoginForm />} />
                 <Route path="/signup" element={<SignUpForm />} />
                 <Route path="*" element={<Home />} />

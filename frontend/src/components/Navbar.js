@@ -1,6 +1,7 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
+import Nav from 'react-bootstrap/Nav';
 import { useTheme } from '../context/theme/ThemeContext';
 import icon from '../asset/inotebookicon.png';
 import Button from 'react-bootstrap/Button';
@@ -8,6 +9,7 @@ import Button from 'react-bootstrap/Button';
 function NavbarComponents() {
   const { isDarkMode, toggleTheme } = useTheme();
   const token = localStorage.getItem('token');
+  const location = useLocation();
 
   let navigate = useNavigate();
   
@@ -34,6 +36,27 @@ function NavbarComponents() {
         <Navbar.Toggle aria-controls="basic-navbar-nav" className="modern-navbar-toggle" />
         
         <Navbar.Collapse id="basic-navbar-nav">
+          {token && (
+            <Nav className="me-auto">
+              <Nav.Link 
+                as={Link} 
+                to="/" 
+                className={location.pathname === '/' ? 'active' : ''}
+              >
+                <i className="fas fa-home me-1"></i>
+                Home
+              </Nav.Link>
+              <Nav.Link 
+                as={Link} 
+                to="/ai-assistant" 
+                className={location.pathname === '/ai-assistant' ? 'active' : ''}
+              >
+                <i className="fas fa-robot me-1"></i>
+                AI Assistant
+              </Nav.Link>
+            </Nav>
+          )}
+          
           <div className="ms-auto d-flex align-items-center gap-3">
             <button 
               className="theme-toggle" 
