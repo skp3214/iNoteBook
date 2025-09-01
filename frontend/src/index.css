@@ -17,7 +17,7 @@
   --warning: #f59e0b;
   --danger: #ef4444;
   --info: #06b6d4;
-  --border-light: #e2e8f0;
+  --border-light: #000000;
   --border-medium: #cbd5e1;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -32,7 +32,7 @@
 [data-bs-theme="dark"] {
   --bg-primary: #000000;
   --bg-secondary: #0a0a0a;
-  --bg-tertiary: #171717;
+  --bg-tertiary: #030303;
   --bg-elevated: #262626;
   --text-primary: #ffffff;
   --text-secondary: #d4d4d8;
@@ -40,7 +40,7 @@
   --accent-primary: #3b82f6;
   --accent-secondary: #6366f1;
   --accent-hover: #2563eb;
-  --border-light: #404040;
+  --border-light: #ffffff;
   --border-medium: #525252;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.8);
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
@@ -123,7 +123,7 @@ body {
 /* Modern Form Controls */
 .modern-input {
   background: var(--bg-tertiary) !important;
-  border: 2px solid var(--border-light) !important;
+  border: 1px solid var(--border-light) !important;
   border-radius: var(--border-radius) !important;
   color: var(--text-primary) !important;
   font-family: 'Inter', sans-serif;
@@ -317,7 +317,7 @@ body {
 .modern-search input {
   padding-left: 3rem !important;
   background: var(--bg-secondary) !important;
-  border: 2px solid transparent !important;
+  border: 2px solid var(--border-light) !important;
 }
 
 .modern-search::before {
@@ -544,7 +544,7 @@ body {
 /* Modern Grid Layout */
 .modern-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 2rem;
   padding: 1rem 0;
   justify-items: center;

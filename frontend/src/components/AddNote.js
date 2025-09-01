@@ -69,7 +69,7 @@ const AddNote = () => {
             <Form.Label className="modern-text fw-medium mb-2">Description</Form.Label>
             <Form.Control
               as="textarea"
-              rows={4}
+              rows={2}
               placeholder="Write your note content here..."
               name="description"
               value={note.description}
