@@ -2,11 +2,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import NavbarComponents from './components/Navbar';
-import Home from './components/Home';
+import Home from './pages/Home';
 import NoteState from './context/notes/NoteState';
 import ThemeProvider from './context/theme/ThemeProvider';
-import LoginForm from './components/LoginForm';
-import SignUpForm from './components/SignUpForm';
+import LoginForm from './pages/LoginForm';
+import SignUpForm from './pages/SignUpForm';
 
 function App() {
   return (

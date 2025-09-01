@@ -42,7 +42,6 @@ const AddNote = () => {
     <Card className="modern-card-elevated mb-4">
       <Card.Body className="p-4">
         <div className="d-flex align-items-center mb-4">
-          
           <div>
             <h4 className="modern-title mb-1">Create New Note</h4>
             <p className="modern-text text-muted mb-0" style={{ fontSize: '0.9rem' }}>
