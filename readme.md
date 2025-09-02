@@ -15,7 +15,11 @@
 
 iNotebook is a next-generation note management application that combines traditional note-taking with cutting-edge AI technology. Built with a completely decoupled architecture, it showcases modern web development practices while providing an intuitive, feature-rich experience for users to manage their digital notes efficiently.
 
-https://github.com/user-attachments/assets/afa0ee96-9d1d-4a46-b459-b64ad3e5dcdb
+
+
+https://github.com/user-attachments/assets/e08d49a7-bc7f-43e6-87a3-3f56f9650d5e
+
+
 
 ## 🌟 Latest Features & Updates
 
@@ -88,7 +92,10 @@ https://github.com/user-attachments/assets/afa0ee96-9d1d-4a46-b459-b64ad3e5dcdb
 
 <div align="center">
 
-![Application Interface](https://github.com/user-attachments/assets/ef627bcb-67ca-4261-8fd3-d41d6b43785b)
+<img width="2848" height="2927" alt="image" src="https://github.com/user-attachments/assets/198ec6a5-5ca5-47f8-9b70-c8d33f75ae72" />
+
+<img width="2848" height="1603" alt="image" src="https://github.com/user-attachments/assets/2b4ef307-e439-4507-9565-df1a259f13ce" />
+
 
 *Clean and intuitive user interface with modern glassmorphism design*
 
