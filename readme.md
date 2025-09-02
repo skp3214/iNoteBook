@@ -23,12 +23,18 @@ https://github.com/user-attachments/assets/e08d49a7-bc7f-43e6-87a3-3f56f9650d5e
 
 ## 🌟 Latest Features & Updates
 
+### 🎤 Speech Recognition Feature
+- **Voice-to-Text Conversion** - Convert spoken words directly into note content
+- **Real-time Speech Processing** - Live transcription with instant feedback
+- **Multi-language Support** - Support for multiple languages and accents
+- **Voice Commands** - Control note operations using voice commands
+- **Hands-free Note Taking** - Create and edit notes without typing
+
 ### 🤖 AI-Powered Note Assistant
 - **Natural Language Processing** - Interact with your notes using conversational AI
 - **Smart CRUD Operations** - Create, read, update, and delete notes through AI chat
 - **Intelligent Search** - AI-powered note discovery and content analysis
 - **Google Gemini Integration** - Powered by Google's advanced AI technology
-- **Conversational Interface** - Chat-based UI with typing indicators and suggestions
 
 ### 🏷️ Advanced Tag Management System
 - **Dynamic Tag Assignment** - Organize notes with customizable tags (Work, Urgent, Personal, Important, Completed)
@@ -51,9 +57,7 @@ https://github.com/user-attachments/assets/e08d49a7-bc7f-43e6-87a3-3f56f9650d5e
 
 ### ⚡ Enhanced User Experience
 - **Loading Spinners** - Beautiful loading indicators for login/signup processes
-- **Modern Glassmorphism UI** - Contemporary design with glass-like effects and gradients
 - **Responsive Animations** - Smooth transitions and micro-interactions
-- **Improved Performance** - Optimized rendering and state management
 - **Advanced Search & Filter** - Powerful search functionality with real-time filtering
 
 ### ✨ Core Highlights
@@ -74,6 +78,7 @@ https://github.com/user-attachments/assets/e08d49a7-bc7f-43e6-87a3-3f56f9650d5e
 - **Context API** - State management
 - **FontAwesome** - Icon library for modern UI
 - **Service Workers** - For offline functionality
+- **Web Speech API** - For speech recognition capabilities
 
 ### Backend  
 - **Node.js** - JavaScript runtime environment
@@ -100,47 +105,6 @@ https://github.com/user-attachments/assets/e08d49a7-bc7f-43e6-87a3-3f56f9650d5e
 *Clean and intuitive user interface with modern glassmorphism design*
 
 </div>
-
-## 🏗️ Project Architecture
-
-```
-inotebook/
-│
-├── 🖥️ backend/                 # Node.js/Express API Server
-│   ├── 🤖 ai-agent/            # AI-powered note assistant
-│   ├── 🎯 controller/          # Request handlers & business logic
-│   ├── 🗄️ dao/                 # Data Access Objects  
-│   ├── 🔒 middleware/          # Authentication & validation
-│   ├── 📋 models/              # MongoDB/Mongoose schemas
-│   ├── 🛣️ routes/              # API route definitions (including AI routes)
-│   ├── ⚙️ services/            # Business logic layer
-│   ├── 🔧 .env                 # Environment variables
-│   ├── 🌐 db.js                # Database connection
-│   ├── 🚀 index.js             # Application entry point
-│   └── 📦 package.json         # Dependencies & scripts
-│
-├── 🎨 frontend/                # React.js Client Application  
-│   ├── 🧩 src/components/      # Reusable React components
-│   │   ├── AiChat.js          # AI chat interface
-│   │   ├── NotesItem.js       # Enhanced notes with tags
-│   │   └── ModalForm.js       # Modern modal forms
-│   ├── 🏪 src/context/         # Context API for state management
-│   │   ├── notes/             # Notes context with offline support
-│   │   └── theme/             # Theme context for dark mode
-│   ├── 📄 src/pages/           # Application pages
-│   │   ├── AiAssistant.js     # AI chat page
-│   │   ├── Home.js            # Enhanced home with filters
-│   │   ├── LoginForm.js       # Login with spinners
-│   │   └── SignUpForm.js      # Signup with spinners
-│   ├── 🔧 src/utils/           # Utility functions
-│   │   ├── offlineUtils.js    # Offline functionality
-│   │   └── sw.js              # Service worker
-│   ├── 🎭 public/              # Static assets
-│   ├── 🔧 .env                 # Frontend environment variables
-│   └── 📦 package.json         # Dependencies & scripts
-│
-└── 📖 README.md               # Project documentation
-```
 
 ## ⚡ Quick Start
 
@@ -207,35 +171,6 @@ inotebook/
    
    🎉 Frontend application running on `http://localhost:3000`
 
-## 🔐 Environment Variables
-
-### Backend (.env)
-```env
-# Database Configuration
-MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database
-
-# Authentication
-JWT_SECRET=your-super-secret-jwt-key-here
-
-# AI Configuration
-GOOGLE_AI_API_KEY=your-google-ai-api-key
-
-# Server Configuration  
-PORT=5000
-NODE_ENV=development
-
-# CORS Configuration
-ALLOWED_ORIGINS=http://localhost:3000,https://yourdomain.com
-```
-
-### Frontend (.env)
-```env
-# API Configuration
-REACT_APP_API_BASE_URL=http://localhost:5000
-
-# Environment
-NODE_ENV=development
-```
 
 ## 📋 API Endpoints
 
@@ -252,49 +187,6 @@ NODE_ENV=development
 
 ### 🤖 AI Assistant Routes
 - `POST /api/ai-agent/chat` - Chat with AI for note operations (Protected)
-
-## 🎯 Features
-
-### 👤 User Management
-- **Secure Registration** - Email validation and password hashing with loading spinners
-- **JWT Authentication** - Token-based session management
-- **Protected Routes** - Middleware-based route protection
-- **Enhanced UI** - Modern glassmorphism design with smooth animations
-
-### 📝 Advanced Note Management
-- **CRUD Operations** - Complete note lifecycle management
-- **AI-Powered Operations** - Natural language note management
-- **Tag System** - Organize notes with color-coded custom tags
-- **Advanced Search & Filter** - Real-time search with tag-based filtering
-- **Offline Support** - Create and manage notes without internet
-- **Real-time Updates** - Instant UI synchronization
-
-### 🎨 Modern User Interface
-- **Glassmorphism Design** - Contemporary glass-like effects
-- **Dark/Light Mode** - Theme switching with system preference detection
-- **Responsive Design** - Mobile-friendly interface
-- **Loading States** - Beautiful spinners and loading indicators
-- **Smooth Animations** - Micro-interactions and transitions
-
-### 🤖 AI Features
-- **Conversational Interface** - Chat-based note management
-- **Natural Language Processing** - Understand user intents
-- **Smart Suggestions** - AI-powered note recommendations
-- **Context Awareness** - Maintains conversation context
-
-### 🛡️ Security Features
-- **Password Hashing** - bcrypt with salt rounds
-- **JWT Tokens** - Secure stateless authentication
-- **Environment Variables** - Sensitive data protection
-- **CORS Configuration** - Cross-origin request security
-- **Input Validation** - Server-side data validation
-
-### 📱 Offline Capabilities
-- **Local Storage** - Efficient offline data persistence
-- **Sync Management** - Automatic synchronization when online
-- **Network Detection** - Smart connectivity handling
-- **Pending Actions** - Queue offline operations for later sync
-
 
 ## 🤝 Contributing
 
@@ -314,15 +206,6 @@ We welcome contributions! Please follow these steps:
    git push origin feature/amazing-feature
    ```
 5. **Open a Pull Request**
-
-
-## 🙏 Acknowledgments
-
-- **CodeWithHarry** - Original inspiration and tutorial guidance
-- **Google Gemini AI** - AI-powered note assistance
-- **MongoDB** - Database technology
-- **Vercel** - Hosting and deployment platform
-
 
 ## 📞 Contact & Support
 
