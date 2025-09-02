@@ -308,7 +308,7 @@ const AiChat = () => {
     return (
         <Container fluid className="d-flex flex-column" style={{
             height: '100vh',
-            maxHeight: window.innerWidth <= 768 ? '70vh' : '750px',
+            maxHeight: window.innerWidth <= 768 ? '90vh' : '770px',
             margin: window.innerWidth <= 768 ? '10px' : '20px',
             overflow: 'hidden'
         }}>
