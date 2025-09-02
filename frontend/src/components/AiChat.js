@@ -49,7 +49,7 @@ const AiChat = () => {
             timestamp: new Date()
         };
 
-        console.log('Adding user message to chat:', userMessage);
+        console.log('Adding user message to chat');
         setMessages(prev => [...prev, userMessage]);
         setIsLoading(true);
 
@@ -65,7 +65,7 @@ const AiChat = () => {
             });
 
             const data = await response.json();
-            console.log('API response:', data);
+            console.log('API response');
 
             if (data.success) {
                 const aiMessage = {
@@ -74,7 +74,7 @@ const AiChat = () => {
                     sender: 'ai',
                     timestamp: new Date()
                 };
-                console.log('Adding AI response to chat:', aiMessage);
+                console.log('Adding AI response to chat');
                 setMessages(prev => [...prev, aiMessage]);
             } else {
                 const errorMessage = {
@@ -135,8 +135,6 @@ const AiChat = () => {
                         interim += transcript;
                     }
                 }
-
-                console.log('Speech result - Final:', final, 'Interim:', interim);
 
                 if (final) {
                     const newTranscript = speechTranscriptRef.current + final;

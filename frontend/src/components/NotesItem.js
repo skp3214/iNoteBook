@@ -12,7 +12,6 @@ const NotesItem = (props) => {
   const { note, updateNote } = props;
 
   const handleDeleteClick = () => {
-    console.log('Deleting note with ID:', note._id);
     deleteNote(note._id);
   };
 
