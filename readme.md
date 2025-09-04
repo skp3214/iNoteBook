@@ -11,6 +11,9 @@
 
 </div>
 
+![Screenshot_4-9-2025_14241_inotebook-live vercel app](https://github.com/user-attachments/assets/2d94a6d5-00fe-4c8e-8758-b0acdd647379)
+
+
 ## 🚀 Overview
 
 iNotebook is a next-generation note management application that combines traditional note-taking with cutting-edge AI technology. Built with a completely decoupled architecture, it showcases modern web development practices while providing an intuitive, feature-rich experience for users to manage their digital notes efficiently.
