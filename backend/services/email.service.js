@@ -12,7 +12,11 @@ exports.sendPasswordResetEmail = async (email, resetToken) => {
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
     
     const mailOptions = {
-        from: process.env.EMAIL_USER,
+        from: {
+            name: 'iNotebook Support',
+            address: process.env.EMAIL_USER
+        },
+        replyTo: process.env.EMAIL_USER,
         to: email,
         subject: 'Password Reset - iNotebook',
         html: `
