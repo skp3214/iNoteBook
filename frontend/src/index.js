@@ -24,24 +24,19 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
-        console.log('SW registered: ', registration);
-        
         // Listen for updates
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              // New content is available, prompt user to refresh
-              if (window.confirm('New content is available! Click OK to refresh.')) {
-                newWorker.postMessage({ type: 'SKIP_WAITING' });
-                window.location.reload();
-              }
+              // Just activate the new worker without reloading
+              newWorker.postMessage({ type: 'SKIP_WAITING' });
             }
           });
         });
       })
-      .catch((registrationError) => {
-        console.log('SW registration failed: ', registrationError);
+      .catch(() => {
+        // Silent fail
       });
   });
 }
