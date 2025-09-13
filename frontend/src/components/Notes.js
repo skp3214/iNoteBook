@@ -272,7 +272,7 @@ const Notes = () => {
                     >
                       <div className="d-flex align-items-center gap-2">
                         <i className="fas fa-th-large text-secondary"></i>
-                        <span>All Categories</span>
+                        <span>All Notes</span>
                       </div>
                       <span className="badge bg-secondary rounded-pill">{note.length}</span>
                     </button>
