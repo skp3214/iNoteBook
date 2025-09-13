@@ -17,4 +17,13 @@ router.post('/login', [
 
 router.post('/getuser', fetchuser, authController.getUser);
 
+router.post('/forgot-password', [
+    body('email', 'Enter a valid email').isEmail()
+], authController.forgotPassword);
+
+router.post('/reset-password', [
+    body('token', 'Reset token is required').notEmpty(),
+    body('password', 'Password must be at least 5 characters').isLength({ min: 5 })
+], authController.resetPassword);
+
 module.exports = router;

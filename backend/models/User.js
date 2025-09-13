@@ -4,6 +4,8 @@ const UserSchema = new Schema({
     name: { type: String, required: true },
     email: { type: String, unique: true, required: true },
     password: { type: String, required: true },
+    resetPasswordToken: { type: String },
+    resetPasswordExpires: { type: Date },
     date: {
         type: Date,
         default: Date.now()

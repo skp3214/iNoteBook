@@ -1,5 +1,6 @@
 const authService = require('../services/auth.service');
 const {validationResult}=require('express-validator');
+
 exports.createUser = async (req, res) => {
     let success = false;
     const errors = validationResult(req);
@@ -57,5 +58,56 @@ exports.getUser = async (req, res) => {
     } catch (err) {
         console.log(err.message);
         res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+
+exports.forgotPassword = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({
+            error: 'Validation failed',
+            data: errors.array()
+        });
+    }
+
+    try {
+        const { email } = req.body;
+        const result = await authService.forgotPassword(email);
+        
+        if (!result.success) {
+            return res.status(404).json({ success: false, message: result.message });
+        }
+
+        res.json({ 
+            success: true, 
+            message: result.message
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+exports.resetPassword = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(422).json({
+            error: 'Validation failed',
+            data: errors.array()
+        });
+    }
+
+    try {
+        const { token, password } = req.body;
+        const result = await authService.resetPassword(token, password);
+        
+        if (!result.success) {
+            return res.status(400).json({ success: false, message: result.message });
+        }
+
+        res.json({ success: true, message: result.message });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 };

@@ -120,6 +120,15 @@ const LoginForm = () => {
                                 </Button>
                             </Form>
                             
+                            <div className="text-center mb-3">
+                                <Link 
+                                    to="/forgot-password" 
+                                    className="text-decoration-none text-muted small"
+                                >
+                                    Forgot your password?
+                                </Link>
+                            </div>
+                            
                             <div className="text-center">
                                 <p className="modern-text text-muted mb-0">
                                     Don't have an account?{' '}

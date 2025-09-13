@@ -8,6 +8,8 @@ import ThemeProvider from './context/theme/ThemeProvider';
 import LoginForm from './pages/LoginForm';
 import SignUpForm from './pages/SignUpForm';
 import AiAssistant from './pages/AiAssistant';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
                 <Route path="/ai-assistant" element={<AiAssistant />} />
                 <Route path="/login" element={<LoginForm />} />
                 <Route path="/signup" element={<SignUpForm />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="*" element={<Home />} />
               </Routes>
             </div>
