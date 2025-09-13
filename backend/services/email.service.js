@@ -2,9 +2,15 @@ const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        rejectUnauthorized: false
     }
 });
 
@@ -12,11 +18,7 @@ exports.sendPasswordResetEmail = async (email, resetToken) => {
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
     
     const mailOptions = {
-        from: {
-            name: 'iNotebook Support',
-            address: process.env.EMAIL_USER
-        },
-        replyTo: process.env.EMAIL_USER,
+        from: `"iNotebook Support" <${process.env.EMAIL_USER}>`,
         to: email,
         subject: 'Password Reset - iNotebook',
         html: `
@@ -36,6 +38,8 @@ exports.sendPasswordResetEmail = async (email, resetToken) => {
     };
 
     try {
+        // Verify transporter configuration
+        await transporter.verify();
         await transporter.sendMail(mailOptions);
         return { success: true };
     } catch (error) {

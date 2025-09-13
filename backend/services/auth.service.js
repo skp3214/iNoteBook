@@ -60,11 +60,20 @@ exports.forgotPassword = async (email) => {
         resetPasswordExpires: resetTokenExpiry
     });
 
-    // Send email with reset token
+    // Try to send email
     const emailResult = await emailService.sendPasswordResetEmail(user.email, resetToken);
     
     if (!emailResult.success) {
-        return { success: false, message: 'Failed to send reset email' };
+        console.error('Email failed:', emailResult.error);
+        // In development, return token for testing
+        if (process.env.NODE_ENV === 'development') {
+            return { 
+                success: true, 
+                message: 'Email service unavailable. Reset token (dev only)', 
+                resetToken 
+            };
+        }
+        return { success: false, message: 'Failed to send reset email. Please try again later.' };
     }
 
     return { success: true, message: 'Password reset email sent successfully' };

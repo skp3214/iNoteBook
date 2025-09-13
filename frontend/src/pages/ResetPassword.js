@@ -4,6 +4,7 @@ import { Form, Button, Container, Row, Col, Card, Alert, Spinner } from 'react-b
 
 const ResetPassword = () => {
     const [formData, setFormData] = useState({
+        token: '',
         password: '',
         confirmPassword: ''
     });
@@ -11,18 +12,15 @@ const ResetPassword = () => {
     const [message, setMessage] = useState('');
     const [showAlert, setShowAlert] = useState(false);
     const [alertType, setAlertType] = useState('success');
-    const [token, setToken] = useState('');
+    const [hasUrlToken, setHasUrlToken] = useState(false);
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
     useEffect(() => {
         const urlToken = searchParams.get('token');
         if (urlToken) {
-            setToken(urlToken);
-        } else {
-            setMessage('Invalid reset link. Please request a new password reset.');
-            setAlertType('danger');
-            setShowAlert(true);
+            setFormData(prev => ({ ...prev, token: urlToken }));
+            setHasUrlToken(true);
         }
     }, [searchParams]);
 
@@ -39,8 +37,8 @@ const ResetPassword = () => {
             return;
         }
 
-        if (!token) {
-            setMessage('Invalid reset token');
+        if (!formData.token) {
+            setMessage('Reset token is required');
             setAlertType('danger');
             setShowAlert(true);
             setIsLoading(false);
@@ -55,7 +53,7 @@ const ResetPassword = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ 
-                    token: token, 
+                    token: formData.token, 
                     password: formData.password 
                 }),
             });
@@ -97,7 +95,9 @@ const ResetPassword = () => {
                         <Card.Body className="p-5">
                             <div className="text-center mb-4">
                                 <h2 className="modern-title mb-2">Reset Password</h2>
-                                <p className="text-muted">Enter your new password</p>
+                                <p className="text-muted">
+                                    {hasUrlToken ? 'Enter your new password' : 'Enter reset token and new password'}
+                                </p>
                             </div>
 
                             {showAlert && (
@@ -106,52 +106,68 @@ const ResetPassword = () => {
                                 </Alert>
                             )}
 
-                            {token && (
-                                <Form onSubmit={handleSubmit}>
+                            <Form onSubmit={handleSubmit}>
+                                {!hasUrlToken && (
                                     <Form.Group className="mb-3">
-                                        <Form.Label className="modern-text fw-medium">New Password</Form.Label>
+                                        <Form.Label className="modern-text fw-medium">Reset Token</Form.Label>
                                         <Form.Control
-                                            type="password"
-                                            name="password"
-                                            placeholder="Enter new password"
-                                            value={formData.password}
+                                            type="text"
+                                            name="token"
+                                            placeholder="Enter reset token"
+                                            value={formData.token}
                                             onChange={onChange}
-                                            className="modern-input"
-                                            minLength={5}
+                                            className="modern-input font-monospace"
                                             required
                                         />
+                                        <Form.Text className="text-muted">
+                                            Enter the reset token from your email or development console
+                                        </Form.Text>
                                     </Form.Group>
+                                )}
 
-                                    <Form.Group className="mb-4">
-                                        <Form.Label className="modern-text fw-medium">Confirm Password</Form.Label>
-                                        <Form.Control
-                                            type="password"
-                                            name="confirmPassword"
-                                            placeholder="Confirm new password"
-                                            value={formData.confirmPassword}
-                                            onChange={onChange}
-                                            className="modern-input"
-                                            minLength={5}
-                                            required
-                                        />
-                                    </Form.Group>
+                                <Form.Group className="mb-3">
+                                    <Form.Label className="modern-text fw-medium">New Password</Form.Label>
+                                    <Form.Control
+                                        type="password"
+                                        name="password"
+                                        placeholder="Enter new password"
+                                        value={formData.password}
+                                        onChange={onChange}
+                                        className="modern-input"
+                                        minLength={5}
+                                        required
+                                    />
+                                </Form.Group>
 
-                                    <Button
-                                        type="submit"
-                                        className="modern-btn modern-btn-solid w-100 mb-3"
-                                        disabled={isLoading}
-                                    >
-                                        {isLoading ? (
-                                            <>
-                                                <Spinner animation="border" size="sm" className="me-2" />
-                                                Resetting...
-                                            </>
-                                        ) : (
-                                            'Reset Password'
-                                        )}
-                                    </Button>
-                                </Form>
-                            )}
+                                <Form.Group className="mb-4">
+                                    <Form.Label className="modern-text fw-medium">Confirm Password</Form.Label>
+                                    <Form.Control
+                                        type="password"
+                                        name="confirmPassword"
+                                        placeholder="Confirm new password"
+                                        value={formData.confirmPassword}
+                                        onChange={onChange}
+                                        className="modern-input"
+                                        minLength={5}
+                                        required
+                                    />
+                                </Form.Group>
+
+                                <Button
+                                    type="submit"
+                                    className="modern-btn modern-btn-solid w-100 mb-3"
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? (
+                                        <>
+                                            <Spinner animation="border" size="sm" className="me-2" />
+                                            Resetting...
+                                        </>
+                                    ) : (
+                                        'Reset Password'
+                                    )}
+                                </Button>
+                            </Form>
 
                             <div className="text-center">
                                 <Link to="/login" className="modern-link">

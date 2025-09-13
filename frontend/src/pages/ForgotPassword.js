@@ -9,6 +9,7 @@ const ForgotPassword = () => {
     const [showAlert, setShowAlert] = useState(false);
     const [alertType, setAlertType] = useState('success');
     const [emailSent, setEmailSent] = useState(false);
+    const [resetToken, setResetToken] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -27,9 +28,13 @@ const ForgotPassword = () => {
             const json = await response.json();
 
             if (json.success) {
-                setMessage('Password reset email sent! Check your inbox and follow the instructions.');
+                setMessage(json.message);
                 setAlertType('success');
                 setEmailSent(true);
+                // If development mode and token is provided
+                if (json.resetToken) {
+                    setResetToken(json.resetToken);
+                }
             } else {
                 setMessage(json.message || 'User not found');
                 setAlertType('danger');
@@ -60,7 +65,18 @@ const ForgotPassword = () => {
                             {showAlert && (
                                 <Alert variant={alertType} className="modern-alert">
                                     {message}
-                                    {emailSent && (
+                                    {resetToken && (
+                                        <div className="mt-3">
+                                            <strong>Development Token:</strong>
+                                            <div className="bg-light p-2 rounded mt-1 font-monospace small">
+                                                {resetToken}
+                                            </div>
+                                            <small className="text-muted">
+                                                Copy this token for development testing.
+                                            </small>
+                                        </div>
+                                    )}
+                                    {emailSent && !resetToken && (
                                         <div className="mt-3">
                                             <small className="text-muted">
                                                 <strong>Didn't receive the email?</strong>
@@ -117,10 +133,19 @@ const ForgotPassword = () => {
                                                 setEmailSent(false);
                                                 setShowAlert(false);
                                                 setEmail('');
+                                                setResetToken('');
                                             }}
                                         >
                                             Try Different Email
                                         </button>
+                                        {resetToken && (
+                                            <>
+                                                <span className="mx-2">•</span>
+                                                <Link to="/reset-password" className="modern-link">
+                                                    Reset Password
+                                                </Link>
+                                            </>
+                                        )}
                                     </>
                                 )}
                             </div>
