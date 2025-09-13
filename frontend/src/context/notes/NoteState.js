@@ -75,19 +75,22 @@ const NoteState = (props) => {
 
         // Refresh notes after sync
         try {
-            const response = await fetch(`${host}/api/notes/fetchallnotes`, {
-                method: "GET",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'authtoken': localStorage.getItem('token')
-                },
-            });
-            
-            if (response.ok) {
-                let onlineNotes = await response.json();
-                const offlineNotes = getOfflineNotes();
-                const mergedNotes = mergeNotes(onlineNotes, offlineNotes);
-                setNotes(mergedNotes);
+            const token = localStorage.getItem('token');
+            if (token) {
+                const response = await fetch(`${host}/api/notes/fetchallnotes`, {
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'authtoken': token
+                    },
+                });
+                
+                if (response.ok) {
+                    let onlineNotes = await response.json();
+                    const offlineNotes = getOfflineNotes();
+                    const mergedNotes = mergeNotes(onlineNotes, offlineNotes);
+                    setNotes(mergedNotes);
+                }
             }
         } catch (error) {
             console.error('Error refreshing notes after sync:', error);
@@ -137,13 +140,19 @@ const NoteState = (props) => {
     }, [syncInProgress, syncPendingActions]);
 
     const getNotes = useCallback(async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setNotes([]);
+            return;
+        }
+
         try {
             if (isOnline) {
                 const response = await fetch(`${host}/api/notes/fetchallnotes`, {
                     method: "GET",
                     headers: {
                         'Content-Type': 'application/json',
-                        'authtoken': localStorage.getItem('token')
+                        'authtoken': token
                     },
                 });
                 

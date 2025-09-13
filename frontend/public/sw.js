@@ -45,6 +45,11 @@ self.addEventListener('activate', function(event) {
 
 // Fetch event
 self.addEventListener('fetch', function(event) {
+  // Skip chrome-extension and other unsupported schemes
+  if (!event.request.url.startsWith('http')) {
+    return;
+  }
+
   const requestUrl = new URL(event.request.url);
   
   // Handle API requests
@@ -88,7 +93,7 @@ self.addEventListener('fetch', function(event) {
           // Return cached version or fetch from network
           return response || fetch(event.request)
             .then(function(response) {
-              // Don't cache non-successful responses
+              // Don't cache non-successful responses or non-basic responses
               if (!response || response.status !== 200 || response.type !== 'basic') {
                 return response;
               }
@@ -98,7 +103,10 @@ self.addEventListener('fetch', function(event) {
               
               caches.open(CACHE_NAME)
                 .then(function(cache) {
-                  cache.put(event.request, responseToCache);
+                  // Only cache if the request URL is supported
+                  if (event.request.url.startsWith('http')) {
+                    cache.put(event.request, responseToCache);
+                  }
                 });
               
               return response;
