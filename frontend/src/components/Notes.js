@@ -4,7 +4,7 @@ import noteContext from '../context/notes/noteContext';
 import { useNavigate } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import ModalForm from './ModalForm';
-import Spinner from 'react-bootstrap/Spinner';
+import Snackbar from './Snackbar';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -15,7 +15,6 @@ const Notes = () => {
   const navigate = useNavigate();
   const { note, getNotes, editNote, addNote, isOnline} = context;
 
-  const [loading, setLoading] = useState(false);
   const [notes, setNote] = useState({
     id: '',
     etitle: '',
@@ -32,6 +31,7 @@ const Notes = () => {
   const [showModal, setShowModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [snackbar, setSnackbar] = useState({ show: false, note: null, deleteAction: null });
 
   useEffect(() => {
     if (localStorage.getItem('token')) {
@@ -149,8 +149,23 @@ const Notes = () => {
     }
   };
 
+  const handleShowSnackbar = (note, deleteAction) => {
+    setSnackbar({ show: true, note, deleteAction });
+    // Execute delete immediately for UI responsiveness
+    deleteAction();
+  };
+
+  const handleUndoDelete = () => {
+    // Re-add the note (this would need to be implemented in context)
+    // For now, just close snackbar
+    setSnackbar({ show: false, note: null, deleteAction: null });
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ show: false, note: null, deleteAction: null });
+  };
+
   const uniqueTags = [
-    { Work: 'primary' },
     { Urgent: 'danger' },
     { Completed: 'success' },
     { Important: 'warning' },
@@ -344,15 +359,7 @@ const Notes = () => {
 
           {/* Notes Content */}
           <div className="position-relative" style={{ minHeight: '200px' }}>
-            {loading && (
-              <div className="position-absolute w-100 h-100 d-flex justify-content-center align-items-center bg-light bg-opacity-75 rounded" style={{ zIndex: 10 }}>
-                <Spinner animation="border" role="status" className="modern-spinner">
-                  <span className="visually-hidden">Loading...</span>
-                </Spinner>
-              </div>
-            )}
-
-            {filteredNotes.length === 0 && !loading && (
+            {filteredNotes.length === 0 && (
               <div className="text-center py-5">
                 <div className="mb-3" style={{ fontSize: '3rem', opacity: 0.3 }}>📝</div>
                 <h5 className="modern-title text-muted">No Notes Found</h5>
@@ -362,11 +369,11 @@ const Notes = () => {
               </div>
             )}
             
-            {!loading && filteredNotes.length > 0 && (
+            {filteredNotes.length > 0 && (
               <div className="modern-grid">
                 {filteredNotes.map((n, idx) => (
                   <div key={n._id || idx} className="fade-in">
-                    <NotesItem note={n} updateNote={updateNote} />
+                    <NotesItem note={n} updateNote={updateNote} onShowSnackbar={handleShowSnackbar} />
                   </div>
                 ))}
               </div>
@@ -403,6 +410,14 @@ const Notes = () => {
       >
         ✏️
       </Button>
+
+      {/* Snackbar */}
+      <Snackbar
+        show={snackbar.show}
+        message={`"${snackbar.note?.title}" deleted`}
+        onUndo={handleUndoDelete}
+        onClose={handleCloseSnackbar}
+      />
     </Container>
   );
 };

@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faEdit, faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import Card from 'react-bootstrap/Card';
@@ -9,10 +9,48 @@ import noteContext from '../context/notes/noteContext';
 const NotesItem = (props) => {
   const context = useContext(noteContext);
   const { deleteNote } = context;
-  const { note, updateNote } = props;
+  const { note, updateNote, onShowSnackbar } = props;
+  
+  const [swipeX, setSwipeX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const startX = useRef(0);
+  const currentX = useRef(0);
 
   const handleDeleteClick = () => {
     deleteNote(note._id);
+  };
+
+  const handleSwipeDelete = () => {
+    if (onShowSnackbar) {
+      onShowSnackbar(note, () => deleteNote(note._id));
+    } else {
+      deleteNote(note._id);
+    }
+  };
+
+  const handleTouchStart = (e) => {
+    if (window.innerWidth > 768) return; // Only on mobile
+    startX.current = e.touches[0].clientX;
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging || window.innerWidth > 768) return;
+    currentX.current = e.touches[0].clientX;
+    const diffX = currentX.current - startX.current;
+    if (diffX < 0) { // Only allow left swipe
+      setSwipeX(Math.max(diffX, -100));
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!isDragging || window.innerWidth > 768) return;
+    setIsDragging(false);
+    
+    if (swipeX < -60) { // Threshold for delete
+      handleSwipeDelete();
+    }
+    setSwipeX(0);
   };
 
   const tagColorMap = {
@@ -52,7 +90,26 @@ const NotesItem = (props) => {
   const tagLabel = note.tag || 'No Tag';
 
   return (
-    <div className="gradient-card-container">
+    <div className="gradient-card-container" style={{ position: 'relative', overflow: 'hidden' }}>
+      {/* Delete background */}
+      <div 
+        style={{
+          position: 'absolute',
+          right: 0,
+          top: 0,
+          bottom: 0,
+          width: '80px',
+          background: '#ef4444',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          borderRadius: '16px',
+          opacity: Math.abs(swipeX) / 100
+        }}
+      >
+        <FontAwesomeIcon icon={faTrash} style={{ color: 'white', fontSize: '1.2rem' }} />
+      </div>
+      
       <Card 
         className="gradient-note-card"
         style={{ 
@@ -63,8 +120,13 @@ const NotesItem = (props) => {
           maxWidth: '320px',
           minHeight: '200px',
           position: 'relative',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          transform: `translateX(${swipeX}px)`,
+          transition: isDragging ? 'none' : 'transform 0.3s ease'
         }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         <Card.Body className="d-flex flex-column justify-content-between h-100 p-4" style={{ paddingTop: '24px' }}>
           <div>
