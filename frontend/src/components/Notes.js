@@ -128,13 +128,8 @@ const Notes = () => {
         return;
       }
 
-      setLoading(true);
-      try {
-        await editNote(notes.id, notes.etitle.trim(), notes.edescription.trim(), notes.etag);
-      } finally {
-        setLoading(false);
-        handleModalClose();
-      }
+      handleModalClose();
+      editNote(notes.id, notes.etitle.trim(), notes.edescription.trim(), notes.etag);
     } else {
       if (!notes.title || notes.title.trim().length < 2) {
         setModalError('Title must be at least 2 characters long');
@@ -149,13 +144,8 @@ const Notes = () => {
         return;
       }
 
-      setLoading(true);
-      try {
-        await addNote(notes.title.trim(), notes.description.trim(), notes.tag);
-      } finally {
-        setLoading(false);
-        handleModalClose();
-      }
+      handleModalClose();
+      addNote(notes.title.trim(), notes.description.trim(), notes.tag);
     }
   };
 
