@@ -8,7 +8,7 @@ const ModalForm = ({
   modalError,
   noteData,
   onChange,
-  uniqueTags
+  isEditMode = false
 }) => {
   const tagOptions = [
     { value: 'Work', label: 'Work', variant: 'primary' },
@@ -22,8 +22,10 @@ const ModalForm = ({
     <Modal show={show} onHide={onClose} centered className="modern-modal">
       <Modal.Header closeButton className="border-0">
         <Modal.Title className="modern-title d-flex align-items-center">
-          <span className="me-2" style={{ fontSize: '1.5rem' }}>✏️</span>
-          Edit Note
+          <span className="me-2" style={{ fontSize: '1.5rem' }}>
+            {isEditMode ? '✏️' : '📝'}
+          </span>
+          {isEditMode ? 'Edit Note' : 'Create New Note'}
         </Modal.Title>
       </Modal.Header>
       
@@ -40,8 +42,8 @@ const ModalForm = ({
             <Form.Control
               type="text"
               placeholder="Enter a descriptive title..."
-              name="etitle"
-              value={noteData.etitle}
+              name={isEditMode ? "etitle" : "title"}
+              value={isEditMode ? noteData.etitle : noteData.title}
               onChange={onChange}
               className="modern-input"
               minLength={2}
@@ -55,8 +57,8 @@ const ModalForm = ({
               as="textarea"
               rows={4}
               placeholder="Write your note content here..."
-              name="edescription"
-              value={noteData.edescription}
+              name={isEditMode ? "edescription" : "description"}
+              value={isEditMode ? noteData.edescription : noteData.description}
               onChange={onChange}
               className="modern-input"
               minLength={2}
@@ -68,8 +70,8 @@ const ModalForm = ({
           <Form.Group className="mb-3" controlId="formTag">
             <Form.Label className="modern-text fw-medium mb-2">Category</Form.Label>
             <Form.Select
-              name="etag"
-              value={noteData.etag}
+              name={isEditMode ? "etag" : "tag"}
+              value={isEditMode ? noteData.etag : noteData.tag}
               onChange={onChange}
               className="modern-input"
               required
@@ -105,8 +107,8 @@ const ModalForm = ({
           onClick={onSubmit}
           className="modern-btn modern-btn-primary"
         >
-          <span className="me-2">💾</span>
-          Update Note
+          <span className="me-2">{isEditMode ? '💾' : '➕'}</span>
+          {isEditMode ? 'Update Note' : 'Add Note'}
         </Button>
       </Modal.Footer>
     </Modal>
