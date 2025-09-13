@@ -247,7 +247,7 @@ const Notes = () => {
                 }}
               >
                 <i className="fas fa-filter"></i>
-                <span>{filterTag || 'All Categories'}</span>
+                <span>{filterTag || 'All Notess'}</span>
                 <span className="badge bg-primary rounded-pill ms-1">
                   {filterTag ? note.filter(n => n.tag === filterTag).length : note.length}
                 </span>
