@@ -240,6 +240,30 @@ const NoteState = (props) => {
         }
     };
 
+    const restoreNote = (noteToRestore) => {
+        // Add the note back to the array
+        setNotes(prevNotes => [...prevNotes, noteToRestore]);
+        
+        // If it was an online note, remove the pending delete action
+        if (!noteToRestore._id.startsWith('offline_')) {
+            const pendingActions = getPendingActions();
+            const deleteAction = pendingActions.find(
+                action => action.type === 'DELETE_NOTE' && action.data.id === noteToRestore._id
+            );
+            if (deleteAction) {
+                removePendingAction(deleteAction.id);
+            }
+        } else {
+            // For offline notes, restore to local storage
+            const offlineNote = {
+                title: noteToRestore.title,
+                description: noteToRestore.description,
+                tag: noteToRestore.tag
+            };
+            addOfflineNote(offlineNote);
+        }
+    };
+
     const editNote = async (id, title, description, tag) => {
         const updateData = { title, description, tag };
 
@@ -284,6 +308,7 @@ const NoteState = (props) => {
             note, 
             addNote, 
             deleteNote, 
+            restoreNote,
             editNote, 
             getNotes, 
             isOnline, 

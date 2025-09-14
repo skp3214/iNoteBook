@@ -24,6 +24,7 @@ const Notes = () => {
     description: '',
     tag: ''
   });
+  const [localNotes, setLocalNotes] = useState([]);
   const [filterTag, setFilterTag] = useState('');
   const [sortAlpha, setSortAlpha] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -31,7 +32,7 @@ const Notes = () => {
   const [showModal, setShowModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [snackbar, setSnackbar] = useState({ show: false, note: null, deleteAction: null });
+  const [snackbar, setSnackbar] = useState({ show: false, note: null, deleteAction: null, timeoutId: null });
 
   useEffect(() => {
     if (localStorage.getItem('token')) {
@@ -40,6 +41,11 @@ const Notes = () => {
       navigate('/login');
     }
   }, [getNotes, navigate]);
+
+  // Sync local notes with context notes
+  useEffect(() => {
+    setLocalNotes(note);
+  }, [note]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -51,7 +57,16 @@ const Notes = () => {
     return () => document.removeEventListener('click', handleClickOutside);
   }, [showDropdown]);
 
-  let filteredNotes = note;
+  // Cleanup timeout on component unmount
+  useEffect(() => {
+    return () => {
+      if (snackbar.timeoutId) {
+        clearTimeout(snackbar.timeoutId);
+      }
+    };
+  }, [snackbar.timeoutId]);
+
+  let filteredNotes = localNotes;
 
   if (searchQuery) {
     filteredNotes = filteredNotes.filter(n =>
@@ -149,20 +164,45 @@ const Notes = () => {
     }
   };
 
-  const handleShowSnackbar = (note, deleteAction) => {
-    setSnackbar({ show: true, note, deleteAction });
-    // Execute delete immediately for UI responsiveness
-    deleteAction();
+  const handleShowSnackbar = (noteToDelete, deleteAction) => {
+    // Clear any existing timeout
+    if (snackbar.timeoutId) {
+      clearTimeout(snackbar.timeoutId);
+    }
+    
+    // Immediately remove note from UI for visual feedback
+    setLocalNotes(prevNotes => prevNotes.filter(n => n._id !== noteToDelete._id));
+    
+    // Set timeout to execute actual deletion after 8 seconds
+    const timeoutId = setTimeout(() => {
+      deleteAction();
+      setSnackbar({ show: false, note: null, deleteAction: null, timeoutId: null });
+    }, 8000);
+    
+    setSnackbar({ show: true, note: noteToDelete, deleteAction, timeoutId });
   };
 
   const handleUndoDelete = () => {
-    // Re-add the note (this would need to be implemented in context)
-    // For now, just close snackbar
-    setSnackbar({ show: false, note: null, deleteAction: null });
+    // Clear the timeout to prevent deletion
+    if (snackbar.timeoutId) {
+      clearTimeout(snackbar.timeoutId);
+    }
+    
+    // Restore the note to local display immediately
+    if (snackbar.note) {
+      setLocalNotes(prevNotes => [...prevNotes, snackbar.note]);
+    }
+    
+    // Close the snackbar
+    setSnackbar({ show: false, note: null, deleteAction: null, timeoutId: null });
   };
 
   const handleCloseSnackbar = () => {
-    setSnackbar({ show: false, note: null, deleteAction: null });
+    // Clear timeout when manually closing
+    if (snackbar.timeoutId) {
+      clearTimeout(snackbar.timeoutId);
+    }
+    setSnackbar({ show: false, note: null, deleteAction: null, timeoutId: null });
   };
 
   const uniqueTags = [
@@ -254,7 +294,7 @@ const Notes = () => {
                 <i className="fas fa-filter"></i>
                 <span>{filterTag || 'All Notess'}</span>
                 <span className="badge bg-primary rounded-pill ms-1">
-                  {filterTag ? note.filter(n => n.tag === filterTag).length : note.length}
+                  {filterTag ? localNotes.filter(n => n.tag === filterTag).length : localNotes.length}
                 </span>
               </button>
               {showDropdown && (
@@ -279,13 +319,13 @@ const Notes = () => {
                         <i className="fas fa-th-large text-secondary"></i>
                         <span>All Notes</span>
                       </div>
-                      <span className="badge bg-secondary rounded-pill">{note.length}</span>
+                      <span className="badge bg-secondary rounded-pill">{localNotes.length}</span>
                     </button>
                   </li>
                   <li><hr className="dropdown-divider my-2" /></li>
                   {uniqueTags.map(item => {
                     const tagName = Object.keys(item)[0];
-                    const count = note.filter(n => n.tag === tagName).length;
+                    const count = localNotes.filter(n => n.tag === tagName).length;
                     const tagIcons = {
                       Work: 'fa-briefcase',
                       Urgent: 'fa-exclamation-triangle',

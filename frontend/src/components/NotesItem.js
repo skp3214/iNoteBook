@@ -22,6 +22,7 @@ const NotesItem = (props) => {
 
   const handleSwipeDelete = () => {
     if (onShowSnackbar) {
+      // Pass the full note object and the delete function
       onShowSnackbar(note, () => deleteNote(note._id));
     } else {
       deleteNote(note._id);
