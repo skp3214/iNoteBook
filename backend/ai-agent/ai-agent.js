@@ -44,6 +44,12 @@ async function runAiAgent(userPrompt, userId, sessionId = 'default') {
 
     let responses = [];
     let sysInstruction = getSystemInstruction(userId, process.platform);
+    
+    // Enhanced system instruction with conversation context
+    if (contents.length > 1) {
+        sysInstruction += `\n\nCONVERSATION CONTEXT: You are continuing a conversation with this user. Look at the previous messages to understand the context and maintain continuity. If the user refers to "that note," "the note," "it," or similar references, they are likely referring to something mentioned earlier in this conversation. Always consider the conversation history when responding.`;
+    }
+
     while (true) {
         const result = await ai.models.generateContent({
             model: "gemini-1.5-flash",
@@ -93,10 +99,25 @@ async function runAiAgent(userPrompt, userId, sessionId = 'default') {
                 ],
             });
         } else {
+            // Add the model's response to conversation history
+            contents.push({
+                role: "model",
+                parts: [
+                    {
+                        text: result.text,
+                    },
+                ],
+            });
+            
             responses.push(result.text);
             break;
         }
     }
+
+    // Update conversation history with all the new interactions
+    userConversation.contents = contents;
+    userConversation.lastUpdated = Date.now();
+    conversationHistory.set(conversationKey, userConversation);
 
     return responses.join('\n');
 }

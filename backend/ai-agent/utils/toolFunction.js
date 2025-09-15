@@ -60,6 +60,27 @@ async function fetchAllNotes({ userId }) {
     }
 }
 
+async function getRecentNotes({ userId, limit = 5 }) {
+    try {
+        const notesService = require('../../services/notes.service');
+        const notes = await notesService.getAllNotes(userId);
+        
+        // Sort by creation date (most recent first) and limit
+        const recentNotes = notes
+            .sort((a, b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date))
+            .slice(0, limit);
+
+        return {
+            status: 'success',
+            notes: recentNotes,
+            count: recentNotes.length,
+            message: `Retrieved ${recentNotes.length} most recent notes`
+        };
+    } catch (error) {
+        return { status: 'error', message: error.message };
+    }
+}
+
 async function findAndUpdateNote({ searchDescription, userId, newTitle, newDescription, newTag, userRequest }) {
     try {
         const notesService = require('../../services/notes.service');
@@ -72,7 +93,14 @@ async function findAndUpdateNote({ searchDescription, userId, newTitle, newDescr
         for (const note of notes) {
             const titleScore = calculateSimilarity(note.title, searchDescription);
             const descScore = calculateSimilarity(note.description, searchDescription);
-            const maxScore = Math.max(titleScore, descScore);
+            let maxScore = Math.max(titleScore, descScore);
+
+            // Boost score for recently created notes (within last 5 minutes)
+            const noteDate = new Date(note.createdAt || note.date);
+            const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+            if (noteDate > fiveMinutesAgo && maxScore > 0.2) {
+                maxScore += 0.3; // Boost recent notes
+            }
 
             if (maxScore > bestScore && maxScore > 0.3) { // Minimum similarity threshold
                 bestScore = maxScore;
@@ -229,7 +257,8 @@ const toolFunctions = {
     findAndDeleteNote,
     updateNoteById,
     deleteNoteById,
-    searchNotes
+    searchNotes,
+    getRecentNotes
 };
 
 module.exports = { toolFunctions, VALID_TAGS };

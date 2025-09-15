@@ -120,6 +120,18 @@ const tools = [
                 },
             },
             {
+                name: "getRecentNotes",
+                description: "Gets the most recently created notes. Use this when the user refers to recent notes, 'that note', 'the note I just created', or when you need context about what they're referring to.",
+                parameters: {
+                    type: Type.OBJECT,
+                    properties: {
+                        userId: { type: Type.STRING, description: "User ID to fetch recent notes for" },
+                        limit: { type: Type.NUMBER, description: "Number of recent notes to get (default: 5)" }
+                    },
+                    required: ["userId"],
+                },
+            },
+            {
                 name: "searchNotes",
                 description: "Searches through notes intelligently to find what the user is looking for. Great for when they want to find notes about specific topics.",
                 parameters: {
