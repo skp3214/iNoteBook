@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-const Snackbar = ({ show, message, onUndo, onClose, duration = 8000 }) => {
+const Snackbar = ({ show, message, onUndo, onClose, duration = 4000 }) => {
   useEffect(() => {
     if (show) {
       const timer = setTimeout(() => {

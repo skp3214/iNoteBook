@@ -25,6 +25,7 @@ const Notes = () => {
     tag: ''
   });
   const [localNotes, setLocalNotes] = useState([]);
+  const [pendingDeletes, setPendingDeletes] = useState(new Set());
   const [filterTag, setFilterTag] = useState('');
   const [sortAlpha, setSortAlpha] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,10 +43,13 @@ const Notes = () => {
     }
   }, [getNotes, navigate]);
 
-  // Sync local notes with context notes
+  // Sync local notes with context notes, but exclude pending deletes
   useEffect(() => {
-    setLocalNotes(note);
-  }, [note]);
+    if (note) {
+      const filteredNotes = note.filter(n => !pendingDeletes.has(n._id));
+      setLocalNotes(filteredNotes);
+    }
+  }, [note, pendingDeletes]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -170,14 +174,22 @@ const Notes = () => {
       clearTimeout(snackbar.timeoutId);
     }
     
+    // Add to pending deletes to prevent reappearing
+    setPendingDeletes(prev => new Set([...prev, noteToDelete._id]));
+    
     // Immediately remove note from UI for visual feedback
     setLocalNotes(prevNotes => prevNotes.filter(n => n._id !== noteToDelete._id));
     
-    // Set timeout to execute actual deletion after 8 seconds
+    // Set timeout to execute actual deletion after 4 seconds
     const timeoutId = setTimeout(() => {
       deleteAction();
+      setPendingDeletes(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(noteToDelete._id);
+        return newSet;
+      });
       setSnackbar({ show: false, note: null, deleteAction: null, timeoutId: null });
-    }, 8000);
+    }, 4000);
     
     setSnackbar({ show: true, note: noteToDelete, deleteAction, timeoutId });
   };
@@ -188,9 +200,22 @@ const Notes = () => {
       clearTimeout(snackbar.timeoutId);
     }
     
-    // Restore the note to local display immediately
+    // Remove from pending deletes
     if (snackbar.note) {
-      setLocalNotes(prevNotes => [...prevNotes, snackbar.note]);
+      setPendingDeletes(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(snackbar.note._id);
+        return newSet;
+      });
+      
+      // Add back to local notes (check for duplicates)
+      setLocalNotes(prevNotes => {
+        const exists = prevNotes.find(n => n._id === snackbar.note._id);
+        if (!exists) {
+          return [...prevNotes, snackbar.note];
+        }
+        return prevNotes;
+      });
     }
     
     // Close the snackbar
@@ -202,6 +227,10 @@ const Notes = () => {
     if (snackbar.timeoutId) {
       clearTimeout(snackbar.timeoutId);
     }
+    
+    // If closing manually and there's a note, we should still keep it in pending deletes
+    // since user didn't explicitly undo - this maintains the current behavior
+    
     setSnackbar({ show: false, note: null, deleteAction: null, timeoutId: null });
   };
 
