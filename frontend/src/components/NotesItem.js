@@ -57,7 +57,7 @@ const NotesItem = (props) => {
 
   const tagColorMap = {
     Work: {
-      borderColor: '#3b82f6',
+      borderColor: '#2563eb',
       badgeVariant: 'primary',
       gradient: 'linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%)'
     },
@@ -153,15 +153,15 @@ const NotesItem = (props) => {
                   bg={tagInfo.badgeVariant}
                   style={{
                     fontSize: '0.75rem',
-                    fontWeight: '700',
+                    fontWeight: '500',
                     padding: '0.35rem 0.75rem',
                     background: 'rgba(255, 255, 255, 0.25)',
                     color: 'white',
-                    border: 'none',
+                    border: `1px solid ${tagInfo.borderColor}`,
                     borderRadius: '8px',
                   }}
                 >
-                  {tagLabel}
+                  {tagLabel.toUpperCase()}
                 </Badge>
               )}
               {note.date && (
@@ -350,16 +350,16 @@ const NotesItem = (props) => {
                   className="px-3 py-1"
                   style={{
                     fontSize: '0.75rem',
-                    fontWeight: '700',
+                    fontWeight: '500',
                     textTransform: 'capitalize',
                     letterSpacing: '0.3px',
                     background: 'rgba(255, 255, 255, 0.25)',
                     color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
+                    border: `1px solid ${tagInfo.borderColor}`,
+                    borderRadius: '6px',
                   }}
                 >
-                  {tagLabel}
+                  {tagLabel.toUpperCase()}
                 </Badge>
               )}
               {note.date && (
