@@ -3,7 +3,16 @@ const { getSystemInstruction } = require('../constants/constant');
 const { toolFunctions } = require('./utils/toolFunction');
 const { tools } = require('./utils/toolDeclarations');
 
-const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_AI_API_KEY });
+// Default AI instance with company API key
+const defaultAI = new GoogleGenAI({ apiKey: process.env.GOOGLE_AI_API_KEY });
+
+// Function to get AI instance based on API key
+function getAIInstance(userApiKey) {
+    if (userApiKey && userApiKey.trim()) {
+        return new GoogleGenAI({ apiKey: userApiKey });
+    }
+    return defaultAI;
+}
 
 // In-memory conversation storage 
 const conversationHistory = new Map();
@@ -17,8 +26,11 @@ setInterval(() => {
     }
 }, 60 * 60 * 1000); // Check every 60 minutes
 
-async function runAiAgent(userPrompt, userId, sessionId = 'default') {
+async function runAiAgent(userPrompt, userId, sessionId = 'default', userApiKey = null) {
     const conversationKey = `${userId}_${sessionId}`;
+    
+    // Get AI instance based on provided API key or use default
+    const ai = getAIInstance(userApiKey);
     
     // Get or initialize conversation history
     let userConversation = conversationHistory.get(conversationKey);

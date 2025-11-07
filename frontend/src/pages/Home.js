@@ -1,9 +1,9 @@
 import Notes from '../components/Notes';
 
-const Home = () => {
+const Home = ({ searchQuery, setSearchQuery }) => {
   return (
     <div className="min-vh-100" style={{ background: 'var(--bg-primary)' }}>
-      <Notes />
+      <Notes searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
     </div>
   );
 };

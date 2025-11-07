@@ -5,15 +5,17 @@ import { useNavigate } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import ModalForm from './ModalForm';
 import Snackbar from './Snackbar';
+import Sidebar from './Sidebar';
+import AiFab from './AiFab';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
+import Badge from 'react-bootstrap/Badge';
 
-const Notes = () => {
+const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSearchQuery }) => {
   const context = useContext(noteContext);
   const navigate = useNavigate();
-  const { note, getNotes, editNote, addNote, isOnline} = context;
+  const { note, getNotes, editNote, addNote } = context;
 
   const [notes, setNote] = useState({
     id: '',
@@ -27,13 +29,17 @@ const Notes = () => {
   const [localNotes, setLocalNotes] = useState([]);
   const [pendingDeletes, setPendingDeletes] = useState(new Set());
   const [filterTag, setFilterTag] = useState('');
-  const [sortAlpha, setSortAlpha] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [modalError, setModalError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [snackbar, setSnackbar] = useState({ show: false, note: null, deleteAction: null, timeoutId: null });
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+
+  // Use external search query if provided (for desktop navbar search)
+  const activeSearchQuery = externalSearchQuery !== undefined ? externalSearchQuery : searchQuery;
 
   useEffect(() => {
     if (localStorage.getItem('token')) {
@@ -53,7 +59,7 @@ const Notes = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (showDropdown && !event.target.closest('.dropdown')) {
+      if (showDropdown && !event.target.closest('.filter-dropdown-container') && !event.target.closest('.filter-toggle-btn')) {
         setShowDropdown(false);
       }
     };
@@ -72,10 +78,10 @@ const Notes = () => {
 
   let filteredNotes = localNotes;
 
-  if (searchQuery) {
+  if (activeSearchQuery) {
     filteredNotes = filteredNotes.filter(n =>
-      n.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      n.description.toLowerCase().includes(searchQuery.toLowerCase())
+      n.title.toLowerCase().includes(activeSearchQuery.toLowerCase()) ||
+      n.description.toLowerCase().includes(activeSearchQuery.toLowerCase())
     );
   }
 
@@ -83,8 +89,9 @@ const Notes = () => {
     filteredNotes = filteredNotes.filter(n => n.tag === filterTag);
   }
 
+  // Sort by date (newest first)
   filteredNotes = [...filteredNotes].sort((a, b) =>
-    sortAlpha ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
+    new Date(b.date) - new Date(a.date)
   );
 
   const updateNote = (currentNote) => {
@@ -173,13 +180,13 @@ const Notes = () => {
     if (snackbar.timeoutId) {
       clearTimeout(snackbar.timeoutId);
     }
-    
+
     // Add to pending deletes to prevent reappearing
     setPendingDeletes(prev => new Set([...prev, noteToDelete._id]));
-    
+
     // Immediately remove note from UI for visual feedback
     setLocalNotes(prevNotes => prevNotes.filter(n => n._id !== noteToDelete._id));
-    
+
     // Set timeout to execute actual deletion after 4 seconds
     const timeoutId = setTimeout(() => {
       deleteAction();
@@ -190,7 +197,7 @@ const Notes = () => {
       });
       setSnackbar({ show: false, note: null, deleteAction: null, timeoutId: null });
     }, 4000);
-    
+
     setSnackbar({ show: true, note: noteToDelete, deleteAction, timeoutId });
   };
 
@@ -199,7 +206,7 @@ const Notes = () => {
     if (snackbar.timeoutId) {
       clearTimeout(snackbar.timeoutId);
     }
-    
+
     // Remove from pending deletes
     if (snackbar.note) {
       setPendingDeletes(prev => {
@@ -207,7 +214,7 @@ const Notes = () => {
         newSet.delete(snackbar.note._id);
         return newSet;
       });
-      
+
       // Add back to local notes (check for duplicates)
       setLocalNotes(prevNotes => {
         const exists = prevNotes.find(n => n._id === snackbar.note._id);
@@ -217,7 +224,7 @@ const Notes = () => {
         return prevNotes;
       });
     }
-    
+
     // Close the snackbar
     setSnackbar({ show: false, note: null, deleteAction: null, timeoutId: null });
   };
@@ -227,10 +234,10 @@ const Notes = () => {
     if (snackbar.timeoutId) {
       clearTimeout(snackbar.timeoutId);
     }
-    
+
     // If closing manually and there's a note, we should still keep it in pending deletes
     // since user didn't explicitly undo - this maintains the current behavior
-    
+
     setSnackbar({ show: false, note: null, deleteAction: null, timeoutId: null });
   };
 
@@ -242,243 +249,332 @@ const Notes = () => {
   ];
 
   return (
-    <Container fluid className="px-4 py-3">
-      <Row>
-        <Col lg={10} xl={8} className="mx-auto">
-          
-          <ModalForm
-            show={showModal}
-            onClose={handleModalClose}
-            onSubmit={handleSubmit}
-            modalError={modalError}
-            noteData={notes}
-            onChange={(e) => setNote({ ...notes, [e.target.name]: e.target.value })}
-            isEditMode={isEditMode}
-          />
-          
-          {/* Header */}
-          <div className="d-flex align-items-center justify-content-between mb-5">
-            <div>
-              <h1 className="fw-bold mb-1" style={{ 
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                fontSize: '2.5rem'
-              }}>
-                Your Notes
-              </h1>
-              <p className="text-muted mb-0">Organize your thoughts beautifully</p>
-            </div>
-            <div className={`px-3 py-2 rounded-pill fw-medium ${isOnline ? 'bg-success bg-opacity-10 text-success' : 'bg-warning bg-opacity-10 text-warning'}`}>
-              <i className={`fas ${isOnline ? 'fa-wifi' : 'fa-wifi-slash'} me-2`}></i>
-              {isOnline ? 'Online' : 'Offline'}
-            </div>
-          </div>
+    <div className="notes-container" style={{ display: 'flex', minHeight: 'calc(100vh - 80px)' }}>
+      {/* Sidebar */}
+      <Sidebar
+        notes={localNotes}
+        filterTag={filterTag}
+        setFilterTag={setFilterTag}
+        showSidebar={showSidebar}
+        setShowSidebar={setShowSidebar}
+        onAddNote={openAddModal}
+      />
 
-          {!isOnline && (
-            <div className="alert alert-warning border-0 rounded-4 mb-4" style={{
-              background: 'linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%)'
-            }}>
-              <i className="fas fa-exclamation-triangle me-2"></i>
-              <strong>Offline Mode:</strong> Changes will sync when you're back online
-            </div>
-          )}
+      {/* Main Content */}
+      <div style={{
+        flex: 1,
+        width: '100%',
+      }}>
+        <Container fluid className="px-4 py-3">
+          <Row>
+            <Col>
 
-          {/* Search Bar */}
-          <div className="mb-4">
-            <div className="position-relative">
-              <i className="fas fa-search position-absolute" style={{
-                left: '1rem',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: '#6c757d',
-                zIndex: 5
-              }}></i>
-              <Form.Control
-                type="text"
-                placeholder="Search your notes..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="ps-5 py-3 border-0 rounded-4 shadow-sm search-input"
-                style={{
-                  fontSize: '1.1rem'
-                }}
+              <ModalForm
+                show={showModal}
+                onClose={handleModalClose}
+                onSubmit={handleSubmit}
+                modalError={modalError}
+                noteData={notes}
+                onChange={(e) => setNote({ ...notes, [e.target.name]: e.target.value })}
+                isEditMode={isEditMode}
               />
-            </div>
-          </div>
 
-          {/* Filters */}
-          <div className="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
-            <div className="dropdown position-relative">
-              <button 
-                className="btn btn-outline-primary dropdown-toggle rounded-pill px-4 py-2 fw-medium d-flex align-items-center gap-2 shadow-sm"
-                type="button" 
-                onClick={() => setShowDropdown(!showDropdown)}
-                style={{
-                  background: 'rgba(102, 126, 234, 0.1)',
-                  border: '2px solid rgba(102, 126, 234, 0.3)',
-                  transition: 'all 0.3s ease'
-                }}
-              >
-                <i className="fas fa-filter"></i>
-                <span>{filterTag || 'All Notess'}</span>
-                <span className="badge bg-primary rounded-pill ms-1">
-                  {filterTag ? localNotes.filter(n => n.tag === filterTag).length : localNotes.length}
-                </span>
-              </button>
+              {/* Desktop Header - Your Notes with Grid/List Toggle */}
+              <div className="d-none d-lg-flex align-items-center justify-content-between mb-4">
+                <div>
+                  <h2
+                    className="mb-1"
+                    style={{
+                      fontSize: '1.75rem',
+                      fontWeight: 600,
+                      color: 'var(--text-primary)',
+                    }}
+                  >
+                    Your Notes
+                  </h2>
+                  <p className="text-muted mb-0" style={{ fontSize: '0.875rem' }}>
+                    {filteredNotes.length} notes found
+                  </p>
+                </div>
+
+                <div className="d-flex gap-2">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`btn btn-sm ${viewMode === 'grid' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                    style={{
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: viewMode === 'grid' ? 'none' : '1px solid var(--border-light)',
+                      fontSize: '1.1rem',
+                    }}
+                    title="Grid View"
+                  >
+                    ▦
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`btn btn-sm ${viewMode === 'list' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                    style={{
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: viewMode === 'list' ? 'none' : '1px solid var(--border-light)',
+                      fontSize: '1.1rem',
+                    }}
+                    title="List View"
+                  >
+                    ☰
+                  </button>
+                </div>
+              </div>
+
+              {/* Search Bar - Mobile Only */}
+              <div className="mb-4 d-lg-none">
+                <div className="position-relative">
+                  <i className="fas fa-search position-absolute" style={{
+                    left: '1.25rem',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    color: 'var(--text-muted)',
+                    zIndex: 5,
+                    fontSize: '1.1rem',
+                  }}></i>
+                  <Form.Control
+                    type="text"
+                    placeholder="Search notes..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="search-input"
+                    style={{
+                      paddingLeft: '3.5rem',
+                      paddingRight: '3.5rem',
+                      height: '56px',
+                      fontSize: '1rem',
+                      background: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-light)',
+                      borderRadius: '16px',
+                      color: 'var(--text-primary)',
+                    }}
+                  />
+                  {/* Filter Icon - Mobile */}
+                  <button
+                    onClick={() => setShowDropdown(!showDropdown)}
+                    className="btn btn-link position-absolute filter-toggle-btn"
+                    style={{
+                      right: '1rem',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      color: 'var(--text-primary)',
+                      textDecoration: 'none',
+                      zIndex: 5,
+                      fontSize: '1.25rem',
+                    }}
+                    title="Filter"
+                  >
+                    ▽
+                  </button>
+                </div>
+              </div>
+
+              {/* Mobile Filter Dropdown */}
               {showDropdown && (
-                <ul className="dropdown-menu show position-absolute shadow-lg border-0 rounded-4 p-2" style={{
-                  background: 'rgba(255, 255, 255, 0.95)',
-                  backdropFilter: 'blur(20px)',
-                  minWidth: '250px',
-                  top: '100%',
-                  left: '0',
-                  zIndex: 1000
-                }}>
-                  <li>
-                    <button 
-                      className={`dropdown-item rounded-3 py-2 px-3 fw-medium d-flex align-items-center justify-content-between ${filterTag === '' ? 'active' : ''}`}
-                      onClick={() => {
-                        setFilterTag('');
-                        setShowDropdown(false);
-                      }}
-                      style={{ transition: 'all 0.2s ease' }}
-                    >
-                      <div className="d-flex align-items-center gap-2">
-                        <i className="fas fa-th-large text-secondary"></i>
-                        <span>All Notes</span>
-                      </div>
-                      <span className="badge bg-secondary rounded-pill">{localNotes.length}</span>
-                    </button>
-                  </li>
-                  <li><hr className="dropdown-divider my-2" /></li>
-                  {uniqueTags.map(item => {
-                    const tagName = Object.keys(item)[0];
-                    const count = localNotes.filter(n => n.tag === tagName).length;
-                    const tagIcons = {
-                      Work: 'fa-briefcase',
-                      Urgent: 'fa-exclamation-triangle',
-                      Completed: 'fa-check-circle',
-                      Important: 'fa-star',
-                      Personal: 'fa-user'
-                    };
-                    const tagColors = {
-                      Work: 'primary',
-                      Urgent: 'danger', 
-                      Completed: 'success',
-                      Important: 'warning',
-                      Personal: 'info'
-                    };
-                    const icon = tagIcons[tagName] || 'fa-tag';
-                    const color = tagColors[tagName] || 'secondary';
-                    return (
-                      <li key={tagName}>
-                        <button
-                          className={`dropdown-item rounded-3 py-2 px-3 fw-medium d-flex align-items-center justify-content-between ${filterTag === tagName ? 'active' : ''}`}
-                          onClick={() => {
-                            setFilterTag(tagName);
-                            setShowDropdown(false);
-                          }}
-                          style={{ transition: 'all 0.2s ease' }}
-                        >
-                          <div className="d-flex align-items-center gap-2">
-                            <i className={`fas ${icon} text-${color}`}></i>
-                            <span>{tagName}</span>
-                          </div>
-                          <span className={`badge bg-${color} rounded-pill`}>{count}</span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
-            
-            <button 
-              className="btn btn-outline-light rounded-pill px-4 py-2 fw-medium d-flex align-items-center gap-2 shadow-sm sort-btn"
-              onClick={() => setSortAlpha(a => !a)}
-              style={{ 
-                transition: 'all 0.3s ease'
-              }}
-            >
-              <i className={`fas fa-sort-alpha-${sortAlpha ? 'down' : 'up'}`}></i>
-              <span className="d-none d-sm-inline">Sort {sortAlpha ? 'A-Z' : 'Z-A'}</span>
-              <span className="d-sm-none">{sortAlpha ? 'A-Z' : 'Z-A'}</span>
-            </button>
-          </div>
-
-          {/* Results Count */}
-          <div className="d-flex align-items-center justify-content-between mb-4">
-            <p className="text-muted mb-0 fw-medium">
-              <i className="fas fa-sticky-note me-2"></i>
-              {filteredNotes.length} {filteredNotes.length === 1 ? 'note' : 'notes'} found
-            </p>
-            {(searchQuery || filterTag) && (
-              <button 
-                className="btn btn-sm btn-outline-secondary rounded-pill px-3"
-                onClick={() => {
-                  setSearchQuery('');
-                  setFilterTag('');
-                }}
-              >
-                <i className="fas fa-times me-1"></i>Clear filters
-              </button>
-            )}
-          </div>
-
-          {/* Notes Content */}
-          <div className="position-relative" style={{ minHeight: '200px' }}>
-            {filteredNotes.length === 0 && (
-              <div className="text-center py-5">
-                <div className="mb-3" style={{ fontSize: '3rem', opacity: 0.3 }}>📝</div>
-                <h5 className="modern-title text-muted">No Notes Found</h5>
-                <p className="modern-text text-muted">
-                  {searchQuery || filterTag ? 'Try adjusting your search or filter' : 'Create your first note to get started'}
-                </p>
-              </div>
-            )}
-            
-            {filteredNotes.length > 0 && (
-              <div className="modern-grid">
-                {filteredNotes.map((n, idx) => (
-                  <div key={n._id || idx} className="fade-in">
-                    <NotesItem note={n} updateNote={updateNote} onShowSnackbar={handleShowSnackbar} />
+                <div className="d-lg-none mb-4 filter-dropdown-container">
+                  <div
+                    className="filter-dropdown-mobile rounded-4 p-3"
+                    style={{
+                      background: 'var(--bg-elevated)',
+                      border: '1px solid var(--border-light)',
+                      boxShadow: 'var(--shadow-lg)',
+                    }}
+                  >
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+                      <h6 className="mb-0" style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                        Filter by Tags
+                      </h6>
+                      <button
+                        onClick={() => setShowDropdown(false)}
+                        className="btn btn-link p-0"
+                        style={{ color: 'var(--text-muted)', textDecoration: 'none', fontSize: '1.25rem' }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <div className="d-flex flex-column gap-2">
+                      <button
+                        onClick={() => {
+                          setFilterTag('');
+                          setShowDropdown(false);
+                        }}
+                        className={`btn ${!filterTag ? 'btn-primary' : 'btn-outline-secondary'} text-start`}
+                        style={{ borderRadius: '12px', padding: '0.75rem 1rem' }}
+                      >
+                        <div className="d-flex justify-content-between align-items-center">
+                          <span>📝 All Notes</span>
+                          <Badge bg={!filterTag ? 'light' : 'secondary'}>{localNotes.length}</Badge>
+                        </div>
+                      </button>
+                      {uniqueTags.map(item => {
+                        const tagName = Object.keys(item)[0];
+                        const count = localNotes.filter(n => n.tag === tagName).length;
+                        const tagIcons = {
+                          Work: '💼',
+                          Urgent: '⚠️',
+                          Completed: '✅',
+                          Important: '⭐',
+                          Personal: '👤'
+                        };
+                        const icon = tagIcons[tagName] || '📌';
+                        return (
+                          <button
+                            key={tagName}
+                            onClick={() => {
+                              setFilterTag(tagName);
+                              setShowDropdown(false);
+                            }}
+                            className={`btn ${filterTag === tagName ? 'btn-primary' : 'btn-outline-secondary'} text-start`}
+                            style={{ borderRadius: '12px', padding: '0.75rem 1rem' }}
+                          >
+                            <div className="d-flex justify-content-between align-items-center">
+                              <span>{icon} {tagName}</span>
+                              <Badge bg={filterTag === tagName ? 'light' : 'secondary'}>{count}</Badge>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </Col>
-      </Row>
+                </div>
+              )}
 
-      {/* Floating Add Button */}
-      <Button
-        onClick={openAddModal}
-        className="position-fixed rounded-circle border-0 shadow-lg d-flex align-items-center justify-content-center"
-        style={{
-          bottom: '2rem',
-          right: '2rem',
-          width: '70px',
-          height: '70px',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          fontSize: '1.8rem',
-          color: 'white',
-          zIndex: 1000,
-          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          boxShadow: '0 8px 32px rgba(102, 126, 234, 0.4)',
-          fontWeight: 'bold'
-        }}
-        onMouseEnter={(e) => {
-          e.target.style.transform = 'scale(1.15)';
-          e.target.style.boxShadow = '0 16px 48px rgba(102, 126, 234, 0.6)';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.transform = 'scale(1)';
-          e.target.style.boxShadow = '0 8px 32px rgba(102, 126, 234, 0.4)';
-        }}
-      >
-        ✏️
-      </Button>
+              {/* Header - Mobile Only */}
+              <div className="d-lg-none d-flex align-items-center justify-content-between mb-4">
+                <div className="d-flex align-items-center gap-3">
+                  <div>
+                    <h2
+                      className="mb-1"
+                      style={{
+                        fontSize: '1.15rem',
+                        fontWeight: 500,
+                        color: 'var(--text-primary)',
+                      }}
+                    >
+                      Your Notes
+                    </h2>
+                    <p className="text-muted mb-0" style={{ fontSize: '0.875rem' }}>
+                      {filteredNotes.length} notes found
+                    </p>
+                  </div>
+                </div>
+
+                <div className="d-flex align-items-center gap-2">
+                  {/* View Toggle + Add Button - Mobile */}
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`btn btn-sm ${viewMode === 'grid' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: viewMode === 'grid' ? 'none' : '1px solid var(--border-light)',
+                    }}
+                    title="Grid View"
+                  >
+                    ▦
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`btn btn-sm ${viewMode === 'list' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: viewMode === 'list' ? 'none' : '1px solid var(--border-light)',
+                    }}
+                    title="List View"
+                  >
+                    ☰
+                  </button>
+                  {/* Add Note Button - Mobile */}
+                  <button
+                    onClick={openAddModal}
+                    className="btn btn-primary"
+                    style={{
+                      width: '46px',
+                      height: '46px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      border: 'none',
+                      fontSize: '1.5rem',
+                      boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)',
+                    }}
+                    title="Add Note"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              {/* Notes Content */}
+              <div className="position-relative" style={{ minHeight: '200px' }}>
+                {filteredNotes.length === 0 && (
+                  <div className="text-center py-5">
+                    <div className="mb-3" style={{ fontSize: '4rem', opacity: 0.3 }}>📝</div>
+                    <h5 style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>No Notes Found</h5>
+                    <p style={{ color: 'var(--text-muted)' }}>
+                      {searchQuery || filterTag ? 'Try adjusting your search or filter' : 'Create your first note to get started'}
+                    </p>
+                  </div>
+                )}
+
+                {filteredNotes.length > 0 && (
+                  <div
+                    className={viewMode === 'grid' ? 'notes-grid' : 'notes-list'}
+                    style={{
+                      display: viewMode === 'grid' ? 'grid' : 'flex',
+                      gridTemplateColumns: viewMode === 'grid'
+                        ? 'repeat(auto-fill, minmax(280px, 1fr))'
+                        : 'none',
+                      flexDirection: viewMode === 'list' ? 'column' : 'row',
+                      gap: '1.5rem',
+                      paddingBottom: '100px', // Space for FAB
+                    }}
+                  >
+                    {filteredNotes.map((n, idx) => (
+                      <div key={n._id || idx} className="fade-in">
+                        <NotesItem
+                          note={n}
+                          updateNote={updateNote}
+                          onShowSnackbar={handleShowSnackbar}
+                          viewMode={viewMode}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </Col>
+          </Row>
+        </Container>
+      </div>
+
+      {/* AI FAB - Always visible */}
+      <AiFab />
 
       {/* Snackbar */}
       <Snackbar
@@ -487,7 +583,7 @@ const Notes = () => {
         onUndo={handleUndoDelete}
         onClose={handleCloseSnackbar}
       />
-    </Container>
+    </div>
   );
 };
 

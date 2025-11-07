@@ -437,6 +437,19 @@ body {
   backdrop-filter: blur(20px);
 }
 
+/* 80% Width Modal for AI Assistant */
+.modal-80w {
+  max-width: 80% !important;
+  width: 80% !important;
+}
+
+@media (max-width: 768px) {
+  .modal-80w {
+    max-width: 95% !important;
+    width: 95% !important;
+  }
+}
+
 .modern-modal .modal-header {
   border: none !important;
   padding: 2rem 2rem 1rem;
@@ -1438,6 +1451,7 @@ body {
   background-size: 400% 400%;
   animation: gradientShift 4s ease infinite;
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 /* Snackbar animation */
@@ -1450,4 +1464,161 @@ body {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
   }
+}
+
+/* Sidebar Styles */
+.sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-medium) transparent;
+}
+
+.sidebar-overlay {
+  animation: fadeIn 0.3s ease;
+}
+
+@media (min-width: 992px) {
+  .notes-container {
+    position: relative;
+  }
+}
+
+/* Notes Grid Responsive */
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  padding-bottom: 100px;
+}
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: 100px;
+}
+
+@media (max-width: 768px) {
+  .notes-grid {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .ai-fab {
+    bottom: 1.5rem !important;
+    right: 1.5rem !important;
+  }
+  
+  .add-note-fab {
+    display: none !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .ai-fab {
+    width: 56px !important;
+    height: 56px !important;
+    font-size: 1.25rem !important;
+    bottom: 1.25rem !important;
+    right: 1.25rem !important;
+  }
+}
+
+/* Search Input Enhancements */
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+}
+
+/* Dropdown Menu Enhancements */
+.modern-dropdown-item:hover {
+  background: var(--bg-secondary) !important;
+}
+
+/* Mobile Tag Filter Scroll */
+@media (max-width: 991px) {
+  .d-lg-none .overflow-auto::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .d-lg-none .overflow-auto {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Mobile Filter Dropdown */
+.filter-dropdown-mobile {
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* AI Configuration Modal */
+.ai-config-modal .modal-dialog {
+  max-width: 500px;
+}
+
+.ai-assistant-modal .modal-dialog {
+  max-width: 800px;
+}
+
+/* List View Card Dropdown Fix */
+.list-note-card {
+  position: relative;
+  z-index: 1;
+}
+
+.list-note-card:hover {
+  z-index: 10;
+}
+
+.list-note-card .dropdown.show {
+  z-index: 1080 !important;
+}
+
+.list-note-card .dropdown-menu {
+  z-index: 1081 !important;
+  position: absolute !important;
+}
+
+/* Hover effects for interactive elements */
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-duration: 0.2s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Override for elements that shouldn't transition */
+.sidebar,
+.notes-grid,
+.notes-list {
+  transition: none;
+}
+
+/* Card hover enhancement */
+.gradient-note-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+}
+
+/* FAB animations */
+.ai-fab:active,
+.add-note-fab:active {
+  transform: scale(0.95) !important;
 }

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { faTrash, faPaperPlane, faMicrophone, faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
+import { faPaperPlane, faMicrophone, faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Container, Row, Col, Card, Button, Form, InputGroup, Spinner, Modal } from 'react-bootstrap';
+import { Card, Button, Form, Spinner, Modal } from 'react-bootstrap';
 
 
 
@@ -55,13 +55,19 @@ const AiChat = () => {
 
         try {
             console.log('Sending API request...');
+            // Get user API key if available
+            const userApiKey = localStorage.getItem('gemini_api_key');
+            
             const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/ai-agent/chat`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'authtoken': localStorage.getItem('token')
                 },
-                body: JSON.stringify({ message: message })
+                body: JSON.stringify({ 
+                    message: message,
+                    ...(userApiKey && { apiKey: userApiKey })
+                })
             });
 
             const data = await response.json();
@@ -231,13 +237,19 @@ const AiChat = () => {
         setIsLoading(true);
 
         try {
+            // Get user API key if available
+            const userApiKey = localStorage.getItem('gemini_api_key');
+            
             const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/ai-agent/chat`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'authtoken': localStorage.getItem('token')
                 },
-                body: JSON.stringify({ message: inputMessage })
+                body: JSON.stringify({ 
+                    message: inputMessage,
+                    ...(userApiKey && { apiKey: userApiKey })
+                })
             });
 
             const data = await response.json();
@@ -305,198 +317,177 @@ const AiChat = () => {
         ]);
     };
 
+    // Expose clearChat function globally for the modal header
+    useEffect(() => {
+        window.clearAiChat = clearChat;
+        return () => {
+            delete window.clearAiChat;
+        };
+    }, []);
+
     return (
-        <Container fluid className="d-flex flex-column" style={{
-            height: '100vh',
-            maxHeight: window.innerWidth <= 768 ? '90vh' : '770px',
-            margin: window.innerWidth <= 768 ? '10px' : '20px',
+        <div className="d-flex flex-column h-100" style={{
+            height: '100%',
             overflow: 'hidden'
         }}>
-            {/* Header */}
-            <Row className="align-items-center border-bottom py-2 px-3" style={{
-                background: 'var(--bg-secondary)',
-                borderTopLeftRadius: '1rem',
-                borderTopRightRadius: '1rem'
-            }}>
-                <Col xs="auto" className="d-flex align-items-center">
-                    <span style={{
-                        background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-                        borderRadius: '50%',
-                        width: window.innerWidth <= 768 ? '24px' : '32px',
-                        height: window.innerWidth <= 768 ? '24px' : '32px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: window.innerWidth <= 768 ? '0.75rem' : '1rem'
+            {/* Messages Container - Scrollable */}
+            <div 
+                className="flex-grow-1 px-3 pt-3"
+                style={{
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
+                    maxHeight: 'calc(100% - 80px)', // Reserve space for input
+                    background: 'var(--bg-primary)'
+                }}
+            >
+                {messages.map((message) => (
+                    <div key={message.id} className="mb-3 d-flex" style={{
+                        justifyContent: message.sender === 'user' ? 'flex-end' : 'flex-start'
                     }}>
-                        🤖
-                    </span>
-                    <span className="ms-2" style={{
-                        color: 'var(--text-primary)',
-                        fontSize: window.innerWidth <= 768 ? '1rem' : '1.25rem'
-                    }}>
-                        {window.innerWidth <= 768 ? 'AI' : 'AI Assistant'}
-                    </span>
-                </Col>
-                <Col xs="auto" className="ms-auto">
-                    <Button
-                        variant="outline-secondary"
-                        onClick={clearChat}
-                        title="Clear chat"
-                        className="d-flex align-items-center justify-content-center"
-                        style={{
-                            borderRadius: '50%',
-                            width: window.innerWidth <= 768 ? '32px' : '40px',
-                            height: window.innerWidth <= 768 ? '32px' : '40px',
-                            padding: 0
-                        }}
-                    >
-                        <FontAwesomeIcon
-                            icon={faTrash}
-                            style={{
-                                color: 'var(--accent-primary)',
-                                fontSize: window.innerWidth <= 768 ? '0.75rem' : '0.9rem'
-                            }}
-                        />
-                    </Button>
-                </Col>
-            </Row>
-
-            {/* Messages */}
-            <Row className="flex-grow-1 overflow-auto px-3 py-2" style={{
-                background: 'var(--bg-primary)',
-                maxHeight: window.innerWidth <= 768 ? 'calc(100vh - 280px)' : 'none',
-                minHeight: window.innerWidth <= 768 ? '200px' : 'auto'
-            }}>
-                <Col>
-                    {messages.map((message) => (
-                        <div
-                            key={message.id}
-                            className="mb-3 d-flex flex-column"
-                            style={{
-                                maxWidth: window.innerWidth <= 768 ? '90%' : '85%',
-                                alignSelf: message.sender === 'user' ? 'flex-end' : 'flex-start'
-                            }}
-                        >
+                        <div style={{ maxWidth: '85%' }}>
                             <Card
-                                bg={message.isError ? "danger" : (message.sender === 'user' ? "primary" : "light")}
-                                text={message.isError ? "white" : (message.sender === 'user' ? "white" : "dark")}
-                                className={`mb-1 ${message.sender === 'user' ? 'align-self-end' : 'align-self-start'}`}
+                                bg={message.sender === 'user' ? 'primary' : (message.isError ? 'danger' : 'light')}
+                                text={message.sender === 'user' || message.isError ? 'white' : 'dark'}
                                 style={{
                                     borderRadius: message.sender === 'user'
-                                        ? window.innerWidth <= 768 ? '1rem 1rem 0.25rem 1rem' : '1.25rem 1.25rem 0.25rem 1.25rem'
-                                        : window.innerWidth <= 768 ? '1rem 1rem 1rem 0.25rem' : '1.25rem 1.25rem 1.25rem 0.25rem',
-                                    padding: window.innerWidth <= 768 ? '0.75rem 1rem' : '1rem 1.25rem',
-                                    fontSize: window.innerWidth <= 768 ? '0.85rem' : '0.95rem',
-                                    wordWrap: 'break-word',
-                                    lineHeight: '1.5',
-                                    fontFamily: 'Inter, sans-serif'
+                                        ? '1.25rem 1.25rem 0.25rem 1.25rem'
+                                        : '1.25rem 1.25rem 1.25rem 0.25rem',
+                                    border: 'none',
+                                    boxShadow: 'var(--shadow-sm)'
                                 }}
                             >
-                                <Card.Body className="p-0">
-                                    {formatMessage(message.text)}
+                                <Card.Body style={{ padding: '1rem' }}>
+                                    <div style={{
+                                        fontSize: '0.95rem',
+                                        lineHeight: '1.6',
+                                        marginBottom: '0.5rem'
+                                    }}>
+                                        {formatMessage(message.text)}
+                                    </div>
+                                    <small className={message.sender === 'user' || message.isError ? 'text-white-50' : 'text-muted'} style={{
+                                        fontSize: '0.75rem'
+                                    }}>
+                                        {formatTimestamp(message.timestamp)}
+                                    </small>
                                 </Card.Body>
                             </Card>
-                            <div style={{
-                                fontSize: window.innerWidth <= 768 ? '0.65rem' : '0.75rem',
-                                color: 'var(--text-muted)',
-                                textAlign: message.sender === 'user' ? 'right' : 'left',
-                                fontFamily: 'Inter, sans-serif'
-                            }}>
-                                {formatTimestamp(message.timestamp)}
-                            </div>
                         </div>
-                    ))}
-                    {isLoading && (
-                        <div className="mb-3 d-flex flex-column" style={{
-                            maxWidth: window.innerWidth <= 768 ? '90%' : '85%',
-                            alignSelf: 'flex-start'
-                        }}>
-                            <Card
-                                bg="light"
-                                className="mb-1 align-self-start"
-                                style={{
-                                    borderRadius: window.innerWidth <= 768 ? '1rem 1rem 1rem 0.25rem' : '1.25rem 1.25rem 1.25rem 0.25rem',
-                                    padding: window.innerWidth <= 768 ? '0.75rem 1rem' : '1rem 1.25rem'
-                                }}
-                            >
-                                <Card.Body className="p-0">
+                    </div>
+                ))}
+                {isLoading && (
+                    <div className="mb-3 d-flex">
+                        <div style={{ maxWidth: '85%' }}>
+                            <Card bg="light" style={{
+                                borderRadius: '1.25rem 1.25rem 1.25rem 0.25rem',
+                                border: 'none',
+                                boxShadow: 'var(--shadow-sm)'
+                            }}>
+                                <Card.Body style={{ padding: '1rem' }}>
                                     <Spinner animation="grow" size="sm" className="me-1" />
                                     <Spinner animation="grow" size="sm" className="me-1" />
                                     <Spinner animation="grow" size="sm" />
                                 </Card.Body>
                             </Card>
                         </div>
-                    )}
-                    <div ref={messagesEndRef} />
-                </Col>
-            </Row>
+                    </div>
+                )}
+                <div ref={messagesEndRef} />
+            </div>
 
-            {/* Input */}
-            <Row className="border-top py-2 px-3" style={{
-                background: 'var(--bg-secondary)',
-                borderBottomLeftRadius: '1rem',
-                borderBottomRightRadius: '1rem'
-            }}>
-                <Col>
-                    <InputGroup>
-                        <Form.Control
-                            as="textarea"
-                            ref={inputRef}
-                            value={inputMessage}
-                            onChange={(e) => setInputMessage(e.target.value)}
-                            onKeyDown={handleKeyPress}
-                            placeholder={window.innerWidth <= 768 ? "Ask about your notes..." : "Ask me anything about your notes..."}
-                            disabled={isLoading}
-                            rows={1}
-                            style={{
-                                resize: 'none',
-                                minHeight: window.innerWidth <= 768 ? '40px' : '48px',
-                                maxHeight: window.innerWidth <= 768 ? '80px' : '120px',
-                                fontFamily: 'Inter, sans-serif',
-                                fontSize: window.innerWidth <= 768 ? '0.85rem' : '0.95rem',
-                                lineHeight: '1.4'
-                            }}
-                        />
-                        {speechSupported && (
-                            <Button
-                                variant="outline-secondary"
-                                onClick={startListening}
-                                disabled={isLoading || isListening}
-                                title="Start voice input"
-                                style={{
-                                    width: window.innerWidth <= 768 ? '40px' : '48px',
-                                    height: window.innerWidth <= 768 ? '40px' : '48px'
-                                }}
-                            >
-                                <FontAwesomeIcon
-                                    icon={faMicrophone}
-                                    style={{
-                                        color: 'var(--accent-primary)',
-                                        fontSize: window.innerWidth <= 768 ? '0.75rem' : '0.9rem'
-                                    }}
-                                />
-                            </Button>
-                        )}
+            {/* Input Section - Fixed at Bottom */}
+            <div 
+                className="border-top p-3"
+                style={{
+                    background: 'var(--bg-secondary)',
+                    minHeight: '80px',
+                    flexShrink: 0
+                }}
+            >
+                <div className="position-relative">
+                    <Form.Control
+                        as="textarea"
+                        ref={inputRef}
+                        value={inputMessage}
+                        onChange={(e) => setInputMessage(e.target.value)}
+                        onKeyDown={handleKeyPress}
+                        placeholder="Ask me anything about your notes..."
+                        disabled={isLoading}
+                        rows={1}
+                        style={{
+                            resize: 'none',
+                            borderRadius: '25px',
+                            paddingLeft: '1.25rem',
+                            paddingRight: speechSupported ? '5rem' : '3.5rem',
+                            paddingTop: '0.875rem',
+                            paddingBottom: '0.875rem',
+                            fontSize: '1rem',
+                            background: 'var(--bg-tertiary)',
+                            border: '1px solid var(--border-light)',
+                            color: 'var(--text-primary)',
+                            maxHeight: '120px',
+                            minHeight: '48px'
+                        }}
+                    />
+                    {speechSupported && (
                         <Button
-                            onClick={sendMessage}
-                            disabled={!inputMessage.trim() || isLoading}
+                            variant={isListening ? "danger" : "outline-secondary"}
+                            onClick={isListening ? stopListening : startListening}
+                            disabled={isLoading}
                             style={{
-                                width: window.innerWidth <= 768 ? '40px' : '48px',
-                                height: window.innerWidth <= 768 ? '40px' : '48px'
+                                position: 'absolute',
+                                right: '55px',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                zIndex: 5,
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: '40px',
+                                height: '40px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                background: isListening ? 'var(--danger)' : 'transparent'
                             }}
+                            title={isListening ? "Stop recording" : "Voice input"}
                         >
                             <FontAwesomeIcon
-                                icon={faPaperPlane}
+                                icon={isListening ? faMicrophoneSlash : faMicrophone}
                                 style={{
-                                    color: 'white',
-                                    fontSize: window.innerWidth <= 768 ? '0.75rem' : '0.9rem'
+                                    fontSize: '1rem',
+                                    color: isListening ? 'white' : 'var(--text-muted)'
                                 }}
                             />
                         </Button>
-                    </InputGroup>
-                </Col>
-            </Row>
+                    )}
+                    <Button
+                        onClick={sendMessage}
+                        disabled={isLoading || !inputMessage.trim()}
+                        style={{
+                            position: 'absolute',
+                            right: '10px',
+                            top: '50%',
+                            transform: 'translateY(-50%)',
+                            zIndex: 5,
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '40px',
+                            height: '40px',
+                            background: inputMessage.trim() && !isLoading ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))' : 'var(--bg-tertiary)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}
+                    >
+                        <FontAwesomeIcon
+                            icon={faPaperPlane}
+                            style={{
+                                fontSize: '1rem',
+                                color: inputMessage.trim() && !isLoading ? 'white' : 'var(--text-muted)'
+                            }}
+                        />
+                    </Button>
+                </div>
+            </div>
 
             {/* Speech Recognition Modal */}
             <Modal
@@ -610,7 +601,7 @@ const AiChat = () => {
                     )}
                 </Modal.Body>
             </Modal>
-        </Container>
+        </div>
     );
 };
 
