@@ -53,7 +53,7 @@ const Sidebar = ({ notes, filterTag, setFilterTag, showSidebar, setShowSidebar, 
           onClick={onAddNote}
           className="w-100 mb-4 d-flex align-items-center justify-content-center"
           style={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: 'linear-gradient(135deg, #00bf8f 0%, #001510 100%)',
             border: 'none',
             borderRadius: '12px',
             padding: '0.875rem 1rem',
@@ -89,7 +89,7 @@ const Sidebar = ({ notes, filterTag, setFilterTag, showSidebar, setShowSidebar, 
           >
             Tags
           </h6>
-          
+
           <div className="d-flex flex-column gap-2">
             {tagConfig.map((tag) => (
               <button
@@ -103,8 +103,8 @@ const Sidebar = ({ notes, filterTag, setFilterTag, showSidebar, setShowSidebar, 
                   padding: '0.75rem',
                   borderRadius: '12px',
                   border: 'none',
-                  background: isActive(tag.name) 
-                    ? 'var(--bg-elevated)' 
+                  background: isActive(tag.name)
+                    ? 'var(--bg-elevated)'
                     : 'transparent',
                   color: 'var(--text-primary)',
                   fontWeight: isActive(tag.name) ? 600 : 500,
@@ -122,10 +122,10 @@ const Sidebar = ({ notes, filterTag, setFilterTag, showSidebar, setShowSidebar, 
                   bg="secondary"
                   pill
                   style={{
-                    background: isActive(tag.name) 
-                      ? tag.color 
+                    background: isActive(tag.name)
+                      ? tag.color
                       : 'var(--bg-tertiary)',
-                    color:'white',
+                    color: 'white',
                     fontWeight: 600,
                     fontSize: '0.75rem',
                     padding: '0.35rem 0.65rem',

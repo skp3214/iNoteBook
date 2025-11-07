@@ -40,7 +40,7 @@ const AiFab = () => {
           right: '2rem',
           width: '64px',
           height: '64px',
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          background: 'linear-gradient(135deg, #000000 0%, #444444 100%)',
           fontSize: '1.5rem',
           color: 'white',
           zIndex: 1000,
@@ -78,7 +78,7 @@ const AiFab = () => {
               style={{
                 width: '28px',
                 height: '28px',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                background: 'linear-gradient(135deg, #000000 0%, #444444 100%)',
                 fontSize: '1.5rem',
               }}
             >
@@ -238,7 +238,7 @@ const AiFab = () => {
                 style={{
                   width: '30px',
                   height: '30px',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  background: 'linear-gradient(135deg, #000000 0%, #444444 100%)',
                   fontSize: '1.25rem',
                 }}
               >

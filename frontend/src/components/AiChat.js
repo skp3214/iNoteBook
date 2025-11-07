@@ -6,6 +6,31 @@ import { Card, Button, Form, Spinner, Modal } from 'react-bootstrap';
 
 
 const AiChat = () => {
+    // Add custom scrollbar styles
+    useEffect(() => {
+        const style = document.createElement('style');
+        style.textContent = `
+            .custom-scrollbar::-webkit-scrollbar {
+                width: 6px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb {
+                background: rgba(0, 0, 0, 0.2);
+                border-radius: 3px;
+            }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: rgba(0, 0, 0, 0.3);
+            }
+        `;
+        document.head.appendChild(style);
+        
+        return () => {
+            document.head.removeChild(style);
+        };
+    }, []);
+
     const [messages, setMessages] = useState([
         {
             id: 1,
@@ -33,6 +58,11 @@ const AiChat = () => {
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
+
+    // Auto-resize textarea when inputMessage changes
+    useEffect(() => {
+        autoResizeTextarea(inputRef.current);
+    }, [inputMessage]);
 
     // Function to send speech message
     const sendSpeechMessage = useCallback(async (message) => {
@@ -196,6 +226,46 @@ const AiChat = () => {
         }
     }, [sendSpeechMessage]);
 
+    // Initialize textarea height on component mount
+    useEffect(() => {
+        if (inputRef.current) {
+            const textarea = inputRef.current;
+            textarea.style.height = '48px'; // Set initial height
+        }
+    }, []);
+
+    // Auto-resize function
+    const autoResizeTextarea = (textarea) => {
+        if (textarea) {
+            // Store current scroll position
+            const cursorPosition = textarea.selectionStart;
+            
+            // Reset height to calculate scroll height
+            textarea.style.height = 'auto';
+            const scrollHeight = textarea.scrollHeight;
+            const maxHeight = 120;
+            const minHeight = 48;
+            
+            if (scrollHeight <= maxHeight) {
+                // Content fits within max height, expand textarea
+                textarea.style.height = Math.max(minHeight, scrollHeight) + 'px';
+                textarea.style.overflowY = 'hidden';
+            } else {
+                // Content exceeds max height, set to max and enable scrolling
+                textarea.style.height = maxHeight + 'px';
+                textarea.style.overflowY = 'auto';
+                
+                // Auto-scroll to bottom when typing
+                setTimeout(() => {
+                    textarea.scrollTop = textarea.scrollHeight;
+                }, 0);
+            }
+            
+            // Restore cursor position
+            textarea.setSelectionRange(cursorPosition, cursorPosition);
+        }
+    };
+
     const startListening = () => {
         if (recognitionRef.current && speechSupported && !isListening) {
             try {
@@ -234,6 +304,8 @@ const AiChat = () => {
 
         setMessages(prev => [...prev, userMessage]);
         setInputMessage('');
+        // Reset textarea height after sending message
+        setTimeout(() => autoResizeTextarea(inputRef.current), 0);
         setIsLoading(true);
 
         try {
@@ -396,7 +468,7 @@ const AiChat = () => {
             </div>
 
             {/* Input Section - Fixed at Bottom */}
-            <div 
+            <div
                 className="border-top p-3"
                 style={{
                     background: 'var(--bg-secondary)',
@@ -404,93 +476,103 @@ const AiChat = () => {
                     flexShrink: 0
                 }}
             >
-                <div className="position-relative">
-                    <Form.Control
-                        as="textarea"
-                        ref={inputRef}
-                        value={inputMessage}
-                        onChange={(e) => setInputMessage(e.target.value)}
-                        onKeyDown={handleKeyPress}
-                        placeholder="Ask me anything about your notes..."
-                        disabled={isLoading}
-                        rows={1}
-                        style={{
-                            resize: 'none',
-                            borderRadius: '25px',
-                            paddingLeft: '1.25rem',
-                            paddingRight: speechSupported ? '5rem' : '3.5rem',
-                            paddingTop: '0.875rem',
-                            paddingBottom: '0.875rem',
-                            fontSize: '1rem',
-                            background: 'var(--bg-tertiary)',
-                            border: '1px solid var(--border-light)',
-                            color: 'var(--text-primary)',
-                            maxHeight: '120px',
-                            minHeight: '48px'
-                        }}
-                    />
+                <div className="d-flex align-items-end gap-2">
+                    {/* Voice Input Button */}
                     {speechSupported && (
                         <Button
                             variant={isListening ? "danger" : "outline-secondary"}
                             onClick={isListening ? stopListening : startListening}
                             disabled={isLoading}
                             style={{
-                                position: 'absolute',
-                                right: '55px',
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                zIndex: 5,
                                 border: 'none',
                                 borderRadius: '50%',
-                                width: '40px',
-                                height: '40px',
+                                width: '44px',
+                                height: '44px',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                background: isListening ? 'var(--danger)' : 'transparent'
+                                background: isListening ? 'var(--danger)' : 'var(--bg-tertiary)',
+                                flexShrink: 0
                             }}
                             title={isListening ? "Stop recording" : "Voice input"}
                         >
                             <FontAwesomeIcon
                                 icon={isListening ? faMicrophoneSlash : faMicrophone}
                                 style={{
-                                    fontSize: '1rem',
+                                    fontSize: '1.1rem',
                                     color: isListening ? 'white' : 'var(--text-muted)'
                                 }}
                             />
                         </Button>
                     )}
-                    <Button
-                        onClick={sendMessage}
-                        disabled={isLoading || !inputMessage.trim()}
-                        style={{
-                            position: 'absolute',
-                            right: '10px',
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            zIndex: 5,
-                            border: 'none',
-                            borderRadius: '50%',
-                            width: '40px',
-                            height: '40px',
-                            background: inputMessage.trim() && !isLoading ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))' : 'var(--bg-tertiary)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center'
-                        }}
-                    >
-                        <FontAwesomeIcon
-                            icon={faPaperPlane}
+                    
+                    {/* Auto-expanding Input Field */}
+                    <div className="position-relative flex-grow-1">
+                        <Form.Control
+                            as="textarea"
+                            ref={inputRef}
+                            value={inputMessage}
+                            onChange={(e) => {
+                                setInputMessage(e.target.value);
+                                // Auto-resize textarea up to max height, then allow scrolling
+                                autoResizeTextarea(e.target);
+                            }}
+                            onKeyDown={handleKeyPress}
+                            placeholder="Ask, note, or create ..."
+                            disabled={isLoading}
+                            rows={1}
+                            className="custom-scrollbar"
                             style={{
+                                resize: 'none',
+                                borderRadius: '25px',
+                                paddingLeft: '1.25rem',
+                                paddingRight: '3.5rem',
+                                paddingTop: '0.875rem',
+                                paddingBottom: '0.875rem',
                                 fontSize: '1rem',
-                                color: inputMessage.trim() && !isLoading ? 'white' : 'var(--text-muted)'
+                                background: 'var(--bg-tertiary)',
+                                border: '1px solid var(--border-light)',
+                                color: 'var(--text-primary)',
+                                maxHeight: '120px',
+                                minHeight: '48px',
+                                lineHeight: '1.4',
+                                overflowY: 'auto',
+                                overflowX: 'hidden',
+                                transition: 'height 0.1s ease, box-shadow 0.2s ease',
+                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+                                scrollbarWidth: 'thin',
+                                scrollbarColor: 'rgba(0, 0, 0, 0.2) transparent'
                             }}
                         />
-                    </Button>
+                        <Button
+                            onClick={sendMessage}
+                            disabled={isLoading || !inputMessage.trim()}
+                            style={{
+                                position: 'absolute',
+                                right: '8px',
+                                bottom: '4px',
+                                zIndex: 5,
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: '40px',
+                                height: '40px',
+                                background: inputMessage.trim() && !isLoading ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))' : 'var(--bg-tertiary)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            <FontAwesomeIcon
+                                icon={faPaperPlane}
+                                style={{
+                                    fontSize: '1rem',
+                                    color: inputMessage.trim() && !isLoading ? 'white' : 'var(--text-muted)'
+                                }}
+                            />
+                        </Button>
+                    </div>
                 </div>
-            </div>
-
-            {/* Speech Recognition Modal */}
+            </div>            {/* Speech Recognition Modal */}
             <Modal
                 show={showSpeechModal}
                 onHide={handleModalClose}

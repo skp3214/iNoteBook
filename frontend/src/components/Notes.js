@@ -351,17 +351,24 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                   <Form.Control
                     type="text"
                     placeholder="Search notes..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    value={activeSearchQuery || ''}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (externalSetSearchQuery) {
+                        externalSetSearchQuery(value);
+                      } else {
+                        setSearchQuery(value);
+                      }
+                    }}
                     className="search-input"
                     style={{
-                      paddingLeft: '3.5rem',
-                      paddingRight: '3.5rem',
-                      height: '56px',
+                      paddingLeft: '2.5rem',
+                      paddingRight: '2.5rem',
+                      height: '38px',
                       fontSize: '1rem',
                       background: 'var(--bg-secondary)',
                       border: '1px solid var(--border-light)',
-                      borderRadius: '16px',
+                      borderRadius: '10px',
                       color: 'var(--text-primary)',
                     }}
                   />
@@ -383,7 +390,7 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                     <FontAwesomeIcon
                       icon={faFilter}
                       style={{
-                        fontSize: '24px',
+                        fontSize: '14px',
                         cursor: 'pointer'
                       }} />
                   </button>
@@ -424,7 +431,7 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                       >
                         <div className="d-flex justify-content-between align-items-center">
                           <span>📝 All Notes</span>
-                          <Badge bg={!filterTag ? 'light' : 'secondary'}>{localNotes.length}</Badge>
+                          <Badge bg={!filterTag ? 'dark' : 'secondary'}>{localNotes.length}</Badge>
                         </div>
                       </button>
                       {uniqueTags.map(item => {
@@ -450,7 +457,7 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                           >
                             <div className="d-flex justify-content-between align-items-center">
                               <span>{icon} {tagName}</span>
-                              <Badge bg={filterTag === tagName ? 'light' : 'secondary'}>{count}</Badge>
+                              <Badge bg={filterTag === tagName ? 'dark' : 'secondary'}>{count}</Badge>
                             </div>
                           </button>
                         );
@@ -519,13 +526,13 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                     onClick={openAddModal}
                     className="btn btn-primary"
                     style={{
-                      width: '46px',
-                      height: '46px',
+                      width: '42px',
+                      height: '42px',
                       borderRadius: '50%',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      background: 'linear-gradient(135deg, #00bf8f 0%, #001510 100%)',
                       border: 'none',
                       fontSize: '1.5rem',
                       boxShadow: '0 4px 12px rgba(102, 126, 234, 0.4)',
