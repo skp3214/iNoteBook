@@ -364,8 +364,9 @@ const AiChat = () => {
                                     }}>
                                         {formatMessage(message.text)}
                                     </div>
-                                    <small className={message.sender === 'user' || message.isError ? 'text-white-50' : 'text-muted'} style={{
-                                        fontSize: '0.75rem'
+                                    <small style={{
+                                        fontSize: '0.75rem',
+                                        color: message.sender === 'user' || message.isError ? 'rgba(255, 255, 255, 0.6)' : 'gray'
                                     }}>
                                         {formatTimestamp(message.timestamp)}
                                     </small>

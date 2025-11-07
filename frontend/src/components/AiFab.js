@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Modal, Form, Button } from 'react-bootstrap';
 import AiChat from './AiChat';
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGear, faRobot, faTrash, faXmark } from '@fortawesome/free-solid-svg-icons';
 const AiFab = () => {
   const [showModal, setShowModal] = useState(false);
   const [showConfig, setShowConfig] = useState(false);
@@ -55,7 +56,12 @@ const AiFab = () => {
           e.target.style.boxShadow = '0 8px 24px rgba(102, 126, 234, 0.4)';
         }}
       >
-        🤖
+        <FontAwesomeIcon
+          icon={faRobot}
+          style={{
+            fontSize: '24px',
+            cursor: 'pointer'
+          }} />
       </Button>
 
       {/* AI Configuration Modal */}
@@ -70,15 +76,21 @@ const AiFab = () => {
             <div
               className="d-flex align-items-center justify-content-center rounded-circle"
               style={{
-                width: '48px',
-                height: '48px',
+                width: '28px',
+                height: '28px',
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 fontSize: '1.5rem',
               }}
             >
-              🤖
+              <FontAwesomeIcon
+                icon={faRobot}
+                style={{
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  color:'white'
+                }} />
             </div>
-            <span>AI Configuration</span>
+            <span style={{ fontSize: '1rem', color: 'var(--text-primary)' }}>AI Configuration</span>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body style={{ background: 'var(--bg-primary)' }}>
@@ -90,7 +102,14 @@ const AiFab = () => {
               border: '1px solid rgba(245, 158, 11, 0.2)',
             }}
           >
-            <div style={{ fontSize: '1.5rem' }}>⚙️</div>
+            <div style={{ fontSize: '1.5rem' }}>
+              <FontAwesomeIcon
+                icon={faGear}
+                style={{
+                  fontSize: '24px',
+                  cursor: 'pointer'
+                }} />
+            </div>
             <div>
               <h6 className="mb-1" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
                 Custom API Key (Optional)
@@ -119,7 +138,7 @@ const AiFab = () => {
                   borderRadius: '12px',
                 }}
               />
-              <Form.Text style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>
+              <Form.Text style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
                 Get your API key from{' '}
                 <a
                   href="https://aistudio.google.com/app/apikey"
@@ -217,15 +236,27 @@ const AiFab = () => {
               <div
                 className="d-flex align-items-center justify-content-center rounded-circle"
                 style={{
-                  width: '40px',
-                  height: '40px',
+                  width: '30px',
+                  height: '30px',
                   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                   fontSize: '1.25rem',
                 }}
               >
-                🤖
+                <FontAwesomeIcon
+                icon={faRobot}
+                style={{
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  color:'white'
+                }} />
               </div>
-              <span>AI Assistant</span>
+              <span
+              style={
+                {
+                  fontSize:'14px'
+                }
+              }
+              >AI Assistant</span>
             </div>
             <div className="d-flex align-items-center gap-2">
               <Button
@@ -244,7 +275,13 @@ const AiFab = () => {
                 }}
                 title="Configure AI"
               >
-                ⚙️
+                <FontAwesomeIcon
+                icon={faGear}
+                style={{
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  color:'var(--text-primary)'
+                }} />
               </Button>
               <Button
                 variant="link"
@@ -265,7 +302,13 @@ const AiFab = () => {
                 }}
                 title="Clear Chat"
               >
-                🗑️
+                <FontAwesomeIcon
+                icon={faTrash}
+                style={{
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  color:'red'
+                }} />
               </Button>
               <Button
                 variant="link"
@@ -283,7 +326,13 @@ const AiFab = () => {
                 }}
                 title="Close"
               >
-                ✕
+                <FontAwesomeIcon
+                icon={faXmark}
+                style={{
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  color:'var(--text-primary)'
+                }} />
               </Button>
             </div>
           </Modal.Title>

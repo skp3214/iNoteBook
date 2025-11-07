@@ -5,6 +5,8 @@ import Form from 'react-bootstrap/Form';
 import { useTheme } from '../context/theme/ThemeContext';
 import icon from '../asset/inotebookicon.png';
 import Button from 'react-bootstrap/Button';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faRightFromBracket, faRightToBracket } from '@fortawesome/free-solid-svg-icons';
 
 function NavbarComponents({ searchQuery, setSearchQuery }) {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -82,22 +84,31 @@ function NavbarComponents({ searchQuery, setSearchQuery }) {
               onClick={handleLogOut}
               className="modern-btn modern-btn-outline d-lg-none"
               size="sm"
-              style={{ fontSize: '0.75rem', padding: '0.25rem 0.5rem' }}
+              style={{ fontSize: '0.75rem', padding: '0.25rem 0.25rem' }}
             >
-              Logout
+              <FontAwesomeIcon
+                icon={faRightFromBracket}
+                style={{
+                  fontSize: '14px',
+                  cursor: 'pointer'
+                }} />
             </Button>
           ) : (
             <div className="d-flex gap-2 d-lg-none">
               <Button 
-                as={Link} 
-                to="/login" 
-                variant="outline-primary"
-                className="modern-btn modern-btn-outline"
-                size="sm"
-                style={{ fontSize: '0.75rem', padding: '0.25rem 0.25rem' }}
-              >
-                Login
-              </Button>
+              variant="outline-danger" 
+              onClick={handleLogOut}
+              className="modern-btn modern-btn-outline d-lg-none"
+              size="sm"
+              style={{ fontSize: '0.75rem', padding: '0.25rem 0.25rem' }}
+            >
+              <FontAwesomeIcon
+                icon={faRightToBracket}
+                style={{
+                  fontSize: '14px',
+                  cursor: 'pointer'
+                }} />
+            </Button>
             </div>
           )}
           

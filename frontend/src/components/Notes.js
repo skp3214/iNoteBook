@@ -11,6 +11,8 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Badge from 'react-bootstrap/Badge';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFilter } from '@fortawesome/free-solid-svg-icons';
 
 const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSearchQuery }) => {
   const context = useContext(noteContext);
@@ -378,7 +380,12 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                     }}
                     title="Filter"
                   >
-                    ▽
+                    <FontAwesomeIcon
+                      icon={faFilter}
+                      style={{
+                        fontSize: '24px',
+                        cursor: 'pointer'
+                      }} />
                   </button>
                 </div>
               </div>
@@ -460,7 +467,7 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                     <h2
                       className="mb-1"
                       style={{
-                        fontSize: '1.15rem',
+                        fontSize: '1.1rem',
                         fontWeight: 500,
                         color: 'var(--text-primary)',
                       }}

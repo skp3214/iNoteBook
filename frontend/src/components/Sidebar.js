@@ -83,7 +83,7 @@ const Sidebar = ({ notes, filterTag, setFilterTag, showSidebar, setShowSidebar, 
               fontSize: '0.75rem',
               fontWeight: 700,
               letterSpacing: '0.1em',
-              color: 'var(--text-muted)',
+              color: 'var(--text-primary)',
               paddingLeft: '0.75rem',
             }}
           >
@@ -125,7 +125,7 @@ const Sidebar = ({ notes, filterTag, setFilterTag, showSidebar, setShowSidebar, 
                     background: isActive(tag.name) 
                       ? tag.color 
                       : 'var(--bg-tertiary)',
-                    color: isActive(tag.name) ? 'white' : 'var(--text-secondary)',
+                    color:'white',
                     fontWeight: 600,
                     fontSize: '0.75rem',
                     padding: '0.35rem 0.65rem',
@@ -146,7 +146,7 @@ const Sidebar = ({ notes, filterTag, setFilterTag, showSidebar, setShowSidebar, 
               fontSize: '0.75rem',
               fontWeight: 700,
               letterSpacing: '0.1em',
-              color: 'var(--text-muted)',
+              color: 'var(--text-primary)',
               paddingLeft: '0.75rem',
             }}
           >
@@ -177,7 +177,7 @@ const Sidebar = ({ notes, filterTag, setFilterTag, showSidebar, setShowSidebar, 
                     >
                       {note.title}
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                       {new Date(note.date).toLocaleDateString()}
                     </div>
                   </div>
