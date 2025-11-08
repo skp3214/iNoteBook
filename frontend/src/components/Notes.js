@@ -12,7 +12,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Badge from 'react-bootstrap/Badge';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faFilter, faSort } from '@fortawesome/free-solid-svg-icons';
 
 const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSearchQuery }) => {
   const context = useContext(noteContext);
@@ -39,6 +39,7 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
   const [snackbar, setSnackbar] = useState({ show: false, note: null, deleteAction: null, timeoutId: null });
   const [showSidebar, setShowSidebar] = useState(false);
   const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [sortOrder, setSortOrder] = useState('date'); // 'date' or 'priority'
 
   // Use external search query if provided (for desktop navbar search)
   const activeSearchQuery = externalSearchQuery !== undefined ? externalSearchQuery : searchQuery;
@@ -91,10 +92,20 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
     filteredNotes = filteredNotes.filter(n => n.tag === filterTag);
   }
 
-  // Sort by date (newest first)
-  filteredNotes = [...filteredNotes].sort((a, b) =>
-    new Date(b.date) - new Date(a.date)
-  );
+  // Sort notes based on selected sort order
+  if (sortOrder === 'priority') {
+    const priorityOrder = { 'Urgent': 1, 'Important': 2, 'Work': 3, 'Personal': 4, 'Completed': 5 };
+    filteredNotes = [...filteredNotes].sort((a, b) => {
+      const aPriority = priorityOrder[a.tag] || 6;
+      const bPriority = priorityOrder[b.tag] || 6;
+      return aPriority - bPriority;
+    });
+  } else {
+    // Sort by date (newest first)
+    filteredNotes = [...filteredNotes].sort((a, b) =>
+      new Date(b.date) - new Date(a.date)
+    );
+  }
 
   const updateNote = (currentNote) => {
     setIsEditMode(true);
@@ -237,17 +248,19 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
       clearTimeout(snackbar.timeoutId);
     }
 
-    // If closing manually and there's a note, we should still keep it in pending deletes
-    // since user didn't explicitly undo - this maintains the current behavior
-
     setSnackbar({ show: false, note: null, deleteAction: null, timeoutId: null });
+  };
+
+  const toggleSortOrder = () => {
+    setSortOrder(prevOrder => prevOrder === 'date' ? 'priority' : 'date');
   };
 
   const uniqueTags = [
     { Urgent: 'danger' },
-    { Completed: 'success' },
     { Important: 'warning' },
+    { Work: 'primary' },
     { Personal: 'info' },
+    { Completed: 'success' },
   ];
 
   return (
@@ -334,20 +347,34 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                   >
                     ☰
                   </button>
+                  <button
+                    onClick={toggleSortOrder}
+                    className={`btn btn-sm ${sortOrder === 'priority' ? 'btn-primary' : 'btn-outline-secondary'}`}
+                    style={{
+                      width: '44px',
+                      height: '44px',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: sortOrder === 'priority' ? 'none' : '1px solid var(--border-light)',
+                      fontSize: '1.1rem',
+                    }}
+                    title={sortOrder === 'priority' ? 'Sort by Date' : 'Sort by Priority'}
+                  >
+                    <FontAwesomeIcon
+                      icon={faSort}
+                      style={{
+                        fontSize: '14px',
+                        cursor: 'pointer'
+                      }} />
+                  </button>
                 </div>
               </div>
 
               {/* Search Bar - Mobile Only */}
               <div className="mb-4 d-lg-none">
                 <div className="position-relative">
-                  <i className="fas fa-search position-absolute" style={{
-                    left: '1.25rem',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    color: 'var(--text-muted)',
-                    zIndex: 5,
-                    fontSize: '1.1rem',
-                  }}></i>
                   <Form.Control
                     type="text"
                     placeholder="Search notes..."
@@ -363,7 +390,7 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                     className="search-input"
                     style={{
                       paddingLeft: '2.5rem',
-                      paddingRight: '2.5rem',
+                      paddingRight: '3.5rem',
                       height: '38px',
                       fontSize: '1rem',
                       background: 'var(--bg-secondary)',
@@ -488,7 +515,7 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                 </div>
 
                 <div className="d-flex align-items-center gap-2">
-                  {/* View Toggle + Add Button - Mobile */}
+                  {/* View Toggle + Sort + Add Button - Mobile */}
                   <button
                     onClick={() => setViewMode('grid')}
                     className={`btn btn-sm ${viewMode === 'grid' ? 'btn-primary' : 'btn-outline-secondary'}`}
@@ -520,6 +547,28 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                     title="List View"
                   >
                     ☰
+                  </button>
+                  <button
+                    onClick={toggleSortOrder}
+                    className={`btn btn-sm ${sortOrder === 'priority' ? 'btn-primary' : 'btn-black'}`}
+                    style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      border: sortOrder === 'priority' ? 'none' : '1px solid var(--border-light)',
+                      fontSize: '1rem',
+                    }}
+                    title={sortOrder === 'priority' ? 'Sort by Date' : 'Sort by Priority'}
+                  >
+                    <FontAwesomeIcon
+                      icon={faSort}
+                      style={{
+                        fontSize: '14px',
+                        cursor: 'pointer'
+                      }} />
                   </button>
                   {/* Add Note Button - Mobile */}
                   <button
