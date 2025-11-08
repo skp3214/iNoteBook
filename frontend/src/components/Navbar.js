@@ -23,6 +23,10 @@ function NavbarComponents({ searchQuery, setSearchQuery }) {
     navigate('/');
   }
 
+  const handleLogin=()=>{
+    navigate('/login');
+  }
+
   const isHomePage = location.pathname === '/home';
 
   return (
@@ -100,7 +104,7 @@ function NavbarComponents({ searchQuery, setSearchQuery }) {
             <div className="d-flex gap-2 d-lg-none">
               <Button 
               variant="outline-danger" 
-              onClick={handleLogOut}
+              onClick={handleLogin}
               className="modern-btn modern-btn-outline d-lg-none"
               size="sm"
               style={{ fontSize: '0.75rem', padding: '0.25rem 0.25rem' }}

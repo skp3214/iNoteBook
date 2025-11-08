@@ -17,36 +17,24 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <>
-      <ThemeProvider>
-        <NoteState>
-          <Router>
-            <div className="min-vh-100" style={{ background: 'var(--bg-primary)' }}>
-              <Routes>
-                {/* Landing Page Route (no navbar) */}
-                <Route path="/landing" element={<LandingPage />} />
-                
-                {/* All other routes with navbar */}
-                <Route path="/*" element={
-                  <>
-                    <NavbarComponents searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-                    <Routes>
-                      <Route path="/" element={<Home searchQuery={searchQuery} setSearchQuery={setSearchQuery} />} />
-                      <Route path="/home" element={<Home searchQuery={searchQuery} setSearchQuery={setSearchQuery} />} />
-                      <Route path="/ai-assistant" element={<AiAssistant />} />
-                      <Route path="/login" element={<LoginForm />} />
-                      <Route path="/signup" element={<SignUpForm />} />
-                      <Route path="/forgot-password" element={<ForgotPassword />} />
-                      <Route path="/reset-password" element={<ResetPassword />} />
-                    </Routes>
-                  </>
-                } />
-              </Routes>
-            </div>
-          </Router>
-        </NoteState>
-      </ThemeProvider>
-    </>
+    <ThemeProvider>
+      <NoteState>
+        <Router>
+          <div className="min-vh-100" style={{ background: 'var(--bg-primary)' }}>
+            <NavbarComponents searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/home" element={<Home searchQuery={searchQuery} setSearchQuery={setSearchQuery} />} />
+              <Route path="/ai-assistant" element={<AiAssistant />} />
+              <Route path="/login" element={<LoginForm />} />
+              <Route path="/signup" element={<SignUpForm />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+            </Routes>
+          </div>
+        </Router>
+      </NoteState>
+    </ThemeProvider>
   );
 }
 

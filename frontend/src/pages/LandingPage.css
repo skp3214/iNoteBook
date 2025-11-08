@@ -1,0 +1,411 @@
+/* -------------------------------------------------------------------------- */
+/* Global Styles & Variables */
+/* -------------------------------------------------------------------------- */
+:root {
+    --color-bg-primary: #0a0a0a;
+    --color-bg-secondary: #161616;
+    --color-text-light: #f3f4f6;
+    --color-text-muted: #9ca3af;
+    --color-accent-green: #10b981;
+    --color-accent-blue: #2563eb;
+    --color-accent-red: #ef4444;
+    --color-shadow-dark: rgba(0, 0, 0, 0.4);
+}
+
+/* Light theme variables */
+.light-theme {
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #f8fafc;
+    --color-text-light: #1f2937;
+    --color-text-muted: #6b7280;
+    --color-accent-green: #10b981;
+    --color-accent-blue: #2563eb;
+    --color-accent-red: #ef4444;
+    --color-shadow-dark: rgba(0, 0, 0, 0.1);
+}
+
+body {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-light);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+}
+
+.landing-page {
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Base Headings and Text */
+.section-title, .hero-title {
+    color: var(--color-text-light);
+    font-weight: 800;
+}
+
+.section-description {
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto 40px;
+}
+
+/* Gradient Text Effect */
+.gradient-text {
+    background: linear-gradient(90deg, #10b981, #06b6d4, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Hero Section */
+/* -------------------------------------------------------------------------- */
+
+.hero-section {
+    position: relative;
+    /* Reduced top padding on mobile/base view */
+    padding: 50px 0; 
+    height: auto; 
+    min-height: 600px;
+    overflow: hidden;
+}
+
+/* Content Area */
+.hero-content {
+    z-index: 10;
+    padding-left: 50px; /* Base padding */
+    padding-top: 50px;
+}
+
+.hero-badge {
+    margin-bottom: 20px;
+}
+
+.modern-badge-ai {
+    background: linear-gradient(135deg, #065f46 0%, #059669 50%, #10b981 100%);
+    color: var(--color-bg-primary);
+    padding: 0.4rem 1rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.hero-title {
+    font-size: 4.5rem;
+    line-height: 1.1;
+    margin-bottom: 20px;
+}
+
+.hero-description {
+    color: var(--color-text-muted);
+    font-size: 1.15rem;
+    max-width: 500px;
+    margin-bottom: 40px;
+}
+
+/* Call to Action Button */
+.hero-btn-primary {
+    background: var(--color-accent-green);
+    border: none;
+    color: var(--color-bg-primary);
+    font-weight: 700;
+    padding: 0.8rem 1.8rem;
+    font-size: 1.1rem;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 25px -5px rgba(16, 185, 129, 0.6);
+}
+
+.hero-btn-primary:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px -5px rgba(16, 185, 129, 0.8);
+}
+
+/* Hero Visual & Cards */
+.hero-visual {
+    display: flex; /* Default to visible */
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 100%;
+}
+
+.hero-cards-container {
+    position: relative;
+    width: 400px;
+    height: 450px;
+}
+
+.floating-card {
+    position: absolute;
+    width: 250px;
+    color: white; /* Always white text on colored cards */
+    border-radius: 1rem;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 10px 30px var(--color-shadow-dark);
+    animation-timing-function: ease-in-out;
+    animation-iteration-count: infinite;
+}
+
+/* Light theme adjustments for floating cards shadow */
+.light-theme .floating-card {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* Desktop/Tablet Card Positioning (Default for large view) */
+.card-1 {
+    top: 50px;
+    left: 100px;
+    animation: float-card-1 8s infinite ease-in-out;
+}
+.card-2 {
+    top: 180px;
+    left: 250px;
+    animation: float-card-2 10s infinite ease-in-out;
+    z-index: 15;
+}
+.card-3 {
+    top: 300px;
+    left: 0;
+    animation: float-card-3 9s infinite ease-in-out;
+}
+
+@keyframes float-card-1 {
+    0%, 100% { transform: translate(0, 0) rotate(5deg); }
+    50% { transform: translate(15px, 20px) rotate(3deg); }
+}
+@keyframes float-card-2 {
+    0%, 100% { transform: translate(0, 0) rotate(-3deg); }
+    50% { transform: translate(-10px, 15px) rotate(-1deg); }
+}
+@keyframes float-card-3 {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(5px, 10px) rotate(2deg); }
+}
+
+/* Card Badges */
+.modern-badge-work { background-color: var(--color-accent-blue); }
+.modern-badge-urgent { background-color: var(--color-accent-red); }
+.modern-badge-completed { background-color: var(--color-accent-green); }
+.modern-badge-work, .modern-badge-urgent, .modern-badge-completed {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 9999px;
+    font-weight: 600;
+}
+
+/* Background Shapes (Matches image style: subtle, dark circles) */
+.hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.floating-shapes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.shape {
+    position: absolute;
+    background: rgba(16, 185, 129, 0.1); /* Subtle green tint */
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.2;
+    transform: translate(-50%, -50%);
+    animation: morph 20s infinite alternate;
+}
+
+/* Light theme background shapes */
+.light-theme .shape {
+    background: rgba(16, 185, 129, 0.08);
+    opacity: 0.3;
+}
+
+.light-theme .shape-3 {
+    background: rgba(37, 99, 235, 0.08);
+}
+
+.light-theme .shape-4 {
+    background: rgba(239, 68, 68, 0.08);
+}
+
+.shape-1 { top: 10%; left: 10%; width: 250px; height: 250px; animation-delay: 0s; }
+.shape-2 { top: 80%; left: 90%; width: 300px; height: 300px; animation-delay: 4s; }
+.shape-3 { top: 50%; left: 50%; width: 150px; height: 150px; background: rgba(37, 99, 235, 0.1); animation-delay: 8s; }
+.shape-4 { top: 90%; left: 10%; width: 200px; height: 200px; background: rgba(239, 68, 68, 0.1); animation-delay: 12s; }
+.shape-5 { top: 20%; left: 80%; width: 180px; height: 180px; animation-delay: 16s; }
+
+@keyframes morph {
+    0% {
+        transform: scale(1) translate(0, 0);
+    }
+    100% {
+        transform: scale(1.2) translate(50px, -50px);
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+/* Features Section */
+/* -------------------------------------------------------------------------- */
+
+.features-section {
+    padding: 80px 0;
+    background-color: var(--color-bg-secondary);
+    border-top: 1px solid #1f1f1f;
+}
+
+/* Light theme features section */
+.light-theme .features-section {
+    border-top: 1px solid #e5e7eb;
+}
+
+.feature-card {
+    background-color: var(--color-bg-primary);
+    border: 1px solid #1f1f1f;
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Light theme feature cards */
+.light-theme .feature-card {
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Active/Hover State with Glow Effect */
+.feature-card:hover, .feature-card.active {
+    border-color: var(--color-accent-green);
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+    transform: translateY(-5px);
+    background-color: #1a1a1a;
+}
+
+/* Light theme hover/active states */
+.light-theme .feature-card:hover, .light-theme .feature-card.active {
+    background-color: #f9fafb;
+    box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+}
+
+.feature-icon {
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    font-size: 1.8rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+}
+
+.feature-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.feature-description {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Responsive Design (Mobile First) */
+/* -------------------------------------------------------------------------- */
+
+/* Mobile Specific Adjustments (Default < 768px) */
+
+.hero-content {
+    padding-left: 15px;
+    padding-right: 15px;
+    text-align: center;
+    padding-top: 0; 
+}
+.hero-title {
+    font-size: 2.5rem;
+}
+.hero-visual {
+    /* Cards are now visible and given space on mobile */
+    display: flex; 
+    height: 400px;
+    margin-top: 30px;
+}
+.hero-cards-container {
+    /* Scale down and center floating cards for mobile screens */
+    width: 300px; 
+    height: 350px;
+    transform: scale(0.85); 
+    transform-origin: center;
+    margin: 0 auto;
+}
+.hero-section {
+    min-height: auto;
+    padding-bottom: 50px;
+}
+
+/* Mobile Card Positioning (Adjusted for scaled container) */
+.card-1 { top: 30px; left: 80px; }
+.card-2 { top: 150px; left: 180px; z-index: 15; }
+.card-3 { top: 250px; left: -10px; }
+
+
+/* Tablet (md) and Desktop (lg) */
+@media (min-width: 768px) {
+    /* Restore Hero content layout for larger screens */
+    .hero-content {
+        text-align: left;
+        padding-left: 30px;
+        padding-top: 50px; 
+    }
+    .hero-title {
+        font-size: 3.5rem;
+    }
+    .hero-visual {
+        height: 100%;
+        margin-top: 0;
+    }
+    
+    /* Restore original desktop settings for card container */
+    .hero-cards-container {
+        width: 400px;
+        height: 450px;
+        transform: scale(1); 
+        margin: unset;
+    }
+    
+    /* Restore original desktop card positions */
+    .card-1 { top: 50px; left: 100px; }
+    .card-2 { top: 180px; left: 250px; z-index: 15; }
+    .card-3 { top: 300px; left: 0; }
+
+    /* Restore hero section properties */
+    .hero-section {
+        min-height: 700px;
+        padding: 100px 0;
+    }
+
+    .hero-title {
+        font-size: 4.5rem;
+    }
+
+    .features-section {
+        padding: 100px 0;
+    }
+}
+
+@media (min-width: 1200px) {
+    .hero-title {
+        font-size: 5rem;
+    }
+}
