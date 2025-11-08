@@ -11,7 +11,7 @@
 
 </div>
 
-![Screenshot_4-9-2025_14241_inotebook-live vercel app](https://github.com/user-attachments/assets/2d94a6d5-00fe-4c8e-8758-b0acdd647379)
+<img width="3087" height="1743" alt="image" src="https://github.com/user-attachments/assets/867d93e6-107d-4c20-94b3-973007f558ae" />
 
 
 ## 🚀 Overview
