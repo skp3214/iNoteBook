@@ -80,6 +80,25 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
     };
   }, [snackbar.timeoutId]);
 
+  // Handle sidebar visibility on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      // Close sidebar when resizing to mobile view (< 992px)
+      if (window.innerWidth < 992) {
+        setShowSidebar(false);
+      }
+    };
+
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+    
+    // Initial check on mount
+    handleResize();
+
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   let filteredNotes = localNotes;
 
   if (activeSearchQuery) {

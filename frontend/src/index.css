@@ -1472,6 +1472,24 @@ body {
   scrollbar-color: var(--border-medium) transparent;
 }
 
+/* Hide sidebar on mobile by default */
+@media (max-width: 991px) {
+  .sidebar {
+    display: none !important;
+  }
+  
+  .sidebar.show {
+    display: block !important;
+  }
+}
+
+/* Show sidebar on desktop always */
+@media (min-width: 992px) {
+  .sidebar {
+    display: block !important;
+  }
+}
+
 .sidebar-overlay {
   animation: fadeIn 0.3s ease;
 }
