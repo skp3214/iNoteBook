@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Form, Button, Container, Row, Col, Spinner, Card } from 'react-bootstrap';
 
@@ -10,6 +10,13 @@ const LoginForm = () => {
     const [isSigningIn, setisSigningIn] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
     const history = useNavigate();
+
+    // Redirect to home if user is already logged in
+    useEffect(() => {
+        if (localStorage.getItem('token')) {
+            history('/');
+        }
+    }, [history]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

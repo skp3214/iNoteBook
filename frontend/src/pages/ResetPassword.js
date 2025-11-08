@@ -16,6 +16,13 @@ const ResetPassword = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
+    // Redirect to home if user is already logged in
+    useEffect(() => {
+        if (localStorage.getItem('token')) {
+            navigate('/');
+        }
+    }, [navigate]);
+
     useEffect(() => {
         const urlToken = searchParams.get('token');
         if (urlToken) {

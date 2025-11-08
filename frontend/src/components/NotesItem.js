@@ -150,14 +150,14 @@ const NotesItem = (props) => {
             <div className="d-flex align-items-center gap-3">
               {note.tag && tagLabel !== 'No Tag' && (
                 <Badge
-                  bg={tagInfo.badgeVariant}
+                  bg='white'
                   style={{
                     fontSize: '0.75rem',
                     fontWeight: '500',
                     padding: '0.35rem 0.75rem',
                     background: 'rgba(255, 255, 255, 0.25)',
-                    color: 'white',
-                    border: `1px solid ${tagInfo.borderColor}`,
+                    color: `${tagInfo.borderColor}`,
+                    border: 'none',
                     borderRadius: '8px',
                   }}
                 >
@@ -179,9 +179,9 @@ const NotesItem = (props) => {
           </div>
 
           {/* Right: Dropdown Menu */}
-          <Dropdown 
-            align="end" 
-            className="ms-3" 
+          <Dropdown
+            align="end"
+            className="ms-3"
             style={{ position: 'static', zIndex: 1060 }}
             onToggle={(isOpen) => setIsDropdownOpen(isOpen)}
           >
@@ -346,17 +346,15 @@ const NotesItem = (props) => {
             <div className="d-flex align-items-center gap-2">
               {note.tag && tagLabel !== 'No Tag' && (
                 <Badge
-                  bg={tagInfo.badgeVariant}
-                  className="px-3 py-1"
+                  bg='white'
                   style={{
                     fontSize: '0.75rem',
                     fontWeight: '500',
-                    textTransform: 'capitalize',
-                    letterSpacing: '0.3px',
+                    padding: '0.35rem 0.75rem',
                     background: 'rgba(255, 255, 255, 0.25)',
-                    color: 'white',
-                    border: `1px solid ${tagInfo.borderColor}`,
-                    borderRadius: '6px',
+                    color: `${tagInfo.borderColor}`,
+                    border: 'none',
+                    borderRadius: '8px',
                   }}
                 >
                   {tagLabel.toUpperCase()}
@@ -370,7 +368,7 @@ const NotesItem = (props) => {
                     opacity: 0.8,
                   }}
                 >
-                  {new Date(note.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year:'numeric' })}
+                  {new Date(note.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                 </span>
               )}
             </div>

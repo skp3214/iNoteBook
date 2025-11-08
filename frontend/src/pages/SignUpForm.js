@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Form, Button, Container, Row, Col, Spinner, Card } from 'react-bootstrap';
 
@@ -14,6 +14,13 @@ const SignUpForm = () => {
   const [isSigningUp, setIsSigningUp] = useState(false);
 
   let history = useNavigate();
+
+  // Redirect to home if user is already logged in
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      history('/');
+    }
+  }, [history]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

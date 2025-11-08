@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Form, Button, Container, Row, Col, Card, Alert, Spinner } from 'react-bootstrap';
 
 const ForgotPassword = () => {
@@ -10,6 +10,14 @@ const ForgotPassword = () => {
     const [alertType, setAlertType] = useState('success');
     const [emailSent, setEmailSent] = useState(false);
     const [resetToken, setResetToken] = useState('');
+    const history = useNavigate();
+
+    // Redirect to home if user is already logged in
+    useEffect(() => {
+        if (localStorage.getItem('token')) {
+            history('/');
+        }
+    }, [history]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
