@@ -7,6 +7,7 @@ import icon from '../asset/inotebookicon.png';
 import Button from 'react-bootstrap/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRightFromBracket, faRightToBracket } from '@fortawesome/free-solid-svg-icons';
+import { clearOfflineData } from '../utils/offlineUtils';
 
 function NavbarComponents({ searchQuery, setSearchQuery }) {
   const { isDarkMode, toggleTheme } = useTheme();
@@ -17,6 +18,8 @@ function NavbarComponents({ searchQuery, setSearchQuery }) {
   
   const handleLogOut = () => {
     localStorage.removeItem('token');
+    // Clear all user-specific offline data on logout
+    clearOfflineData();
     navigate('login');
   }
 

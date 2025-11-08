@@ -9,7 +9,15 @@ import {
     addPendingAction,
     removePendingAction,
     mergeNotes,
-    setNetworkStatus
+    setNetworkStatus,
+    clearSyncedOfflineNotes,
+    migrateOldOfflineData,
+    saveCachedNotes,
+    getCachedNotes,
+    updateCachedNote,
+    removeCachedNote,
+    cleanupPendingActions,
+    removeOfflineNoteByContent
 } from '../../utils/offlineUtils';
 
 const NoteState = (props) => {
@@ -20,6 +28,11 @@ const NoteState = (props) => {
     const [isOnline, setIsOnline] = useState(true);
     const [syncInProgress, setSyncInProgress] = useState(false);
     const syncRef = useRef(false);
+
+    // Migrate old localStorage data on component mount
+    useEffect(() => {
+        migrateOldOfflineData();
+    }, []);
 
     // Sync pending actions when back online
     const syncPendingActions = useCallback(async () => {
@@ -33,7 +46,7 @@ const NoteState = (props) => {
             try {
                 switch (action.type) {
                     case 'ADD_NOTE':
-                        await fetch(`${host}/api/notes/addnotes`, {
+                        const addResponse = await fetch(`${host}/api/notes/addnotes`, {
                             method: "POST",
                             headers: {
                                 'Content-Type': 'application/json',
@@ -41,6 +54,11 @@ const NoteState = (props) => {
                             },
                             body: JSON.stringify(action.data)
                         });
+                        
+                        // If successful, remove the corresponding offline note
+                        if (addResponse.ok) {
+                            removeOfflineNoteByContent(action.data.title, action.data.description, action.data.tag);
+                        }
                         break;
                     case 'UPDATE_NOTE':
                         await fetch(`${host}/api/notes/updatenotes/${action.data.id}`, {
@@ -92,6 +110,11 @@ const NoteState = (props) => {
                     const offlineNotes = getOfflineNotes();
                     const mergedNotes = mergeNotes(onlineNotes, offlineNotes);
                     setNotes(mergedNotes);
+                    
+                    // Cache notes, clean up invalid actions, and clear synced offline notes
+                    saveCachedNotes(onlineNotes);
+                    cleanupPendingActions(onlineNotes);
+                    clearSyncedOfflineNotes(onlineNotes);
                 }
             }
         } catch (error) {
@@ -164,6 +187,10 @@ const NoteState = (props) => {
                     const offlineNotes = getOfflineNotes();
                     const mergedNotes = mergeNotes(onlineNotes, offlineNotes);
                     setNotes(mergedNotes);
+                    
+                    // Cache notes and clean up invalid pending actions
+                    saveCachedNotes(onlineNotes);
+                    cleanupPendingActions(onlineNotes);
                     return;
                 }
             }
@@ -171,9 +198,11 @@ const NoteState = (props) => {
             console.error('Error fetching online notes:', error);
         }
 
-        // Fallback to offline notes
+        // Fallback to offline notes + cached online notes
         const offlineNotes = getOfflineNotes();
-        setNotes(offlineNotes);
+        const cachedNotes = getCachedNotes();
+        const allOfflineNotes = mergeNotes(cachedNotes, offlineNotes);
+        setNotes(allOfflineNotes);
     }, [host, isOnline]);
 
     const addNote = async (title, description, tag) => {
@@ -236,6 +265,8 @@ const NoteState = (props) => {
         setNotes(prevNotes => prevNotes.filter(note => note._id !== id));
         
         if (!id.startsWith('offline_')) {
+            // Remove from cached notes and add pending delete action
+            removeCachedNote(id);
             addPendingAction({
                 type: 'DELETE_NOTE',
                 data: { id }
@@ -247,7 +278,7 @@ const NoteState = (props) => {
         // Add the note back to the array
         setNotes(prevNotes => [...prevNotes, noteToRestore]);
         
-        // If it was an online note, remove the pending delete action
+        // If it was an online note, remove the pending delete action and restore to cache
         if (!noteToRestore._id.startsWith('offline_')) {
             const pendingActions = getPendingActions();
             const deleteAction = pendingActions.find(
@@ -255,6 +286,10 @@ const NoteState = (props) => {
             );
             if (deleteAction) {
                 removePendingAction(deleteAction.id);
+                // Restore note to cached notes
+                const cachedNotes = getCachedNotes();
+                cachedNotes.push(noteToRestore);
+                saveCachedNotes(cachedNotes);
             }
         } else {
             // For offline notes, restore to local storage
@@ -299,6 +334,8 @@ const NoteState = (props) => {
         ));
 
         if (!id.startsWith('offline_')) {
+            // Update cached note and add pending action
+            updateCachedNote(id, updateData);
             addPendingAction({
                 type: 'UPDATE_NOTE',
                 data: { id, ...updateData }
