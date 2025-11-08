@@ -1,8 +1,10 @@
-const CACHE_NAME = 'inotebook-v1';
+// Update version whenever you make changes to force cache refresh
+const CACHE_VERSION = 'v2.0.0';
+const CACHE_NAME = `inotebook-${CACHE_VERSION}`;
+const DATA_CACHE_NAME = `inotebook-data-${CACHE_VERSION}`;
+
+// Only cache essential offline assets
 const urlsToCache = [
-  '/',
-  '/static/js/bundle.js',
-  '/static/css/main.css',
   '/manifest.json',
   '/inotebookicon.png'
 ];
@@ -21,13 +23,17 @@ self.addEventListener('install', function(event) {
   self.skipWaiting();
 });
 
-// Activate event
+// Activate event - Clean up old caches
 self.addEventListener('activate', function(event) {
   event.waitUntil(
     caches.keys().then(function(cacheNames) {
       return Promise.all(
         cacheNames.map(function(cacheName) {
-          if (cacheName !== CACHE_NAME) {
+          // Delete all old caches that don't match current version
+          if (cacheName.startsWith('inotebook-') && 
+              cacheName !== CACHE_NAME && 
+              cacheName !== DATA_CACHE_NAME) {
+            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -46,28 +52,28 @@ self.addEventListener('fetch', function(event) {
 
   const requestUrl = new URL(event.request.url);
   
-  // Handle API requests
+  // Handle API requests - Network first, cache fallback
   if (requestUrl.pathname.startsWith('/api/')) {
     event.respondWith(
       fetch(event.request)
         .then(function(response) {
-          // Only cache GET requests with successful responses
+          // Cache API GET requests for offline access
           if (response.status === 200 && event.request.method === 'GET') {
             const responseClone = response.clone();
-            caches.open(CACHE_NAME).then(function(cache) {
+            caches.open(DATA_CACHE_NAME).then(function(cache) {
               cache.put(event.request, responseClone);
             });
           }
           return response;
         })
         .catch(function() {
-          // If fetch fails, try to get from cache
+          // If network fails, try cache
           return caches.match(event.request)
             .then(function(cachedResponse) {
               if (cachedResponse) {
                 return cachedResponse;
               }
-              // Return a generic offline response for API calls
+              // Return offline response
               return new Response(JSON.stringify({
                 success: false,
                 message: 'Offline - data not available in cache'
@@ -80,37 +86,39 @@ self.addEventListener('fetch', function(event) {
         })
     );
   } else {
-    // Handle static assets with cache-first strategy
+    // Handle static assets - NETWORK FIRST for development, cache as fallback
     event.respondWith(
-      caches.match(event.request)
+      fetch(event.request)
         .then(function(response) {
-          // Return cached version or fetch from network
-          return response || fetch(event.request)
-            .then(function(response) {
-              // Don't cache non-successful responses or non-basic responses
-              if (!response || response.status !== 200 || response.type !== 'basic') {
-                return response;
-              }
-              
-              // Clone the response
+          // Only cache successful responses
+          if (response && response.status === 200) {
+            // Don't cache HTML files in production to ensure updates
+            const isHtml = event.request.destination === 'document' || 
+                          event.request.url.endsWith('.html') ||
+                          requestUrl.pathname === '/';
+            
+            if (!isHtml) {
+              // Cache non-HTML static assets
               const responseToCache = response.clone();
-              
-              caches.open(CACHE_NAME)
-                .then(function(cache) {
-                  // Only cache if the request URL is supported
-                  if (event.request.url.startsWith('http')) {
-                    cache.put(event.request, responseToCache);
-                  }
-                });
-              
-              return response;
-            });
+              caches.open(CACHE_NAME).then(function(cache) {
+                cache.put(event.request, responseToCache);
+              });
+            }
+          }
+          return response;
         })
         .catch(function() {
-          // If both cache and network fail, return a fallback
-          if (event.request.destination === 'document') {
-            return caches.match('/');
-          }
+          // If network fails, try cache
+          return caches.match(event.request)
+            .then(function(cachedResponse) {
+              if (cachedResponse) {
+                return cachedResponse;
+              }
+              // For document requests, try to return cached index
+              if (event.request.destination === 'document') {
+                return caches.match('/');
+              }
+            });
         })
     );
   }

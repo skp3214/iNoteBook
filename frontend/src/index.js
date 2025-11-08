@@ -19,24 +19,58 @@ root.render(
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
 
-// Register service worker for PWA functionality
-if ('serviceWorker' in navigator) {
+// Register service worker for PWA functionality (only in production)
+if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
+        console.log('Service Worker registered');
+        
+        // Check for updates periodically
+        setInterval(() => {
+          registration.update();
+        }, 60000); // Check every minute
+
         // Listen for updates
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
+          console.log('New Service Worker found, updating...');
+          
           newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              // Just activate the new worker without reloading
-              newWorker.postMessage({ type: 'SKIP_WAITING' });
+            if (newWorker.state === 'installed') {
+              if (navigator.serviceWorker.controller) {
+                // New service worker available, activate it
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
+                console.log('New content available, reloading...');
+                // Reload to get new content
+                window.location.reload();
+              } else {
+                // First time installation
+                console.log('Content cached for offline use');
+              }
             }
           });
         });
       })
-      .catch(() => {
-        // Silent fail
+      .catch((error) => {
+        console.log('Service Worker registration failed:', error);
       });
+
+    // Reload when new service worker takes control
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        window.location.reload();
+      }
+    });
+  });
+} else if ('serviceWorker' in navigator && process.env.NODE_ENV === 'development') {
+  // Unregister service worker in development
+  navigator.serviceWorker.getRegistrations().then(registrations => {
+    registrations.forEach(registration => {
+      registration.unregister();
+      console.log('Service Worker unregistered for development');
+    });
   });
 }
