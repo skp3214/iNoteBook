@@ -20,15 +20,15 @@ function NavbarComponents({ searchQuery, setSearchQuery }) {
     localStorage.removeItem('token');
     // Clear all user-specific offline data on logout
     clearOfflineData();
-    navigate('login');
+    navigate('/');
   }
 
-  const isHomePage = location.pathname === '/';
+  const isHomePage = location.pathname === '/home';
 
   return (
     <Navbar className="modern-navbar sticky-top">
       <Container fluid className="px-4">
-        <Navbar.Brand as={Link} to="/" className="d-flex align-items-center modern-brand">
+        <Navbar.Brand as={Link} to={token ? "/home" : "/"} className="d-flex align-items-center modern-brand">
           <img
             alt="iNoteBook"
             src={icon}

@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
 import NavbarComponents from './components/Navbar';
 import Home from './pages/Home';
+import LandingPage from './pages/LandingPage';
 import NoteState from './context/notes/NoteState';
 import ThemeProvider from './context/theme/ThemeProvider';
 import LoginForm from './pages/LoginForm';
@@ -21,15 +22,25 @@ function App() {
         <NoteState>
           <Router>
             <div className="min-vh-100" style={{ background: 'var(--bg-primary)' }}>
-              <NavbarComponents searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
               <Routes>
-                <Route path="/" element={<Home searchQuery={searchQuery} setSearchQuery={setSearchQuery} />} />
-                <Route path="/ai-assistant" element={<AiAssistant />} />
-                <Route path="/login" element={<LoginForm />} />
-                <Route path="/signup" element={<SignUpForm />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="*" element={<Home searchQuery={searchQuery} setSearchQuery={setSearchQuery} />} />
+                {/* Landing Page Route (no navbar) */}
+                <Route path="/landing" element={<LandingPage />} />
+                
+                {/* All other routes with navbar */}
+                <Route path="/*" element={
+                  <>
+                    <NavbarComponents searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+                    <Routes>
+                      <Route path="/" element={<Home searchQuery={searchQuery} setSearchQuery={setSearchQuery} />} />
+                      <Route path="/home" element={<Home searchQuery={searchQuery} setSearchQuery={setSearchQuery} />} />
+                      <Route path="/ai-assistant" element={<AiAssistant />} />
+                      <Route path="/login" element={<LoginForm />} />
+                      <Route path="/signup" element={<SignUpForm />} />
+                      <Route path="/forgot-password" element={<ForgotPassword />} />
+                      <Route path="/reset-password" element={<ResetPassword />} />
+                    </Routes>
+                  </>
+                } />
               </Routes>
             </div>
           </Router>

@@ -14,7 +14,7 @@ const LoginForm = () => {
     // Redirect to home if user is already logged in
     useEffect(() => {
         if (localStorage.getItem('token')) {
-            history('/');
+            history('/home');
         }
     }, [history]);
 
@@ -36,7 +36,7 @@ const LoginForm = () => {
 
             if (json.success) {
                 localStorage.setItem('token', json.authtoken);
-                history('/');
+                history('/home');
             } else {
                 setShowAlert(true);
             }
