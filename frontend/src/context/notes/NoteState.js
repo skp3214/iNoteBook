@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import noteContext from "./noteContext";
 import {
     getOfflineNotes,
@@ -19,11 +19,13 @@ const NoteState = (props) => {
     const [note, setNotes] = useState(notesInitial);
     const [isOnline, setIsOnline] = useState(true);
     const [syncInProgress, setSyncInProgress] = useState(false);
+    const syncRef = useRef(false);
 
     // Sync pending actions when back online
     const syncPendingActions = useCallback(async () => {
-        if (!isOnline || syncInProgress) return;
+        if (!isOnline || syncRef.current) return;
 
+        syncRef.current = true;
         setSyncInProgress(true);
         const pendingActions = getPendingActions();
 
@@ -97,14 +99,15 @@ const NoteState = (props) => {
         }
         
         setSyncInProgress(false);
-    }, [host, isOnline, syncInProgress]);
+        syncRef.current = false;
+    }, [host, isOnline]);
 
     // Network status management
     useEffect(() => {
         const updateNetworkStatus = (online) => {
             setIsOnline(online);
             setNetworkStatus(online);
-            if (online && !syncInProgress) {
+            if (online && !syncRef.current) {
                 syncPendingActions();
             }
         };
@@ -137,7 +140,7 @@ const NoteState = (props) => {
                 navigator.serviceWorker.removeEventListener('message', handleMessage);
             }
         };
-    }, [syncInProgress, syncPendingActions]);
+    }, [syncPendingActions]);
 
     const getNotes = useCallback(async () => {
         const token = localStorage.getItem('token');
