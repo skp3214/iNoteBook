@@ -13,6 +13,7 @@ import Col from 'react-bootstrap/Col';
 import Badge from 'react-bootstrap/Badge';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter, faSort } from '@fortawesome/free-solid-svg-icons';
+import { faBriefcase, faExclamationTriangle, faUser, faStar, faCheck,faClipboardList } from '@fortawesome/free-solid-svg-icons';
 
 const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSearchQuery }) => {
   const context = useContext(noteContext);
@@ -255,13 +256,7 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
     setSortOrder(prevOrder => prevOrder === 'date' ? 'priority' : 'date');
   };
 
-  const uniqueTags = [
-    { Urgent: 'danger' },
-    { Important: 'warning' },
-    { Work: 'primary' },
-    { Personal: 'info' },
-    { Completed: 'success' },
-  ];
+ 
 
   return (
     <div className="notes-container" style={{ display: 'flex', minHeight: 'calc(100vh - 80px)' }}>
@@ -448,44 +443,58 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                       </button>
                     </div>
                     <div className="d-flex flex-column gap-2">
-                      <button
-                        onClick={() => {
-                          setFilterTag('');
-                          setShowDropdown(false);
-                        }}
-                        className={`btn ${!filterTag ? 'btn-primary' : 'btn-outline-secondary'} text-start`}
-                        style={{ borderRadius: '12px', padding: '0.75rem 1rem' }}
-                      >
-                        <div className="d-flex justify-content-between align-items-center">
-                          <span>📝 All Notes</span>
-                          <Badge bg={!filterTag ? 'dark' : 'secondary'}>{localNotes.length}</Badge>
-                        </div>
-                      </button>
-                      {uniqueTags.map(item => {
-                        const tagName = Object.keys(item)[0];
-                        const count = localNotes.filter(n => n.tag === tagName).length;
-                        const tagIcons = {
-                          Work: '💼',
-                          Urgent: '⚠️',
-                          Completed: '✅',
-                          Important: '⭐',
-                          Personal: '👤'
-                        };
-                        const icon = tagIcons[tagName] || '📌';
+                      {[
+                        { name: 'All Notes', icon: <FontAwesomeIcon icon={faClipboardList} style={{color:'#8b5cf6'}} />, color: '#8b5cf6', count: localNotes.length },
+                        { name: 'Work', icon: <FontAwesomeIcon icon={faBriefcase} style={{color:'#3b82f6'}} />, color: '#3b82f6', count: localNotes.filter(n => n.tag === 'Work').length },
+                        { name: 'Urgent', icon: <FontAwesomeIcon icon={faExclamationTriangle} style={{color:'#ef4444'}} />, color: '#ef4444', count: localNotes.filter(n => n.tag === 'Urgent').length },
+                        { name: 'Personal', icon: <FontAwesomeIcon icon={faUser} style={{color:'#06b6d4'}} />, color: '#06b6d4', count: localNotes.filter(n => n.tag === 'Personal').length },
+                        { name: 'Important', icon: <FontAwesomeIcon icon={faStar} style={{color:'#f59e0b'}} />, color: '#f59e0b', count: localNotes.filter(n => n.tag === 'Important').length },
+                        { name: 'Completed', icon: <FontAwesomeIcon icon={faCheck} style={{color:'#10b981'}} />, color: '#10b981', count: localNotes.filter(n => n.tag === 'Completed').length },
+                      ].map((tag) => {
+                        const isActive = (tag.name === 'All Notes' && !filterTag) || (tag.name === filterTag);
+                        const tagName = tag.name === 'All Notes' ? '' : tag.name;
+                        
                         return (
                           <button
-                            key={tagName}
+                            key={tag.name}
                             onClick={() => {
                               setFilterTag(tagName);
                               setShowDropdown(false);
                             }}
-                            className={`btn ${filterTag === tagName ? 'btn-primary' : 'btn-outline-secondary'} text-start`}
-                            style={{ borderRadius: '12px', padding: '0.75rem 1rem' }}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              padding: '0.25rem 0.75rem',
+                              borderRadius: '10px',
+                              border: 'none',
+                              background: isActive ? 'var(--bg-elevated)' : 'transparent',
+                              color: 'var(--text-primary)',
+                              fontWeight: isActive ? 600 : 500,
+                              fontSize: '0.75rem',
+                              cursor: 'pointer',
+                              transition: 'all 0.2s ease',
+                              boxShadow: isActive ? 'var(--shadow-sm)' : 'none',
+                              width: '100%',
+                            }}
                           >
-                            <div className="d-flex justify-content-between align-items-center">
-                              <span>{icon} {tagName}</span>
-                              <Badge bg={filterTag === tagName ? 'dark' : 'secondary'}>{count}</Badge>
+                            <div className="d-flex align-items-center gap-3">
+                              <span style={{ fontSize: '1rem' }}>{tag.icon}</span>
+                              <span>{tag.name}</span>
                             </div>
+                            <Badge
+                              bg="secondary"
+                              pill
+                              style={{
+                                background: tag.color,
+                                color: 'white',
+                                fontWeight: 600,
+                                fontSize: '0.75rem',
+                                padding: '0.35rem 0.55rem',
+                              }}
+                            >
+                              {tag.count}
+                            </Badge>
                           </button>
                         );
                       })}

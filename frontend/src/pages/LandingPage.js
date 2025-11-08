@@ -8,15 +8,8 @@ import {
   faMoon, 
   faWifi, 
   faShield, 
-  faSearch, 
-  faMobile, 
-  faCloud, 
   faRocket,
   faArrowRight,
-  faStar,
-  faUsers,
-  faDownload,
-  faPlay
 } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import './LandingPage.css';

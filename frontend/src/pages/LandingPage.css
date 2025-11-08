@@ -55,7 +55,6 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    text-fill-color: transparent;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -74,8 +73,8 @@ body {
 /* Content Area */
 .hero-content {
     z-index: 10;
-    padding-left: 50px; /* Base padding */
-    padding-top: 50px;
+    padding-left: 80px; /* Base padding */
+    padding-top: 20px;
 }
 
 .hero-badge {
@@ -355,9 +354,9 @@ body {
 }
 
 /* Mobile Card Positioning (Adjusted for scaled container) */
-.card-1 { top: 30px; left: 80px; }
-.card-2 { top: 150px; left: 180px; z-index: 15; }
-.card-3 { top: 250px; left: -10px; }
+.card-1 { top: 10px; left: 8px; }
+.card-2 { top: 130px; left: 100px; z-index: 15; }
+.card-3 { top: 270px; left: -10px; }
 
 
 /* Tablet (md) and Desktop (lg) */
@@ -365,8 +364,7 @@ body {
     /* Restore Hero content layout for larger screens */
     .hero-content {
         text-align: left;
-        padding-left: 30px;
-        padding-top: 50px; 
+        padding-left: 80px;
     }
     .hero-title {
         font-size: 3.5rem;

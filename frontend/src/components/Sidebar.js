@@ -1,14 +1,16 @@
 import React from 'react';
 import { Badge, Button } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBriefcase, faExclamationTriangle, faUser, faStar, faCheck,faClipboardList } from '@fortawesome/free-solid-svg-icons';
 
 const Sidebar = ({ notes, filterTag, setFilterTag, showSidebar, setShowSidebar, onAddNote }) => {
   const tagConfig = [
-    { name: 'All Notes', icon: '📝', color: '#8b5cf6', count: notes.length },
-    { name: 'Work', icon: '💼', color: '#3b82f6', count: notes.filter(n => n.tag === 'Work').length },
-    { name: 'Urgent', icon: '⚠️', color: '#ef4444', count: notes.filter(n => n.tag === 'Urgent').length },
-    { name: 'Personal', icon: '👤', color: '#06b6d4', count: notes.filter(n => n.tag === 'Personal').length },
-    { name: 'Important', icon: '⭐', color: '#f59e0b', count: notes.filter(n => n.tag === 'Important').length },
-    { name: 'Completed', icon: '✅', color: '#10b981', count: notes.filter(n => n.tag === 'Completed').length },
+    { name: 'All Notes', icon: <FontAwesomeIcon icon={faClipboardList} style={{color:'#8b5cf6'}} />, color: '#8b5cf6', count: notes.length },
+    { name: 'Work', icon: <FontAwesomeIcon icon={faBriefcase} style={{color:'#3b82f6'}} />, color: '#3b82f6', count: notes.filter(n => n.tag === 'Work').length },
+    { name: 'Urgent', icon: <FontAwesomeIcon icon={faExclamationTriangle} style={{color:'#ef4444'}} />, color: '#ef4444', count: notes.filter(n => n.tag === 'Urgent').length },
+    { name: 'Personal', icon: <FontAwesomeIcon icon={faUser} style={{color:'#06b6d4'}} />, color: '#06b6d4', count: notes.filter(n => n.tag === 'Personal').length },
+    { name: 'Important', icon: <FontAwesomeIcon icon={faStar} style={{color:'#f59e0b'}} />, color: '#f59e0b', count: notes.filter(n => n.tag === 'Important').length },
+    { name: 'Completed', icon: <FontAwesomeIcon icon={faCheck} style={{color:'#10b981'}} />, color: '#10b981', count: notes.filter(n => n.tag === 'Completed').length },
   ];
 
   const handleTagClick = (tagName) => {
@@ -164,7 +166,7 @@ const Sidebar = ({ notes, filterTag, setFilterTag, showSidebar, setShowSidebar, 
                 }}
               >
                 <div className="d-flex align-items-start gap-2">
-                  <span>📄</span>
+                  <span><FontAwesomeIcon icon={faClipboardList} /></span>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div
                       style={{

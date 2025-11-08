@@ -6,7 +6,7 @@ import { useTheme } from '../context/theme/ThemeContext';
 import icon from '../asset/inotebookicon.png';
 import Button from 'react-bootstrap/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faRightFromBracket, faRightToBracket } from '@fortawesome/free-solid-svg-icons';
+import { faMoon, faRightFromBracket, faRightToBracket, faSun } from '@fortawesome/free-solid-svg-icons';
 import { clearOfflineData } from '../utils/offlineUtils';
 
 function NavbarComponents({ searchQuery, setSearchQuery }) {
@@ -82,7 +82,11 @@ function NavbarComponents({ searchQuery, setSearchQuery }) {
             onClick={toggleTheme}
             title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
           >
-            {isDarkMode ? '☀️' : '🌙'}
+            {isDarkMode ? (
+              <FontAwesomeIcon icon={faSun} />
+            ) : (
+              <FontAwesomeIcon icon={faMoon} />
+            )}
           </button>
           
           {token ? (
