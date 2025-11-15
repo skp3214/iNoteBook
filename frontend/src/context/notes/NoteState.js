@@ -9,7 +9,6 @@ import {
     addPendingAction,
     removePendingAction,
     mergeNotes,
-    setNetworkStatus,
     clearSyncedOfflineNotes,
     migrateOldOfflineData,
     saveCachedNotes,
@@ -129,7 +128,6 @@ const NoteState = (props) => {
     useEffect(() => {
         const updateNetworkStatus = (online) => {
             setIsOnline(online);
-            setNetworkStatus(online);
             if (online && !syncRef.current) {
                 syncPendingActions();
             }
@@ -274,33 +272,7 @@ const NoteState = (props) => {
         }
     };
 
-    const restoreNote = (noteToRestore) => {
-        // Add the note back to the array
-        setNotes(prevNotes => [...prevNotes, noteToRestore]);
-        
-        // If it was an online note, remove the pending delete action and restore to cache
-        if (!noteToRestore._id.startsWith('offline_')) {
-            const pendingActions = getPendingActions();
-            const deleteAction = pendingActions.find(
-                action => action.type === 'DELETE_NOTE' && action.data.id === noteToRestore._id
-            );
-            if (deleteAction) {
-                removePendingAction(deleteAction.id);
-                // Restore note to cached notes
-                const cachedNotes = getCachedNotes();
-                cachedNotes.push(noteToRestore);
-                saveCachedNotes(cachedNotes);
-            }
-        } else {
-            // For offline notes, restore to local storage
-            const offlineNote = {
-                title: noteToRestore.title,
-                description: noteToRestore.description,
-                tag: noteToRestore.tag
-            };
-            addOfflineNote(offlineNote);
-        }
-    };
+
 
     const editNote = async (id, title, description, tag) => {
         const updateData = { title, description, tag };
@@ -348,7 +320,6 @@ const NoteState = (props) => {
             note, 
             addNote, 
             deleteNote, 
-            restoreNote,
             editNote, 
             getNotes, 
             isOnline, 

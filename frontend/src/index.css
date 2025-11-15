@@ -1454,15 +1454,100 @@ body {
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-/* Snackbar animation */
+/* Enhanced Snackbar Styles */
+.modern-snackbar {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.modern-snackbar-btn {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.modern-snackbar-btn:focus {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
+}
+
+/* Enhanced slideUp animation */
 @keyframes slideUp {
-  from {
-    transform: translateX(-50%) translateY(100%);
+  0% {
+    transform: translateX(-50%) translateY(120%);
     opacity: 0;
+    scale: 0.95;
   }
-  to {
+  50% {
+    transform: translateX(-50%) translateY(-10%);
+    opacity: 0.8;
+    scale: 1.02;
+  }
+  100% {
     transform: translateX(-50%) translateY(0);
     opacity: 1;
+    scale: 1;
+  }
+}
+
+/* Responsive adjustments for Snackbar */
+@media (max-width: 576px) {
+  .modern-snackbar {
+    bottom: 80px !important; /* Avoid FAB overlap */
+    left: 16px !important;
+    right: 16px !important;
+    transform: none !important;
+    min-width: unset !important;
+    max-width: unset !important;
+    width: calc(100% - 32px) !important;
+    padding: 14px 16px !important;
+    animation: slideUpMobile 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  }
+  
+  .modern-snackbar .d-flex:first-child {
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+  
+  .modern-snackbar span {
+    font-size: 0.85rem !important;
+    line-height: 1.4 !important;
+  }
+  
+  .modern-snackbar .undo-btn {
+    padding: 6px 12px !important;
+    font-size: 0.8rem !important;
+    min-height: 32px !important;
+  }
+  
+  .modern-snackbar .close-btn {
+    width: 32px !important;
+    height: 32px !important;
+  }
+}
+
+@keyframes slideUpMobile {
+  0% {
+    transform: translateY(120%);
+    opacity: 0;
+    scale: 0.95;
+  }
+  50% {
+    transform: translateY(-10%);
+    opacity: 0.8;
+    scale: 1.02;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 577px) and (max-width: 992px) {
+  .modern-snackbar {
+    bottom: 24px !important;
+    min-width: 380px !important;
+    max-width: 80vw !important;
   }
 }
 

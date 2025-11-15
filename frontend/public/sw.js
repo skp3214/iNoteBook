@@ -1,5 +1,5 @@
 // Update version whenever you make changes to force cache refresh
-const CACHE_VERSION = 'v2.0.1';
+const CACHE_VERSION = 'v2.0.2';
 const CACHE_NAME = `inotebook-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `inotebook-data-${CACHE_VERSION}`;
 
@@ -128,18 +128,6 @@ self.addEventListener('fetch', function(event) {
 self.addEventListener('message', function(event) {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
-  }
-  
-  if (event.data && event.data.type === 'GET_NETWORK_STATUS') {
-    // Broadcast network status to all clients
-    self.clients.matchAll().then(clients => {
-      clients.forEach(client => {
-        client.postMessage({
-          type: 'NETWORK_STATUS_UPDATE',
-          isOnline: navigator.onLine
-        });
-      });
-    });
   }
 });
 

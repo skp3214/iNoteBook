@@ -18,7 +18,6 @@ const getUserSpecificKey = (baseKey) => {
 // Keys for localStorage
 const getOfflineNotesKey = () => getUserSpecificKey('inotebook_offline_notes');
 const getPendingActionsKey = () => getUserSpecificKey('inotebook_pending_actions');
-const getNetworkStatusKey = () => getUserSpecificKey('inotebook_network_status');
 const getCachedNotesKey = () => getUserSpecificKey('inotebook_cached_notes');
 
 // Get offline notes from localStorage
@@ -194,37 +193,13 @@ export const clearPendingActions = () => {
   }
 };
 
-// Network status management
-export const getNetworkStatus = () => {
-  try {
-    const status = localStorage.getItem(getNetworkStatusKey());
-    return status ? JSON.parse(status) : { isOnline: navigator.onLine, lastChecked: Date.now() };
-  } catch (error) {
-    console.error('Error getting network status:', error);
-    return { isOnline: navigator.onLine, lastChecked: Date.now() };
-  }
-};
 
-export const setNetworkStatus = (isOnline) => {
-  try {
-    const status = {
-      isOnline,
-      lastChecked: Date.now()
-    };
-    localStorage.setItem(getNetworkStatusKey(), JSON.stringify(status));
-    return status;
-  } catch (error) {
-    console.error('Error setting network status:', error);
-    return null;
-  }
-};
 
 // Clear all offline data
 export const clearOfflineData = () => {
   try {
     localStorage.removeItem(getOfflineNotesKey());
     localStorage.removeItem(getPendingActionsKey());
-    localStorage.removeItem(getNetworkStatusKey());
     localStorage.removeItem(getCachedNotesKey());
     return true;
   } catch (error) {
@@ -358,12 +333,10 @@ export const migrateOldOfflineData = () => {
     // Check if old global data exists and user-specific data doesn't
     const oldNotes = localStorage.getItem('inotebook_offline_notes');
     const oldActions = localStorage.getItem('inotebook_pending_actions');
-    const oldNetworkStatus = localStorage.getItem('inotebook_network_status');
     const oldCachedNotes = localStorage.getItem('inotebook_cached_notes');
     
     const userNotesKey = getOfflineNotesKey();
     const userActionsKey = getPendingActionsKey();
-    const userNetworkKey = getNetworkStatusKey();
     const userCachedKey = getCachedNotesKey();
     
     // Migrate notes
@@ -376,12 +349,6 @@ export const migrateOldOfflineData = () => {
     if (oldActions && !localStorage.getItem(userActionsKey)) {
       localStorage.setItem(userActionsKey, oldActions);
       localStorage.removeItem('inotebook_pending_actions');
-    }
-    
-    // Migrate network status
-    if (oldNetworkStatus && !localStorage.getItem(userNetworkKey)) {
-      localStorage.setItem(userNetworkKey, oldNetworkStatus);
-      localStorage.removeItem('inotebook_network_status');
     }
     
     // Migrate cached notes
@@ -397,20 +364,4 @@ export const migrateOldOfflineData = () => {
   }
 };
 
-// Check if we're in a PWA environment
-export const isPWA = () => {
-  return window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
-};
 
-// Check network connectivity
-export const checkNetworkConnectivity = async () => {
-  try {
-    const response = await fetch('/api/health', {
-      method: 'HEAD',
-      cache: 'no-cache'
-    });
-    return response.ok;
-  } catch (error) {
-    return false;
-  }
-};
