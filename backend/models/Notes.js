@@ -12,12 +12,12 @@ const NotesSchema = new Schema({
         type: String,
         default: "General"
     },
+    // legacy `date` field kept for backward-compatibility
     date: {
         type: Date,
         default: Date.now()
     }
 
-
-})
+}, { timestamps: true })
 
 module.exports = mongoose.model("Notes", NotesSchema)

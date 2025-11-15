@@ -155,7 +155,15 @@ const Sidebar = ({ notes, filterTag, setFilterTag, showSidebar, setShowSidebar, 
             Recent Activity
           </h6>
           <div className="d-flex flex-column gap-2">
-            {notes.slice(0, 3).map((note, idx) => (
+            {notes
+              .sort((a, b) => {
+                // Sort by updatedAt (most recent first), fallback to date for older notes
+                const dateA = new Date(a.updatedAt || a.date);
+                const dateB = new Date(b.updatedAt || b.date);
+                return dateB - dateA;
+              })
+              .slice(0, 3)
+              .map((note, idx) => (
               <div
                 key={idx}
                 className="p-2"
@@ -180,7 +188,7 @@ const Sidebar = ({ notes, filterTag, setFilterTag, showSidebar, setShowSidebar, 
                       {note.title}
                     </div>
                     <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                      {new Date(note.date).toLocaleDateString()}
+                      {new Date(note.updatedAt || note.date).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
