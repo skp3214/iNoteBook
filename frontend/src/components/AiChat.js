@@ -1,11 +1,14 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useContext } from 'react';
 import { faPaperPlane, faMicrophone, faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Form, Spinner, Modal } from 'react-bootstrap';
+import noteContext from '../context/notes/noteContext';
 
 
 
 const AiChat = () => {
+    const context = useContext(noteContext);
+    const { getNotes } = context;
     // Add custom scrollbar styles
     useEffect(() => {
         const style = document.createElement('style');
@@ -112,6 +115,19 @@ const AiChat = () => {
                 };
                 console.log('Adding AI response to chat');
                 setMessages(prev => [...prev, aiMessage]);
+                
+                // Refresh notes if AI performed CRUD operations
+                if (data.response && (data.response.toLowerCase().includes('created') || 
+                    data.response.toLowerCase().includes('updated') || 
+                    data.response.toLowerCase().includes('deleted') ||
+                    data.response.toLowerCase().includes('added'))) {
+                    console.log('AI performed CRUD operation, refreshing notes...');
+                    setTimeout(() => {
+                        if (getNotes) {
+                            getNotes();
+                        }
+                    }, 500);
+                }
             } else {
                 const errorMessage = {
                     id: Date.now() + 1,
@@ -334,6 +350,19 @@ const AiChat = () => {
                     timestamp: new Date()
                 };
                 setMessages(prev => [...prev, aiMessage]);
+                
+                // Refresh notes if AI performed CRUD operations
+                if (data.response && (data.response.toLowerCase().includes('created') || 
+                    data.response.toLowerCase().includes('updated') || 
+                    data.response.toLowerCase().includes('deleted') ||
+                    data.response.toLowerCase().includes('added'))) {
+                    console.log('AI performed CRUD operation, refreshing notes...');
+                    setTimeout(() => {
+                        if (getNotes) {
+                            getNotes();
+                        }
+                    }, 500);
+                }
             } else {
                 const errorMessage = {
                     id: Date.now() + 1,
