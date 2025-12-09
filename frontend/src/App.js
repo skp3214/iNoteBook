@@ -2,6 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import NavbarComponents from './components/Navbar';
 import Home from './pages/Home';
 import LandingPage from './pages/LandingPage';
@@ -31,6 +32,7 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/reset-password" element={<ResetPassword />} />
             </Routes>
+            <Analytics />
           </div>
         </Router>
       </NoteState>
