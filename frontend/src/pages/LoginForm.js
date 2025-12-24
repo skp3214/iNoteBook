@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Form, Button, Container, Row, Col, Spinner, Card } from 'react-bootstrap';
 
 const LoginForm = () => {
@@ -9,7 +9,19 @@ const LoginForm = () => {
     });
     const [isSigningIn, setisSigningIn] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
     const history = useNavigate();
+    const location = useLocation();
+
+    // Show session expired message if redirected from auth check
+    useEffect(() => {
+        if (location.state?.message) {
+            setShowAlert(true);
+            setAlertMessage(location.state.message);
+            // Clear the state
+            window.history.replaceState({}, document.title);
+        }
+    }, [location]);
 
     // Redirect to home if user is already logged in
     useEffect(() => {
@@ -39,9 +51,11 @@ const LoginForm = () => {
                 history('/home');
             } else {
                 setShowAlert(true);
+                setAlertMessage('Login failed. Please check your email and password.');
             }
         } catch (error) {
             setShowAlert(true);
+            setAlertMessage('An error occurred. Please try again.');
         } finally {
             setisSigningIn(false);
         }
@@ -69,7 +83,7 @@ const LoginForm = () => {
 
                             {showAlert && (
                                 <div className="modern-alert alert-danger mb-4">
-                                    <strong>Login failed.</strong> Please check your email and password.
+                                    <strong>{alertMessage || 'Login failed. Please check your email and password.'}</strong>
                                 </div>
                             )}
                             

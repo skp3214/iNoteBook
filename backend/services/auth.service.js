@@ -19,7 +19,7 @@ exports.createUser = async (name, email, password) => {
             id: user.id,
         }
     }
-    const authtoken = jwt.sign(data, JWT_SECRET);
+    const authtoken = jwt.sign(data, JWT_SECRET, { expiresIn: '3d' });
     return { userExist: false, authtoken };
 };
 
@@ -37,7 +37,7 @@ exports.loginUser = async (email, password) => {
             id: user.id
         }
     }
-    const authtoken = jwt.sign(payload, JWT_SECRET);
+    const authtoken = jwt.sign(payload, JWT_SECRET, { expiresIn: '3d' });
     return { authtoken };
 };
 

@@ -5,13 +5,16 @@ import App from './App';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import 'popper.js/dist/umd/popper.min.js'; // Optional: Popper.js
+import { BrowserRouter } from 'react-router-dom';
 
 
 import reportWebVitals from './reportWebVitals';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <App />
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
 );
 
 // If you want to start measuring performance in your app, pass a function
@@ -25,7 +28,7 @@ if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
         console.log('Service Worker registered');
-        
+
         // Check for updates periodically
         setInterval(() => {
           registration.update();
@@ -35,7 +38,7 @@ if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
           console.log('New Service Worker found, updating...');
-          
+
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed') {
               if (navigator.serviceWorker.controller) {

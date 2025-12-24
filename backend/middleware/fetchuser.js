@@ -4,7 +4,7 @@ const fetchuser = (req, res, next) => {
     // Get the user from the jwt token and add id to req id
     const token=req.header('authtoken');
     if(!token){
-        res.status(401).send({error:"please authenticate using a valid token"})
+        return res.status(401).send({error:"please authenticate using a valid token"})
     }
     try{
         const data=jwt.verify(token,JWT_SECRET);
@@ -12,7 +12,10 @@ const fetchuser = (req, res, next) => {
         next()
     }
     catch(err){
-        res.status(401).send({error:"sorry"})
+        if (err.name === 'TokenExpiredError') {
+            return res.status(401).send({error:"Token expired, please login again", expired: true});
+        }
+        return res.status(401).send({error:"Invalid token"})
     }
 }
 module.exports = fetchuser;

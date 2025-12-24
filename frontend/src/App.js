@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
 import { Analytics } from '@vercel/analytics/react';
 import NavbarComponents from './components/Navbar';
@@ -20,7 +20,6 @@ function App() {
   return (
     <ThemeProvider>
       <NoteState>
-        <Router>
           <div className="min-vh-100" style={{ background: 'var(--bg-primary)' }}>
             <NavbarComponents searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
             <Routes>
@@ -34,7 +33,6 @@ function App() {
             </Routes>
             <Analytics />
           </div>
-        </Router>
       </NoteState>
     </ThemeProvider>
   );

@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
+import { useNavigate } from 'react-router-dom';
 import noteContext from "./noteContext";
 import {
     getOfflineNotes,
@@ -18,10 +19,12 @@ import {
     cleanupPendingActions,
     removeOfflineNoteByContent
 } from '../../utils/offlineUtils';
+import { handleAuthResponse } from '../../utils/authUtils';
 
 const NoteState = (props) => {
     const host = process.env.REACT_APP_API_BASE_URL;
     const notesInitial = [];
+    const navigate = useNavigate();
 
     const [note, setNotes] = useState(notesInitial);
     const [isOnline, setIsOnline] = useState(true);
@@ -54,13 +57,16 @@ const NoteState = (props) => {
                             body: JSON.stringify(action.data)
                         });
                         
+                        const addValid = await handleAuthResponse(addResponse, navigate);
+                        if (!addValid) return;
+                        
                         // If successful, remove the corresponding offline note
                         if (addResponse.ok) {
                             removeOfflineNoteByContent(action.data.title, action.data.description, action.data.tag);
                         }
                         break;
                     case 'UPDATE_NOTE':
-                        await fetch(`${host}/api/notes/updatenotes/${action.data.id}`, {
+                        const updateResponse = await fetch(`${host}/api/notes/updatenotes/${action.data.id}`, {
                             method: "PUT",
                             headers: {
                                 'Content-Type': 'application/json',
@@ -72,15 +78,21 @@ const NoteState = (props) => {
                                 tag: action.data.tag
                             })
                         });
+                        
+                        const updateValid = await handleAuthResponse(updateResponse, navigate);
+                        if (!updateValid) return;
                         break;
                     case 'DELETE_NOTE':
-                        await fetch(`${host}/api/notes/deletenotes/${action.data.id}`, {
+                        const deleteResponse = await fetch(`${host}/api/notes/deletenotes/${action.data.id}`, {
                             method: "DELETE",
                             headers: {
                                 'Content-Type': 'application/json',
                                 'authtoken': localStorage.getItem('token')
                             }
                         });
+                        
+                        const deleteValid = await handleAuthResponse(deleteResponse, navigate);
+                        if (!deleteValid) return;
                         break;
                     default:
                         break;
@@ -104,6 +116,9 @@ const NoteState = (props) => {
                     },
                 });
                 
+                const isValid = await handleAuthResponse(response, navigate);
+                if (!isValid) return;
+                
                 if (response.ok) {
                     let onlineNotes = await response.json();
                     const offlineNotes = getOfflineNotes();
@@ -122,7 +137,7 @@ const NoteState = (props) => {
         
         setSyncInProgress(false);
         syncRef.current = false;
-    }, [host, isOnline]);
+    }, [host, isOnline, navigate]);
 
     // Network status management
     useEffect(() => {
@@ -180,6 +195,12 @@ const NoteState = (props) => {
                     },
                 });
                 
+                const isValid = await handleAuthResponse(response, navigate);
+                if (!isValid) {
+                    setNotes([]);
+                    return;
+                }
+                
                 if (response.ok) {
                     let onlineNotes = await response.json();
                     const offlineNotes = getOfflineNotes();
@@ -201,7 +222,7 @@ const NoteState = (props) => {
         const cachedNotes = getCachedNotes();
         const allOfflineNotes = mergeNotes(cachedNotes, offlineNotes);
         setNotes(allOfflineNotes);
-    }, [host, isOnline]);
+    }, [host, isOnline, navigate]);
 
     const addNote = async (title, description, tag) => {
         const noteData = { title, description, tag };
@@ -216,6 +237,9 @@ const NoteState = (props) => {
                     },
                     body: JSON.stringify(noteData)
                 });
+
+                const isValid = await handleAuthResponse(response, navigate);
+                if (!isValid) return;
 
                 if (response.ok) {
                     const newNote = await response.json();
@@ -248,6 +272,9 @@ const NoteState = (props) => {
                         'authtoken': localStorage.getItem('token')
                     }
                 });
+
+                const isValid = await handleAuthResponse(response, navigate);
+                if (!isValid) return;
 
                 if (response.ok) {
                     setNotes(prevNotes => prevNotes.filter(note => note._id !== id));
@@ -287,6 +314,9 @@ const NoteState = (props) => {
                     },
                     body: JSON.stringify(updateData)
                 });
+
+                const isValid = await handleAuthResponse(response, navigate);
+                if (!isValid) return;
 
                 if (response.ok) {
                     setNotes(prevNotes => prevNotes.map(note => 

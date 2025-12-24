@@ -1,14 +1,17 @@
 import { useState, useRef, useEffect, useCallback, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { faPaperPlane, faMicrophone, faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button, Form, Spinner, Modal } from 'react-bootstrap';
 import noteContext from '../context/notes/noteContext';
+import { handleAuthResponse } from '../utils/authUtils';
 
 
 
 const AiChat = () => {
     const context = useContext(noteContext);
     const { getNotes } = context;
+    const navigate = useNavigate();
     // Add custom scrollbar styles
     useEffect(() => {
         const style = document.createElement('style');
@@ -103,6 +106,19 @@ const AiChat = () => {
                 })
             });
 
+            const isValid = await handleAuthResponse(response, navigate);
+            if (!isValid) {
+                const errorMessage = {
+                    id: Date.now() + 1,
+                    text: 'Your session has expired. Please login again.',
+                    sender: 'ai',
+                    timestamp: new Date(),
+                    isError: true
+                };
+                setMessages(prev => [...prev, errorMessage]);
+                return;
+            }
+
             const data = await response.json();
             console.log('API response');
 
@@ -153,7 +169,7 @@ const AiChat = () => {
             console.log('Setting loading to false');
             setIsLoading(false);
         }
-    }, [isLoading]);
+    }, [isLoading, getNotes, navigate]);
 
     // Initialize speech recognition
     useEffect(() => {
@@ -339,6 +355,20 @@ const AiChat = () => {
                     ...(userApiKey && { apiKey: userApiKey })
                 })
             });
+
+            const isValid = await handleAuthResponse(response, navigate);
+            if (!isValid) {
+                const errorMessage = {
+                    id: Date.now() + 1,
+                    text: 'Your session has expired. Please login again.',
+                    sender: 'ai',
+                    timestamp: new Date(),
+                    isError: true
+                };
+                setMessages(prev => [...prev, errorMessage]);
+                setIsLoading(false);
+                return;
+            }
 
             const data = await response.json();
 

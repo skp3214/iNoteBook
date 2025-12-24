@@ -1,5 +1,5 @@
 // Update version whenever you make changes to force cache refresh
-const CACHE_VERSION = 'v2.0.3';
+const CACHE_VERSION = 'v2.0.4';
 const CACHE_NAME = `inotebook-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `inotebook-data-${CACHE_VERSION}`;
 
