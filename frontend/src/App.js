@@ -10,7 +10,6 @@ import NoteState from './context/notes/NoteState';
 import ThemeProvider from './context/theme/ThemeProvider';
 import LoginForm from './pages/LoginForm';
 import SignUpForm from './pages/SignUpForm';
-import AiAssistant from './pages/AiAssistant';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 
@@ -25,7 +24,6 @@ function App() {
             <Routes>
               <Route path="/" element={<LandingPage />} />
               <Route path="/home" element={<Home searchQuery={searchQuery} setSearchQuery={setSearchQuery} />} />
-              <Route path="/ai-assistant" element={<AiAssistant />} />
               <Route path="/login" element={<LoginForm />} />
               <Route path="/signup" element={<SignUpForm />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
