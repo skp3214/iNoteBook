@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { faPaperPlane, faMicrophone, faMicrophoneSlash } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Form, Spinner, Modal } from 'react-bootstrap';
+import { Spinner } from 'react-bootstrap';
 import noteContext from '../context/notes/noteContext';
 import { handleAuthResponse } from '../utils/authUtils';
+import SpeechModal from './ai-chat/SpeechModal';
+import AutoExpandingInputField from './ai-chat/AutoExpandingInputField';
 
 
 
@@ -31,7 +31,7 @@ const AiChat = () => {
             }
         `;
         document.head.appendChild(style);
-        
+
         return () => {
             document.head.removeChild(style);
         };
@@ -93,14 +93,14 @@ const AiChat = () => {
             console.log('Sending API request...');
             // Get user API key if available
             const userApiKey = localStorage.getItem('gemini_api_key');
-            
+
             const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/ai-agent/chat`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'authtoken': localStorage.getItem('token')
                 },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     message: message,
                     ...(userApiKey && { apiKey: userApiKey })
                 })
@@ -131,10 +131,10 @@ const AiChat = () => {
                 };
                 console.log('Adding AI response to chat');
                 setMessages(prev => [...prev, aiMessage]);
-                
+
                 // Refresh notes if AI performed CRUD operations
-                if (data.response && (data.response.toLowerCase().includes('created') || 
-                    data.response.toLowerCase().includes('updated') || 
+                if (data.response && (data.response.toLowerCase().includes('created') ||
+                    data.response.toLowerCase().includes('updated') ||
                     data.response.toLowerCase().includes('deleted') ||
                     data.response.toLowerCase().includes('added'))) {
                     console.log('AI performed CRUD operation, refreshing notes...');
@@ -177,7 +177,7 @@ const AiChat = () => {
             setSpeechSupported(true);
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognitionRef.current = new SpeechRecognition();
-            
+
             recognitionRef.current.continuous = false;
             recognitionRef.current.interimResults = true;
             recognitionRef.current.lang = 'en-US';
@@ -217,7 +217,7 @@ const AiChat = () => {
             recognitionRef.current.onend = () => {
                 console.log('Speech recognition ended. Transcript:', speechTranscriptRef.current);
                 setIsListening(false);
-                
+
                 // Auto-send the message if we have a transcript
                 const finalTranscript = speechTranscriptRef.current.trim();
                 if (finalTranscript) {
@@ -246,7 +246,7 @@ const AiChat = () => {
                 setSpeechTranscript('');
                 setInterimTranscript('');
                 speechTranscriptRef.current = '';
-                
+
                 if (event.error === 'not-allowed') {
                     alert('Microphone access denied. Please allow microphone access and try again.');
                 } else if (event.error === 'no-speech') {
@@ -271,13 +271,13 @@ const AiChat = () => {
         if (textarea) {
             // Store current scroll position
             const cursorPosition = textarea.selectionStart;
-            
+
             // Reset height to calculate scroll height
             textarea.style.height = 'auto';
             const scrollHeight = textarea.scrollHeight;
             const maxHeight = 120;
             const minHeight = 48;
-            
+
             if (scrollHeight <= maxHeight) {
                 // Content fits within max height, expand textarea
                 textarea.style.height = Math.max(minHeight, scrollHeight) + 'px';
@@ -286,13 +286,13 @@ const AiChat = () => {
                 // Content exceeds max height, set to max and enable scrolling
                 textarea.style.height = maxHeight + 'px';
                 textarea.style.overflowY = 'auto';
-                
+
                 // Auto-scroll to bottom when typing
                 setTimeout(() => {
                     textarea.scrollTop = textarea.scrollHeight;
                 }, 0);
             }
-            
+
             // Restore cursor position
             textarea.setSelectionRange(cursorPosition, cursorPosition);
         }
@@ -343,14 +343,14 @@ const AiChat = () => {
         try {
             // Get user API key if available
             const userApiKey = localStorage.getItem('gemini_api_key');
-            
+
             const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/ai-agent/chat`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'authtoken': localStorage.getItem('token')
                 },
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     message: inputMessage,
                     ...(userApiKey && { apiKey: userApiKey })
                 })
@@ -380,10 +380,10 @@ const AiChat = () => {
                     timestamp: new Date()
                 };
                 setMessages(prev => [...prev, aiMessage]);
-                
+
                 // Refresh notes if AI performed CRUD operations
-                if (data.response && (data.response.toLowerCase().includes('created') || 
-                    data.response.toLowerCase().includes('updated') || 
+                if (data.response && (data.response.toLowerCase().includes('created') ||
+                    data.response.toLowerCase().includes('updated') ||
                     data.response.toLowerCase().includes('deleted') ||
                     data.response.toLowerCase().includes('added'))) {
                     console.log('AI performed CRUD operation, refreshing notes...');
@@ -427,17 +427,17 @@ const AiChat = () => {
     const formatMessage = (text) => {
         const lines = text.split('\n');
         const formattedElements = [];
-        
+
         lines.forEach((line, index) => {
             // Handle bullet points
             if (line.trim().startsWith('* ')) {
                 const content = line.substring(2).trim();
-                
+
                 // Handle bold text within bullet points (e.g., **text**)
                 const formattedContent = content.split(/(\*\*[^*]+\*\*)/g).map((part, partIndex) => {
                     if (part.startsWith('**') && part.endsWith('**')) {
                         return (
-                            <strong key={partIndex} style={{ 
+                            <strong key={partIndex} style={{
                                 fontWeight: 600,
                                 color: 'var(--accent-primary, #007bff)'
                             }}>
@@ -447,15 +447,15 @@ const AiChat = () => {
                     }
                     return part;
                 });
-                
+
                 formattedElements.push(
-                    <div key={index} style={{ 
-                        display: 'flex', 
+                    <div key={index} style={{
+                        display: 'flex',
                         alignItems: 'flex-start',
                         marginBottom: '0.5rem',
                         paddingLeft: '0.5rem'
                     }}>
-                        <span style={{ 
+                        <span style={{
                             marginRight: '0.5rem',
                             color: 'var(--accent-primary, #007bff)',
                             fontWeight: 'bold',
@@ -492,7 +492,7 @@ const AiChat = () => {
                 const formattedContent = line.split(/(\*\*[^*]+\*\*)/g).map((part, partIndex) => {
                     if (part.startsWith('**') && part.endsWith('**')) {
                         return (
-                            <strong key={partIndex} style={{ 
+                            <strong key={partIndex} style={{
                                 fontWeight: 600,
                                 color: 'var(--accent-primary, #007bff)'
                             }}>
@@ -502,9 +502,9 @@ const AiChat = () => {
                     }
                     return part;
                 });
-                
+
                 formattedElements.push(
-                    <div key={index} style={{ 
+                    <div key={index} style={{
                         marginBottom: '0.5rem',
                         lineHeight: '1.6'
                     }}>
@@ -513,7 +513,7 @@ const AiChat = () => {
                 );
             }
         });
-        
+
         return <div style={{ fontSize: '0.95rem' }}>{formattedElements}</div>;
     };
 
@@ -542,7 +542,7 @@ const AiChat = () => {
             overflow: 'hidden'
         }}>
             {/* Messages Container - Scrollable */}
-            <div 
+            <div
                 className="flex-grow-1 px-3 pt-3"
                 style={{
                     overflowY: 'auto',
@@ -558,9 +558,9 @@ const AiChat = () => {
                         <div style={{ maxWidth: '85%' }}>
                             <div
                                 style={{
-                                    background: message.sender === 'user' 
+                                    background: message.sender === 'user'
                                         ? 'linear-gradient(135deg, var(--accent-primary, #007bff), var(--accent-secondary, #0056b3))'
-                                        : message.isError 
+                                        : message.isError
                                             ? 'var(--danger, #dc3545)'
                                             : 'var(--bg-secondary, #f8f9fa)',
                                     color: message.sender === 'user' || message.isError ? 'white' : 'var(--text-primary)',
@@ -617,214 +617,29 @@ const AiChat = () => {
                     flexShrink: 0
                 }}
             >
-                <div className="d-flex align-items-end gap-2">
-                    {/* Voice Input Button */}
-                    {speechSupported && (
-                        <Button
-                            variant={isListening ? "danger" : "outline-secondary"}
-                            onClick={isListening ? stopListening : startListening}
-                            disabled={isLoading}
-                            style={{
-                                border: 'none',
-                                borderRadius: '50%',
-                                width: '44px',
-                                height: '44px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                background: isListening ? 'var(--danger)' : 'var(--bg-tertiary)',
-                                flexShrink: 0
-                            }}
-                            title={isListening ? "Stop recording" : "Voice input"}
-                        >
-                            <FontAwesomeIcon
-                                icon={isListening ? faMicrophoneSlash : faMicrophone}
-                                style={{
-                                    fontSize: '1.1rem',
-                                    color: isListening ? 'white' : 'var(--text-muted)'
-                                }}
-                            />
-                        </Button>
-                    )}
-                    
-                    {/* Auto-expanding Input Field */}
-                    <div className="position-relative flex-grow-1">
-                        <Form.Control
-                            as="textarea"
-                            ref={inputRef}
-                            value={inputMessage}
-                            onChange={(e) => {
-                                setInputMessage(e.target.value);
-                                // Auto-resize textarea up to max height, then allow scrolling
-                                autoResizeTextarea(e.target);
-                            }}
-                            onKeyDown={handleKeyPress}
-                            placeholder="Ask, note, or create ..."
-                            disabled={isLoading}
-                            rows={1}
-                            className="custom-scrollbar"
-                            style={{
-                                resize: 'none',
-                                borderRadius: '25px',
-                                paddingLeft: '1.25rem',
-                                paddingRight: '3.5rem',
-                                paddingTop: '0.875rem',
-                                paddingBottom: '0.875rem',
-                                fontSize: '1rem',
-                                background: 'var(--bg-tertiary)',
-                                border: '1px solid var(--border-light)',
-                                color: 'var(--text-primary)',
-                                maxHeight: '120px',
-                                minHeight: '48px',
-                                lineHeight: '1.4',
-                                overflowY: 'auto',
-                                overflowX: 'hidden',
-                                transition: 'height 0.1s ease, box-shadow 0.2s ease',
-                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
-                                scrollbarWidth: 'thin',
-                                scrollbarColor: 'rgba(0, 0, 0, 0.2) transparent'
-                            }}
-                        />
-                        <Button
-                            onClick={sendMessage}
-                            disabled={isLoading || !inputMessage.trim()}
-                            style={{
-                                position: 'absolute',
-                                right: '8px',
-                                bottom: '4px',
-                                zIndex: 5,
-                                border: 'none',
-                                borderRadius: '50%',
-                                width: '40px',
-                                height: '40px',
-                                background: inputMessage.trim() && !isLoading ? 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))' : 'var(--bg-tertiary)',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center'
-                            }}
-                        >
-                            <FontAwesomeIcon
-                                icon={faPaperPlane}
-                                style={{
-                                    fontSize: '1rem',
-                                    color: inputMessage.trim() && !isLoading ? 'white' : 'var(--text-muted)'
-                                }}
-                            />
-                        </Button>
-                    </div>
-                </div>
-            </div>            {/* Speech Recognition Modal */}
-            <Modal
-                show={showSpeechModal}
-                onHide={handleModalClose}
-                centered
-                backdrop="static"
-                className="modern-modal"
-            >
-                <Modal.Header closeButton style={{ 
-                    background: 'var(--bg-secondary)',
-                    borderBottom: '1px solid var(--border-light)'
-                }}>
-                    <Modal.Title className="d-flex align-items-center">
-                        <FontAwesomeIcon 
-                            icon={faMicrophone} 
-                            className={`me-2 ${isListening ? 'animate-pulse' : ''}`}
-                            style={{ 
-                                color: isListening ? 'var(--danger)' : 'var(--accent-primary)',
-                                fontSize: '1.25rem'
-                            }}
-                        />
-                        {isListening ? 'Listening...' : 'Speech Recognition'}
-                    </Modal.Title>
-                </Modal.Header>
-                <Modal.Body style={{ 
-                    background: 'var(--bg-primary)',
-                    minHeight: '200px',
-                    padding: '2rem'
-                }}>
-                    <div className="text-center mb-3">
-                        <p style={{ 
-                            color: 'var(--text-secondary)',
-                            fontFamily: 'Inter, sans-serif',
-                            fontSize: '0.9rem'
-                        }}>
-                            {isListening 
-                                ? 'Speak clearly into your microphone...' 
-                                : speechTranscript 
-                                ? 'Processing your speech...'
-                                : 'Getting ready to listen...'}
-                        </p>
-                    </div>
-                    
-                    <div style={{
-                        background: 'var(--bg-secondary)',
-                        border: '2px solid var(--border-light)',
-                        borderRadius: 'var(--border-radius)',
-                        padding: '1.5rem',
-                        minHeight: '120px',
-                        fontFamily: 'Inter, sans-serif',
-                        fontSize: '1rem',
-                        lineHeight: '1.6',
-                        color: 'var(--text-primary)',
-                        position: 'relative'
-                    }}>
-                        {speechTranscript && (
-                            <div>
-                                <span style={{ color: 'var(--text-primary)', fontWeight: '500' }}>
-                                    {speechTranscript}
-                                </span>
-                                {!isListening && (
-                                    <div style={{ 
-                                        marginTop: '1rem',
-                                        padding: '0.5rem',
-                                        background: 'rgba(59, 130, 246, 0.1)',
-                                        borderRadius: '8px',
-                                        fontSize: '0.875rem',
-                                        color: 'var(--accent-primary)',
-                                        textAlign: 'center'
-                                    }}>
-                                        Sending message automatically...
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                        {interimTranscript && (
-                            <span style={{ 
-                                color: 'var(--text-muted)',
-                                fontStyle: 'italic' 
-                            }}>
-                                {interimTranscript}
-                            </span>
-                        )}
-                        {!speechTranscript && !interimTranscript && (
-                            <span style={{ 
-                                color: 'var(--text-muted)',
-                                fontStyle: 'italic' 
-                            }}>
-                                Your speech will appear here...
-                            </span>
-                        )}
-                    </div>
-
-                    {isListening && (
-                        <div className="text-center mt-3">
-                            <Button
-                                variant="danger"
-                                onClick={stopListening}
-                                className="modern-btn"
-                                style={{
-                                    borderRadius: '25px',
-                                    padding: '0.75rem 1.5rem',
-                                    fontWeight: '600'
-                                }}
-                            >
-                                <FontAwesomeIcon icon={faMicrophoneSlash} className="me-2" />
-                                Stop Listening
-                            </Button>
-                        </div>
-                    )}
-                </Modal.Body>
-            </Modal>
+                <AutoExpandingInputField
+                    inputRef={inputRef}
+                    isLoading={isLoading}
+                    inputMessage={inputMessage}
+                    setInputMessage={setInputMessage}
+                    autoResizeTextarea={autoResizeTextarea}
+                    handleKeyPress={handleKeyPress}
+                    sendMessage={sendMessage}
+                    speechSupported={speechSupported}
+                    isListening={isListening}
+                    stopListening={stopListening}
+                    startListening={startListening}
+                />
+            </div>
+            {/* Speech Recognition Modal */}
+            <SpeechModal
+                showSpeechModal={showSpeechModal}
+                handleModalClose={handleModalClose}
+                speechTranscript={speechTranscript}
+                stopListening={stopListening}
+                isListening={isListening}
+                interimTranscript={interimTranscript}
+            />
         </div>
     );
 };
