@@ -3,10 +3,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react'
 import { Button, Form } from 'react-bootstrap';
 
-const AutoExpandingInputField = ({ inputRef, isLoading, inputMessage, 
-    setInputMessage, autoResizeTextarea, handleKeyPress, 
+const AutoExpandingInputField = ({ inputRef, isLoading, inputMessage,
+    setInputMessage, autoResizeTextarea,
     sendMessage, speechSupported, isListening, stopListening, startListening }) => {
-        
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    };
     return (
         <>
 
