@@ -31,7 +31,7 @@ const NoteState = (props) => {
     const [syncInProgress, setSyncInProgress] = useState(false);
     const syncRef = useRef(false);
 
-    // Migrate old localStorage data on component mount
+    // Migrate old localStorage data on mount
     useEffect(() => {
         migrateOldOfflineData();
     }, []);
@@ -46,9 +46,12 @@ const NoteState = (props) => {
 
         for (const action of pendingActions) {
             try {
+                let response;
+                let authResult;
+
                 switch (action.type) {
                     case 'ADD_NOTE':
-                        const addResponse = await fetch(`${host}/api/notes/addnotes`, {
+                        response = await fetch(`${host}/api/notes/addnotes`, {
                             method: "POST",
                             headers: {
                                 'Content-Type': 'application/json',
@@ -57,16 +60,20 @@ const NoteState = (props) => {
                             body: JSON.stringify(action.data)
                         });
                         
-                        const addValid = await handleAuthResponse(addResponse, navigate);
-                        if (!addValid) return;
+                        authResult = await handleAuthResponse(response, navigate);
+                        if (!authResult.isValid) {
+                            syncRef.current = false;
+                            setSyncInProgress(false);
+                            return;
+                        }
                         
-                        // If successful, remove the corresponding offline note
-                        if (addResponse.ok) {
+                        if (response.ok) {
                             removeOfflineNoteByContent(action.data.title, action.data.description, action.data.tag);
                         }
                         break;
+
                     case 'UPDATE_NOTE':
-                        const updateResponse = await fetch(`${host}/api/notes/updatenotes/${action.data.id}`, {
+                        response = await fetch(`${host}/api/notes/updatenotes/${action.data.id}`, {
                             method: "PUT",
                             headers: {
                                 'Content-Type': 'application/json',
@@ -79,11 +86,16 @@ const NoteState = (props) => {
                             })
                         });
                         
-                        const updateValid = await handleAuthResponse(updateResponse, navigate);
-                        if (!updateValid) return;
+                        authResult = await handleAuthResponse(response, navigate);
+                        if (!authResult.isValid) {
+                            syncRef.current = false;
+                            setSyncInProgress(false);
+                            return;
+                        }
                         break;
+
                     case 'DELETE_NOTE':
-                        const deleteResponse = await fetch(`${host}/api/notes/deletenotes/${action.data.id}`, {
+                        response = await fetch(`${host}/api/notes/deletenotes/${action.data.id}`, {
                             method: "DELETE",
                             headers: {
                                 'Content-Type': 'application/json',
@@ -91,16 +103,21 @@ const NoteState = (props) => {
                             }
                         });
                         
-                        const deleteValid = await handleAuthResponse(deleteResponse, navigate);
-                        if (!deleteValid) return;
+                        authResult = await handleAuthResponse(response, navigate);
+                        if (!authResult.isValid) {
+                            syncRef.current = false;
+                            setSyncInProgress(false);
+                            return;
+                        }
                         break;
+
                     default:
                         break;
                 }
                 removePendingAction(action.id);
             } catch (error) {
                 console.error('Failed to sync action:', action, error);
-                break; // Stop syncing if one fails
+                break; // Stop syncing on error
             }
         }
 
@@ -116,16 +133,19 @@ const NoteState = (props) => {
                     },
                 });
                 
-                const isValid = await handleAuthResponse(response, navigate);
-                if (!isValid) return;
+                const authResult = await handleAuthResponse(response, navigate);
+                if (!authResult.isValid) {
+                    syncRef.current = false;
+                    setSyncInProgress(false);
+                    return;
+                }
                 
                 if (response.ok) {
-                    let onlineNotes = await response.json();
+                    const onlineNotes = authResult.data;
                     const offlineNotes = getOfflineNotes();
                     const mergedNotes = mergeNotes(onlineNotes, offlineNotes);
                     setNotes(mergedNotes);
                     
-                    // Cache notes, clean up invalid actions, and clear synced offline notes
                     saveCachedNotes(onlineNotes);
                     cleanupPendingActions(onlineNotes);
                     clearSyncedOfflineNotes(onlineNotes);
@@ -148,17 +168,14 @@ const NoteState = (props) => {
             }
         };
 
-        // Initial network status
         updateNetworkStatus(navigator.onLine);
 
-        // Listen for network status changes
         const handleOnline = () => updateNetworkStatus(true);
         const handleOffline = () => updateNetworkStatus(false);
 
         window.addEventListener('online', handleOnline);
         window.addEventListener('offline', handleOffline);
 
-        // Listen for service worker messages
         const handleMessage = (event) => {
             if (event.data && event.data.type === 'NETWORK_STATUS_UPDATE') {
                 updateNetworkStatus(event.data.isOnline);
@@ -195,19 +212,18 @@ const NoteState = (props) => {
                     },
                 });
                 
-                const isValid = await handleAuthResponse(response, navigate);
-                if (!isValid) {
+                const authResult = await handleAuthResponse(response, navigate);
+                if (!authResult.isValid) {
                     setNotes([]);
                     return;
                 }
                 
                 if (response.ok) {
-                    let onlineNotes = await response.json();
+                    const onlineNotes = authResult.data;
                     const offlineNotes = getOfflineNotes();
                     const mergedNotes = mergeNotes(onlineNotes, offlineNotes);
                     setNotes(mergedNotes);
                     
-                    // Cache notes and clean up invalid pending actions
                     saveCachedNotes(onlineNotes);
                     cleanupPendingActions(onlineNotes);
                     return;
@@ -217,7 +233,7 @@ const NoteState = (props) => {
             console.error('Error fetching online notes:', error);
         }
 
-        // Fallback to offline notes + cached online notes
+        // Fallback to offline + cached
         const offlineNotes = getOfflineNotes();
         const cachedNotes = getCachedNotes();
         const allOfflineNotes = mergeNotes(cachedNotes, offlineNotes);
@@ -238,11 +254,11 @@ const NoteState = (props) => {
                     body: JSON.stringify(noteData)
                 });
 
-                const isValid = await handleAuthResponse(response, navigate);
-                if (!isValid) return;
+                const authResult = await handleAuthResponse(response, navigate);
+                if (!authResult.isValid) return;
 
                 if (response.ok) {
-                    const newNote = await response.json();
+                    const newNote = authResult.data;
                     setNotes(prevNotes => [...prevNotes, newNote]);
                     return;
                 }
@@ -251,7 +267,7 @@ const NoteState = (props) => {
             console.error('Error adding note online:', error);
         }
 
-        // Fallback to offline mode
+        // Offline fallback
         const offlineNote = addOfflineNote(noteData);
         if (offlineNote) {
             setNotes(prevNotes => [...prevNotes, offlineNote]);
@@ -273,8 +289,8 @@ const NoteState = (props) => {
                     }
                 });
 
-                const isValid = await handleAuthResponse(response, navigate);
-                if (!isValid) return;
+                const authResult = await handleAuthResponse(response, navigate);
+                if (!authResult.isValid) return;
 
                 if (response.ok) {
                     setNotes(prevNotes => prevNotes.filter(note => note._id !== id));
@@ -285,12 +301,11 @@ const NoteState = (props) => {
             console.error('Error deleting note online:', error);
         }
 
-        // Handle offline deletion
+        // Offline handling
         deleteOfflineNote(id);
         setNotes(prevNotes => prevNotes.filter(note => note._id !== id));
         
         if (!id.startsWith('offline_')) {
-            // Remove from cached notes and add pending delete action
             removeCachedNote(id);
             addPendingAction({
                 type: 'DELETE_NOTE',
@@ -298,8 +313,6 @@ const NoteState = (props) => {
             });
         }
     };
-
-
 
     const editNote = async (id, title, description, tag) => {
         const updateData = { title, description, tag };
@@ -315,8 +328,8 @@ const NoteState = (props) => {
                     body: JSON.stringify(updateData)
                 });
 
-                const isValid = await handleAuthResponse(response, navigate);
-                if (!isValid) return;
+                const authResult = await handleAuthResponse(response, navigate);
+                if (!authResult.isValid) return;
 
                 if (response.ok) {
                     setNotes(prevNotes => prevNotes.map(note => 
@@ -329,14 +342,13 @@ const NoteState = (props) => {
             console.error('Error updating note online:', error);
         }
 
-        // Handle offline update
+        // Offline update
         updateOfflineNote(id, updateData);
         setNotes(prevNotes => prevNotes.map(note => 
             note._id === id ? { ...note, ...updateData, isOffline: true } : note
         ));
 
         if (!id.startsWith('offline_')) {
-            // Update cached note and add pending action
             updateCachedNote(id, updateData);
             addPendingAction({
                 type: 'UPDATE_NOTE',

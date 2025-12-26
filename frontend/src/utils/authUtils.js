@@ -1,38 +1,41 @@
-
 export const handleAuthResponse = async (response, navigate) => {
+    let data = {};
+
+    try {
+        data = await response.json();
+    } catch (e) {
+        data = { error: 'Invalid response from server' };
+    }
+
     if (response.status === 401) {
-        try {
-            const errorData = await response.json();
-            if (errorData.expired) {
-                // Token expired - clear and redirect
-                localStorage.removeItem('token');
-                if (navigate) {
-                    navigate('/login', { 
-                        state: { message: 'Your session has expired. Please login again.' } 
-                    });
-                }
-                return false;
-            }
-        } catch (e) {
-            // If JSON parsing fails, still handle as auth error
-            localStorage.removeItem('token');
-            if (navigate) {
-                navigate('/login', { 
-                    state: { message: 'Authentication failed. Please login again.' } 
-                });
-            }
-            return false;
+        if (data.requiresApiKey || 
+            (data.error && data.error.includes('API key invalid or expired'))) {
+            return {
+                isValid: false,
+                isApiKeyError: true,
+                message: data.error || 'Your Gemini API key is invalid or expired. Please add a valid one.',
+                data 
+            };
         }
-        
+
+        // Regular session expired
         localStorage.removeItem('token');
         if (navigate) {
-            navigate('/login', { 
-                state: { message: 'Please login to continue.' } 
+            navigate('/login', {
+                state: { message: 'Your session has expired. Please login again.' }
             });
         }
-        return false;
+        return {
+            isValid: false,
+            isApiKeyError: false,
+            message: 'Session expired. Redirecting to login...'
+        };
     }
-    
-    return response.ok;
-};
 
+    return {
+        isValid: response.ok,
+        isApiKeyError: false,
+        message: data.error || null,
+        data 
+    };
+};

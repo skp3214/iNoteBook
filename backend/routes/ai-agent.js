@@ -23,10 +23,10 @@ router.post('/chat', fetchuser, async (req, res) => {
             response: response 
         });
     } catch (error) {
-        console.error('AI Agent Error:', error);
+        console.error('AI Agent Error:', error.message);
         
         // Check if it's an API key related error
-        if (error.message && (error.message.includes('API key') || error.message.includes('401') || error.message.includes('403'))) {
+        if (error.message) {
             return res.status(401).json({ 
                 success: false, 
                 error: 'API key invalid or expired. Please configure a new API key.',

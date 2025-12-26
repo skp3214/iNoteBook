@@ -1,20 +1,31 @@
 export const formatMessage = (text) => {
+    // Guard clause: if text is not a string, return empty or fallback
+    if (typeof text !== 'string') {
+        return <div style={{ fontSize: '0.95rem', color: 'var(--text-muted)' }}>
+            [Message not available]
+        </div>;
+    }
+
     const lines = text.split('\n');
     const formattedElements = [];
 
     lines.forEach((line, index) => {
-        // Handle bullet points
-        if (line.trim().startsWith('* ')) {
-            const content = line.substring(2).trim();
+        const trimmedLine = line.trim();
 
-            // Handle bold text within bullet points (e.g., **text**)
-            const formattedContent = content.split(/(\*\*[^*]+\*\*)/g).map((part, partIndex) => {
+        // Empty line → spacing
+        if (trimmedLine === '') {
+            formattedElements.push(<div key={index} style={{ height: '0.75rem' }} />);
+            return;
+        }
+
+        // Bullet points: starts with "* "
+        if (trimmedLine.startsWith('* ')) {
+            const content = line.substring(2); // Keep original indentation if any
+
+            const formattedContent = content.split(/(\*\*[^*]+\*\*)/g).map((part, i) => {
                 if (part.startsWith('**') && part.endsWith('**')) {
                     return (
-                        <strong key={partIndex} style={{
-                            fontWeight: 600,
-                            color: 'var(--accent-primary, #007bff)'
-                        }}>
+                        <strong key={i} style={{ fontWeight: 600, color: 'var(--accent-primary, #007bff)' }}>
                             {part.slice(2, -2)}
                         </strong>
                     );
@@ -23,24 +34,16 @@ export const formatMessage = (text) => {
             });
 
             formattedElements.push(
-                <div key={index} style={{
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    marginBottom: '0.5rem',
-                    paddingLeft: '0.5rem'
-                }}>
-                    <span style={{
-                        marginRight: '0.5rem',
-                        color: 'var(--accent-primary, #007bff)',
-                        fontWeight: 'bold',
-                        minWidth: '8px'
-                    }}>•</span>
+                <div key={index} style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '0.5rem', paddingLeft: '0.5rem' }}>
+                    <span style={{ marginRight: '0.5rem', color: 'var(--accent-primary, #007bff)', fontWeight: 'bold', minWidth: '8px' }}>•</span>
                     <span style={{ lineHeight: '1.5' }}>{formattedContent}</span>
                 </div>
             );
+            return;
         }
-        // Handle headers (lines that end with colon)
-        else if (line.trim().endsWith(':') && line.trim().length > 1 && !line.includes('*')) {
+
+        // Header: ends with colon and no bullets
+        if (trimmedLine.endsWith(':') && !line.includes('*')) {
             formattedElements.push(
                 <div key={index} style={{
                     fontWeight: 600,
@@ -51,41 +54,29 @@ export const formatMessage = (text) => {
                     borderBottom: '1px solid var(--border-light)',
                     paddingBottom: '0.25rem'
                 }}>
-                    {line.trim()}
+                    {trimmedLine}
                 </div>
             );
+            return;
         }
-        // Handle empty lines
-        else if (line.trim() === '') {
-            formattedElements.push(
-                <div key={index} style={{ height: '0.75rem' }} />
-            );
-        }
-        // Handle regular text with bold formatting
-        else if (line.trim()) {
-            const formattedContent = line.split(/(\*\*[^*]+\*\*)/g).map((part, partIndex) => {
-                if (part.startsWith('**') && part.endsWith('**')) {
-                    return (
-                        <strong key={partIndex} style={{
-                            fontWeight: 600,
-                            color: 'var(--accent-primary, #007bff)'
-                        }}>
-                            {part.slice(2, -2)}
-                        </strong>
-                    );
-                }
-                return part;
-            });
 
-            formattedElements.push(
-                <div key={index} style={{
-                    marginBottom: '0.5rem',
-                    lineHeight: '1.6'
-                }}>
-                    {formattedContent}
-                </div>
-            );
-        }
+        // Regular paragraph with bold support
+        const formattedContent = line.split(/(\*\*[^*]+\*\*)/g).map((part, i) => {
+            if (part.startsWith('**') && part.endsWith('**')) {
+                return (
+                    <strong key={i} style={{ fontWeight: 600, color: 'var(--accent-primary, #007bff)' }}>
+                        {part.slice(2, -2)}
+                    </strong>
+                );
+            }
+            return part;
+        });
+
+        formattedElements.push(
+            <div key={index} style={{ marginBottom: '0.5rem', lineHeight: '1.6' }}>
+                {formattedContent}
+            </div>
+        );
     });
 
     return <div style={{ fontSize: '0.95rem' }}>{formattedElements}</div>;

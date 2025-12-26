@@ -1,3 +1,19 @@
+/* Modern Circular Ring Spinner */
+.modern-ring-spinner {
+  width: 3.5rem;
+  height: 3.5rem;
+  border: 5px solid var(--bg-secondary);
+  border-top: 5px solid var(--accent-primary);
+  border-radius: 50%;
+  animation: modern-spin 1s linear infinite;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
+  margin-bottom: 0.5rem;
+}
+
+@keyframes modern-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 @import 'bootstrap/dist/css/bootstrap.min.css';
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
 

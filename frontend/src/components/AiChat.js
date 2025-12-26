@@ -7,36 +7,10 @@ import AutoExpandingInputField from './ai-chat/AutoExpandingInputField';
 import LoadingSpinner from './ai-chat/LoadingSpinner';
 import { autoResizeTextarea, formatMessage } from '../utils/noteUtils';
 
-
-
 const AiChat = () => {
     const context = useContext(noteContext);
     const { getNotes } = context;
     const navigate = useNavigate();
-    // Add custom scrollbar styles
-    useEffect(() => {
-        const style = document.createElement('style');
-        style.textContent = `
-            .custom-scrollbar::-webkit-scrollbar {
-                width: 6px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-track {
-                background: transparent;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb {
-                background: rgba(0, 0, 0, 0.2);
-                border-radius: 3px;
-            }
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                background: rgba(0, 0, 0, 0.3);
-            }
-        `;
-        document.head.appendChild(style);
-
-        return () => {
-            document.head.removeChild(style);
-        };
-    }, []);
 
     const [messages, setMessages] = useState([
         {
@@ -53,6 +27,7 @@ const AiChat = () => {
     const [showSpeechModal, setShowSpeechModal] = useState(false);
     const [speechTranscript, setSpeechTranscript] = useState('');
     const [interimTranscript, setInterimTranscript] = useState('');
+
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
     const recognitionRef = useRef(null);
@@ -66,33 +41,25 @@ const AiChat = () => {
         scrollToBottom();
     }, [messages]);
 
-    // Auto-resize textarea when inputMessage changes
     useEffect(() => {
         autoResizeTextarea(inputRef.current);
     }, [inputMessage]);
 
-    // Function to send speech message
-    const sendSpeechMessage = useCallback(async (message) => {
-        console.log('sendSpeechMessage called with:', message);
-        if (!message.trim() || isLoading) {
-            console.log('Message empty or already loading, returning');
-            return;
-        }
+    // Unified message sending logic (text or speech)
+    const handleSendMessage = useCallback(async (messageText) => {
+        if (!messageText?.trim() || isLoading) return;
 
         const userMessage = {
             id: Date.now(),
-            text: message,
+            text: messageText,
             sender: 'user',
             timestamp: new Date()
         };
 
-        console.log('Adding user message to chat');
         setMessages(prev => [...prev, userMessage]);
         setIsLoading(true);
 
         try {
-            console.log('Sending API request...');
-            // Get user API key if available
             const userApiKey = localStorage.getItem('gemini_api_key');
 
             const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/ai-agent/chat`, {
@@ -102,26 +69,32 @@ const AiChat = () => {
                     'authtoken': localStorage.getItem('token')
                 },
                 body: JSON.stringify({
-                    message: message,
+                    message: messageText,
                     ...(userApiKey && { apiKey: userApiKey })
                 })
             });
 
-            const isValid = await handleAuthResponse(response, navigate);
-            if (!isValid) {
-                const errorMessage = {
+            // This now returns parsed data + auth info
+            const authResult = await handleAuthResponse(response, navigate);
+
+            if (!authResult.isValid) {
+                const errorText = authResult.isApiKeyError
+                    ? authResult.message
+                    : 'Your session has expired. Please login again.';
+
+                setMessages(prev => [...prev, {
                     id: Date.now() + 1,
-                    text: 'Your session has expired. Please login again.',
+                    text: errorText,
                     sender: 'ai',
                     timestamp: new Date(),
                     isError: true
-                };
-                setMessages(prev => [...prev, errorMessage]);
+                }]);
+                setIsLoading(false);
                 return;
             }
 
-            const data = await response.json();
-            console.log('API response');
+            // Use the already-parsed data from handleAuthResponse
+            const data = authResult.data;
 
             if (data.success) {
                 const aiMessage = {
@@ -130,49 +103,46 @@ const AiChat = () => {
                     sender: 'ai',
                     timestamp: new Date()
                 };
-                console.log('Adding AI response to chat');
                 setMessages(prev => [...prev, aiMessage]);
 
-                // Refresh notes if AI performed CRUD operations
-                if (data.response && (data.response.toLowerCase().includes('created') ||
-                    data.response.toLowerCase().includes('updated') ||
-                    data.response.toLowerCase().includes('deleted') ||
-                    data.response.toLowerCase().includes('added'))) {
-                    console.log('AI performed CRUD operation, refreshing notes...');
-                    setTimeout(() => {
-                        if (getNotes) {
-                            getNotes();
-                        }
-                    }, 500);
+                if (data.response && /\b(created|updated|deleted|added)\b/i.test(data.response)) {
+                    setTimeout(() => getNotes?.(), 500);
                 }
             } else {
-                const errorMessage = {
+                setMessages(prev => [...prev, {
                     id: Date.now() + 1,
-                    text: data.error || 'Sorry, I encountered an error. Please try again.',
+                    text: data.error || 'Sorry, something went wrong. Please try again.',
                     sender: 'ai',
                     timestamp: new Date(),
                     isError: true
-                };
-                console.log('Adding error message to chat:', errorMessage);
-                setMessages(prev => [...prev, errorMessage]);
+                }]);
             }
         } catch (error) {
-            console.error('Network error:', error);
-            const errorMessage = {
+            console.error('Chat error:', error);
+            setMessages(prev => [...prev, {
                 id: Date.now() + 1,
-                text: 'Sorry, I couldn\'t connect to the server. Please check your connection and try again.',
+                text: 'Network error. Please check your connection and try again.',
                 sender: 'ai',
                 timestamp: new Date(),
                 isError: true
-            };
-            setMessages(prev => [...prev, errorMessage]);
+            }]);
         } finally {
-            console.log('Setting loading to false');
             setIsLoading(false);
         }
     }, [isLoading, getNotes, navigate]);
+    // Text input send
+    const sendMessage = () => {
+        handleSendMessage(inputMessage);
+        setInputMessage('');
+        setTimeout(() => autoResizeTextarea(inputRef.current), 0);
+    };
 
-    // Initialize speech recognition
+    // Speech send
+    const sendSpeechMessage = useCallback((transcript) => {
+        handleSendMessage(transcript);
+    }, [handleSendMessage]);
+
+    // Speech Recognition Setup
     useEffect(() => {
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             setSpeechSupported(true);
@@ -184,7 +154,6 @@ const AiChat = () => {
             recognitionRef.current.lang = 'en-US';
 
             recognitionRef.current.onstart = () => {
-                console.log('Speech recognition started');
                 setIsListening(true);
                 setShowSpeechModal(true);
                 setSpeechTranscript('');
@@ -194,7 +163,7 @@ const AiChat = () => {
 
             recognitionRef.current.onresult = (event) => {
                 let interim = '';
-                let final = '';
+                let final = speechTranscriptRef.current;
 
                 for (let i = event.resultIndex; i < event.results.length; i++) {
                     const transcript = event.results[i][0].transcript;
@@ -205,75 +174,51 @@ const AiChat = () => {
                     }
                 }
 
-                if (final) {
-                    const newTranscript = speechTranscriptRef.current + final;
-                    speechTranscriptRef.current = newTranscript;
-                    setSpeechTranscript(newTranscript);
-                    setInterimTranscript('');
-                } else {
-                    setInterimTranscript(interim);
-                }
+                speechTranscriptRef.current = final;
+                setSpeechTranscript(final);
+                setInterimTranscript(interim);
             };
 
             recognitionRef.current.onend = () => {
-                console.log('Speech recognition ended. Transcript:', speechTranscriptRef.current);
                 setIsListening(false);
-
-                // Auto-send the message if we have a transcript
                 const finalTranscript = speechTranscriptRef.current.trim();
+
                 if (finalTranscript) {
-                    console.log('Auto-sending message:', finalTranscript);
-                    // Show the transcript for a moment before sending
                     setTimeout(() => {
                         sendSpeechMessage(finalTranscript);
                         setShowSpeechModal(false);
                         setSpeechTranscript('');
                         setInterimTranscript('');
                         speechTranscriptRef.current = '';
-                    }, 1000); // Show for 1 second before sending
+                    }, 1000);
                 } else {
-                    console.log('No transcript to send');
                     setShowSpeechModal(false);
-                    setSpeechTranscript('');
-                    setInterimTranscript('');
-                    speechTranscriptRef.current = '';
                 }
             };
 
             recognitionRef.current.onerror = (event) => {
-                console.error('Speech recognition error:', event.error);
+                console.error('Speech error:', event.error);
                 setIsListening(false);
                 setShowSpeechModal(false);
-                setSpeechTranscript('');
-                setInterimTranscript('');
-                speechTranscriptRef.current = '';
-
-                if (event.error === 'not-allowed') {
-                    alert('Microphone access denied. Please allow microphone access and try again.');
-                } else if (event.error === 'no-speech') {
-                    alert('No speech detected. Please try speaking and try again.');
-                } else {
-                    alert(`Speech recognition error: ${event.error}. Please try again.`);
-                }
+                alert(
+                    event.error === 'not-allowed'
+                        ? 'Microphone access denied. Please allow it.'
+                        : `Speech error: ${event.error}`
+                );
             };
         }
     }, [sendSpeechMessage]);
 
-    // Initialize textarea height on component mount
+    // Initial textarea height
     useEffect(() => {
         if (inputRef.current) {
-            const textarea = inputRef.current;
-            textarea.style.height = '48px'; // Set initial height
+            inputRef.current.style.height = '48px';
         }
     }, []);
 
     const startListening = () => {
         if (recognitionRef.current && speechSupported && !isListening) {
-            try {
-                recognitionRef.current.start();
-            } catch (error) {
-                console.error('Error starting speech recognition:', error);
-            }
+            recognitionRef.current.start();
         }
     };
 
@@ -284,147 +229,45 @@ const AiChat = () => {
     };
 
     const handleModalClose = () => {
-        if (isListening) {
-            stopListening();
-        } else {
-            setShowSpeechModal(false);
-            setSpeechTranscript('');
-            setInterimTranscript('');
-        }
+        if (isListening) stopListening();
+        setShowSpeechModal(false);
+        setSpeechTranscript('');
+        setInterimTranscript('');
     };
-
-    const sendMessage = async () => {
-        if (!inputMessage.trim() || isLoading) return;
-
-        const userMessage = {
-            id: Date.now(),
-            text: inputMessage,
-            sender: 'user',
-            timestamp: new Date()
-        };
-
-        setMessages(prev => [...prev, userMessage]);
-        setInputMessage('');
-        // Reset textarea height after sending message
-        setTimeout(() => autoResizeTextarea(inputRef.current), 0);
-        setIsLoading(true);
-
-        try {
-            // Get user API key if available
-            const userApiKey = localStorage.getItem('gemini_api_key');
-
-            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/ai-agent/chat`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'authtoken': localStorage.getItem('token')
-                },
-                body: JSON.stringify({
-                    message: inputMessage,
-                    ...(userApiKey && { apiKey: userApiKey })
-                })
-            });
-
-            const isValid = await handleAuthResponse(response, navigate);
-            if (!isValid) {
-                const errorMessage = {
-                    id: Date.now() + 1,
-                    text: 'Your session has expired. Please login again.',
-                    sender: 'ai',
-                    timestamp: new Date(),
-                    isError: true
-                };
-                setMessages(prev => [...prev, errorMessage]);
-                setIsLoading(false);
-                return;
-            }
-
-            const data = await response.json();
-
-            if (data.success) {
-                const aiMessage = {
-                    id: Date.now() + 1,
-                    text: data.response,
-                    sender: 'ai',
-                    timestamp: new Date()
-                };
-                setMessages(prev => [...prev, aiMessage]);
-
-                // Refresh notes if AI performed CRUD operations
-                if (data.response && (data.response.toLowerCase().includes('created') ||
-                    data.response.toLowerCase().includes('updated') ||
-                    data.response.toLowerCase().includes('deleted') ||
-                    data.response.toLowerCase().includes('added'))) {
-                    console.log('AI performed CRUD operation, refreshing notes...');
-                    setTimeout(() => {
-                        if (getNotes) {
-                            getNotes();
-                        }
-                    }, 500);
-                }
-            } else {
-                const errorMessage = {
-                    id: Date.now() + 1,
-                    text: data.error || 'Sorry, I encountered an error. Please try again.',
-                    sender: 'ai',
-                    timestamp: new Date(),
-                    isError: true
-                };
-                setMessages(prev => [...prev, errorMessage]);
-            }
-        } catch (error) {
-            const errorMessage = {
-                id: Date.now() + 1,
-                text: 'Sorry, I couldn\'t connect to the server. Please check your connection and try again.',
-                sender: 'ai',
-                timestamp: new Date(),
-                isError: true
-            };
-            setMessages(prev => [...prev, errorMessage]);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
 
     const clearChat = () => {
-        setMessages([
-            {
-                id: 1,
-                text: "Hello! I'm your AI assistant for iNotebook. How can I help you today?",
-                sender: 'ai',
-                timestamp: new Date()
-            }
-        ]);
+        setMessages([{
+            id: 1,
+            text: "Hello! I'm your AI assistant for iNotebook. How can I help you today?",
+            sender: 'ai',
+            timestamp: new Date()
+        }]);
     };
 
-    // Expose clearChat function globally for the modal header
+    // Optional: Keep window.clearAiChat if SpeechModal uses it (better to pass as prop later)
     useEffect(() => {
         window.clearAiChat = clearChat;
-        return () => {
-            delete window.clearAiChat;
-        };
+        return () => delete window.clearAiChat;
     }, []);
 
     return (
-        <div className="d-flex flex-column h-100" style={{
-            height: '100%',
-            overflow: 'hidden'
-        }}>
-            {/* Messages Container - Scrollable */}
+        <div className="d-flex flex-column h-100" style={{ height: '100%', overflow: 'hidden' }}>
+            {/* Messages Area */}
             <div
                 className="flex-grow-1 px-3 pt-3"
                 style={{
                     overflowY: 'auto',
                     overflowX: 'hidden',
-                    maxHeight: 'calc(100% - 80px)', // Reserve space for input
+                    maxHeight: 'calc(100% - 80px)',
                     background: 'var(--bg-primary)'
                 }}
             >
                 {messages.map((message) => (
-                    <div key={message.id} className="mb-3 d-flex" style={{
-                        justifyContent: message.sender === 'user' ? 'flex-end' : 'flex-start'
-                    }}>
+                    <div
+                        key={message.id}
+                        className="mb-3 d-flex"
+                        style={{ justifyContent: message.sender === 'user' ? 'flex-end' : 'flex-start' }}
+                    >
                         <div style={{ maxWidth: '85%' }}>
                             <div
                                 style={{
@@ -440,26 +283,20 @@ const AiChat = () => {
                                     border: message.sender === 'ai' && !message.isError ? '1px solid var(--border-light)' : 'none',
                                     boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
                                     padding: '1rem 1.25rem',
-                                    position: 'relative'
                                 }}
                             >
-                                {/* Message content */}
-                                <div style={{
-                                    marginBottom: message.sender === 'ai' ? '0.75rem' : '0.5rem'
-                                }}>
-                                    {formatMessage(message.text)}
+                                <div style={{ marginBottom: message.sender === 'ai' ? '0.75rem' : '0.5rem' }}>
+                                    {formatMessage(message.text || '')}
                                 </div>
                             </div>
                         </div>
                     </div>
                 ))}
-                {isLoading && (
-                    <LoadingSpinner />
-                )}
+                {isLoading && <LoadingSpinner />}
                 <div ref={messagesEndRef} />
             </div>
 
-            {/* Input Section - Fixed at Bottom */}
+            {/* Input Area */}
             <div
                 className="border-top p-3"
                 style={{
@@ -477,18 +314,19 @@ const AiChat = () => {
                     sendMessage={sendMessage}
                     speechSupported={speechSupported}
                     isListening={isListening}
-                    stopListening={stopListening}
                     startListening={startListening}
+                    stopListening={stopListening}
                 />
             </div>
-            {/* Speech Recognition Modal */}
+
+            {/* Speech Modal */}
             <SpeechModal
                 showSpeechModal={showSpeechModal}
                 handleModalClose={handleModalClose}
                 speechTranscript={speechTranscript}
-                stopListening={stopListening}
-                isListening={isListening}
                 interimTranscript={interimTranscript}
+                isListening={isListening}
+                stopListening={stopListening}
             />
         </div>
     );

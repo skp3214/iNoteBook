@@ -38,18 +38,28 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
   const [isEditMode, setIsEditMode] = useState(false);
   const [snackbar, setSnackbar] = useState({ show: false, note: null, deleteAction: null, timeoutId: null });
   const [showSidebar, setShowSidebar] = useState(false);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
-  const [sortOrder, setSortOrder] = useState('date'); // 'date' or 'priority'
+  const [viewMode, setViewMode] = useState('grid');
+  const [sortOrder, setSortOrder] = useState('date');
 
-  // Use external search query if provided (for desktop navbar search)
+  const [isLoading, setIsLoading] = useState(true);
+
   const activeSearchQuery = externalSearchQuery !== undefined ? externalSearchQuery : searchQuery;
 
+  // Fetch notes with loading control
   useEffect(() => {
-    if (localStorage.getItem('token')) {
-      getNotes();
-    } else {
-      navigate('/login');
-    }
+    const fetchNotes = async () => {
+      setIsLoading(true); // Start loading
+
+      if (localStorage.getItem('token')) {
+        await getNotes();
+      } else {
+        navigate('/login');
+      }
+
+      setIsLoading(false); // Done loading
+    };
+
+    fetchNotes();
   }, [getNotes, navigate]);
 
   // Sync local notes with context notes, but exclude pending deletes
@@ -70,7 +80,6 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
     return () => document.removeEventListener('click', handleClickOutside);
   }, [showDropdown]);
 
-  // Cleanup timeout on component unmount
   useEffect(() => {
     return () => {
       if (snackbar.timeoutId) {
@@ -79,22 +88,15 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
     };
   }, [snackbar.timeoutId]);
 
-  // Handle sidebar visibility on window resize
   useEffect(() => {
     const handleResize = () => {
-      // Close sidebar when resizing to mobile view (< 992px)
       if (window.innerWidth < 992) {
         setShowSidebar(false);
       }
     };
 
-    // Add event listener
     window.addEventListener('resize', handleResize);
-
-    // Initial check on mount
     handleResize();
-
-    // Cleanup
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
@@ -111,7 +113,6 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
     filteredNotes = filteredNotes.filter(n => n.tag === filterTag);
   }
 
-  // Sort notes based on selected sort order
   if (sortOrder === 'priority') {
     const priorityOrder = { 'Urgent': 1, 'Important': 2, 'Work': 3, 'Personal': 4, 'Completed': 5 };
     filteredNotes = [...filteredNotes].sort((a, b) => {
@@ -120,7 +121,6 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
       return aPriority - bPriority;
     });
   } else {
-    // Sort by date (newest first)
     filteredNotes = [...filteredNotes].sort((a, b) =>
       new Date(b.date) - new Date(a.date)
     );
@@ -208,18 +208,14 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
   };
 
   const handleShowSnackbar = (noteToDelete, deleteAction) => {
-    // Clear any existing timeout
     if (snackbar.timeoutId) {
       clearTimeout(snackbar.timeoutId);
     }
 
-    // Add to pending deletes to prevent reappearing
     setPendingDeletes(prev => new Set([...prev, noteToDelete._id]));
 
-    // Immediately remove note from UI for visual feedback
     setLocalNotes(prevNotes => prevNotes.filter(n => n._id !== noteToDelete._id));
 
-    // Set timeout to execute actual deletion after 4 seconds
     const timeoutId = setTimeout(() => {
       deleteAction();
       setPendingDeletes(prev => {
@@ -234,12 +230,10 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
   };
 
   const handleUndoDelete = () => {
-    // Clear the timeout to prevent deletion
     if (snackbar.timeoutId) {
       clearTimeout(snackbar.timeoutId);
     }
 
-    // Remove from pending deletes
     if (snackbar.note) {
       setPendingDeletes(prev => {
         const newSet = new Set(prev);
@@ -247,7 +241,6 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
         return newSet;
       });
 
-      // Add back to local notes (check for duplicates)
       setLocalNotes(prevNotes => {
         const exists = prevNotes.find(n => n._id === snackbar.note._id);
         if (!exists) {
@@ -257,12 +250,10 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
       });
     }
 
-    // Close the snackbar
     setSnackbar({ show: false, note: null, deleteAction: null, timeoutId: null });
   };
 
   const handleCloseSnackbar = () => {
-    // Clear timeout when manually closing
     if (snackbar.timeoutId) {
       clearTimeout(snackbar.timeoutId);
     }
@@ -274,11 +265,8 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
     setSortOrder(prevOrder => prevOrder === 'date' ? 'priority' : 'date');
   };
 
-
-
   return (
     <div className="notes-container" style={{ display: 'flex', minHeight: 'calc(100vh - 80px)' }}>
-      {/* Sidebar */}
       <Sidebar
         notes={localNotes}
         filterTag={filterTag}
@@ -288,15 +276,10 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
         onAddNote={openAddModal}
       />
 
-      {/* Main Content */}
-      <div style={{
-        flex: 1,
-        width: '100%',
-      }}>
+      <div style={{ flex: 1, width: '100%' }}>
         <Container fluid className="px-4 py-3">
           <Row>
             <Col>
-
               <ModalForm
                 show={showModal}
                 onClose={handleModalClose}
@@ -307,7 +290,6 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                 isEditMode={isEditMode}
               />
 
-              {/* Desktop Header - Your Notes with Grid/List Toggle */}
               <DesktopHeader
                 sortOrder={sortOrder}
                 viewMode={viewMode}
@@ -316,16 +298,14 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                 filteredNotes={filteredNotes}
               />
 
-              {/* Search Bar - Mobile Only */}
               <SearchBar
-                externalSetSearchQuery={externalSearchQuery}
+                externalSetSearchQuery={externalSetSearchQuery}
                 setSearchQuery={setSearchQuery}
                 setShowDropdown={setShowDropdown}
                 showDropdown={showDropdown}
                 activeSearchQuery={activeSearchQuery}
               />
 
-              {/* Mobile Filter Dropdown */}
               {showDropdown && (
                 <MobileFilterDropDown
                   localNotes={localNotes}
@@ -335,7 +315,6 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                 />
               )}
 
-              {/* Header - Mobile Only */}
               <MobileHeader
                 sortOrder={sortOrder}
                 openAddModal={openAddModal}
@@ -345,9 +324,14 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                 toggleSortOrder={toggleSortOrder}
               />
 
-              {/* Notes Content */}
-              <div className="position-relative" style={{ minHeight: '200px' }}>
-                {filteredNotes.length === 0 && (
+              {/* Notes Content with Loading Spinner */}
+              <div className="position-relative" style={{ minHeight: '400px' }}>
+                {isLoading ? (
+                  <div className="d-flex flex-column align-items-center justify-content-center border-0" style={{ minHeight: '300px' }}>
+                    <div className="modern-ring-spinner mb-4"></div>
+                    <p className="fw-semibold text-primary" style={{ fontSize: '1.2rem', letterSpacing: '0.5px' }}>Loading your notes...</p>
+                  </div>
+                ) : filteredNotes.length === 0 ? (
                   <div className="text-center py-5">
                     <div className="mb-3" style={{ fontSize: '4rem', opacity: 0.3 }}>📝</div>
                     <h5 style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>No Notes Found</h5>
@@ -355,9 +339,7 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                       {searchQuery || filterTag ? 'Try adjusting your search or filter' : 'Create your first note to get started'}
                     </p>
                   </div>
-                )}
-
-                {filteredNotes.length > 0 && (
+                ) : (
                   <div
                     className={viewMode === 'grid' ? 'notes-grid' : 'notes-list'}
                     style={{
@@ -367,7 +349,7 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
                         : 'none',
                       flexDirection: viewMode === 'list' ? 'column' : 'row',
                       gap: '1.5rem',
-                      paddingBottom: '100px', // Space for FAB
+                      paddingBottom: '100px',
                     }}
                   >
                     {filteredNotes.map((n, idx) => (
@@ -388,10 +370,8 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
         </Container>
       </div>
 
-      {/* AI FAB - Always visible */}
       <AiFab />
 
-      {/* Snackbar */}
       <Snackbar
         show={snackbar.show}
         message={`${snackbar.note?.title} deleted`}
