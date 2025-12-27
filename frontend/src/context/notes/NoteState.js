@@ -59,14 +59,14 @@ const NoteState = (props) => {
                             },
                             body: JSON.stringify(action.data)
                         });
-                        
+
                         authResult = await handleAuthResponse(response, navigate);
                         if (!authResult.isValid) {
                             syncRef.current = false;
                             setSyncInProgress(false);
                             return;
                         }
-                        
+
                         if (response.ok) {
                             removeOfflineNoteByContent(action.data.title, action.data.description, action.data.tag);
                         }
@@ -85,7 +85,7 @@ const NoteState = (props) => {
                                 tag: action.data.tag
                             })
                         });
-                        
+
                         authResult = await handleAuthResponse(response, navigate);
                         if (!authResult.isValid) {
                             syncRef.current = false;
@@ -102,7 +102,7 @@ const NoteState = (props) => {
                                 'authtoken': localStorage.getItem('token')
                             }
                         });
-                        
+
                         authResult = await handleAuthResponse(response, navigate);
                         if (!authResult.isValid) {
                             syncRef.current = false;
@@ -132,20 +132,20 @@ const NoteState = (props) => {
                         'authtoken': token
                     },
                 });
-                
+
                 const authResult = await handleAuthResponse(response, navigate);
                 if (!authResult.isValid) {
                     syncRef.current = false;
                     setSyncInProgress(false);
                     return;
                 }
-                
+
                 if (response.ok) {
                     const onlineNotes = authResult.data;
                     const offlineNotes = getOfflineNotes();
                     const mergedNotes = mergeNotes(onlineNotes, offlineNotes);
                     setNotes(mergedNotes);
-                    
+
                     saveCachedNotes(onlineNotes);
                     cleanupPendingActions(onlineNotes);
                     clearSyncedOfflineNotes(onlineNotes);
@@ -154,7 +154,7 @@ const NoteState = (props) => {
         } catch (error) {
             console.error('Error refreshing notes after sync:', error);
         }
-        
+
         setSyncInProgress(false);
         syncRef.current = false;
     }, [host, isOnline, navigate]);
@@ -202,8 +202,14 @@ const NoteState = (props) => {
             return;
         }
 
-        try {
-            if (isOnline) {
+        const offlineNotes = getOfflineNotes();
+        const cachedNotes = getCachedNotes();
+        const instantNotes = mergeNotes(cachedNotes, offlineNotes);
+        console.log('Displaying instant notes from cache and offline storage:', instantNotes);
+        setNotes(instantNotes); 
+
+        if (isOnline) {
+            try {
                 const response = await fetch(`${host}/api/notes/fetchallnotes`, {
                     method: "GET",
                     headers: {
@@ -211,35 +217,33 @@ const NoteState = (props) => {
                         'authtoken': token
                     },
                 });
-                
+
                 const authResult = await handleAuthResponse(response, navigate);
                 if (!authResult.isValid) {
-                    setNotes([]);
                     return;
                 }
-                
+
                 if (response.ok) {
                     const onlineNotes = authResult.data;
-                    const offlineNotes = getOfflineNotes();
+
                     const mergedNotes = mergeNotes(onlineNotes, offlineNotes);
-                    setNotes(mergedNotes);
-                    
+
+                    console.log('Fetched online notes and merged with offline notes:', mergedNotes);
+                    setNotes(prev => {
+                        if (JSON.stringify(prev) === JSON.stringify(mergedNotes)) {
+                            return prev;
+                        }
+                        return mergedNotes;
+                    });
+
                     saveCachedNotes(onlineNotes);
                     cleanupPendingActions(onlineNotes);
-                    return;
                 }
+            } catch (error) {
+                console.error('Background fetch failed (offline mode):', error);
             }
-        } catch (error) {
-            console.error('Error fetching online notes:', error);
         }
-
-        // Fallback to offline + cached
-        const offlineNotes = getOfflineNotes();
-        const cachedNotes = getCachedNotes();
-        const allOfflineNotes = mergeNotes(cachedNotes, offlineNotes);
-        setNotes(allOfflineNotes);
     }, [host, isOnline, navigate]);
-
     const addNote = async (title, description, tag) => {
         const noteData = { title, description, tag };
 
@@ -304,7 +308,7 @@ const NoteState = (props) => {
         // Offline handling
         deleteOfflineNote(id);
         setNotes(prevNotes => prevNotes.filter(note => note._id !== id));
-        
+
         if (!id.startsWith('offline_')) {
             removeCachedNote(id);
             addPendingAction({
@@ -332,7 +336,7 @@ const NoteState = (props) => {
                 if (!authResult.isValid) return;
 
                 if (response.ok) {
-                    setNotes(prevNotes => prevNotes.map(note => 
+                    setNotes(prevNotes => prevNotes.map(note =>
                         note._id === id ? { ...note, ...updateData } : note
                     ));
                     return;
@@ -344,7 +348,7 @@ const NoteState = (props) => {
 
         // Offline update
         updateOfflineNote(id, updateData);
-        setNotes(prevNotes => prevNotes.map(note => 
+        setNotes(prevNotes => prevNotes.map(note =>
             note._id === id ? { ...note, ...updateData, isOffline: true } : note
         ));
 
@@ -358,14 +362,14 @@ const NoteState = (props) => {
     };
 
     return (
-        <noteContext.Provider value={{ 
-            note, 
-            addNote, 
-            deleteNote, 
-            editNote, 
-            getNotes, 
-            isOnline, 
-            syncInProgress 
+        <noteContext.Provider value={{
+            note,
+            addNote,
+            deleteNote,
+            editNote,
+            getNotes,
+            isOnline,
+            syncInProgress
         }}>
             {props.children}
         </noteContext.Provider>

@@ -326,12 +326,7 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
 
               {/* Notes Content with Loading Spinner */}
               <div className="position-relative" style={{ minHeight: '400px' }}>
-                {isLoading ? (
-                  <div className="d-flex flex-column align-items-center justify-content-center border-0" style={{ minHeight: '300px' }}>
-                    <div className="modern-ring-spinner mb-4"></div>
-                    <p className="fw-semibold text-primary" style={{ fontSize: '1.2rem', letterSpacing: '0.5px' }}>Loading your notes...</p>
-                  </div>
-                ) : filteredNotes.length === 0 ? (
+                {filteredNotes.length === 0 ? (
                   <div className="text-center py-5">
                     <div className="mb-3" style={{ fontSize: '4rem', opacity: 0.3 }}>📝</div>
                     <h5 style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>No Notes Found</h5>
