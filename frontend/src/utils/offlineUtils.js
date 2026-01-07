@@ -1,6 +1,3 @@
-// Offline storage utilities for iNotebook
-
-// Get user-specific keys for localStorage
 const getUserSpecificKey = (baseKey) => {
   const token = localStorage.getItem('token');
   if (!token) return baseKey; // Fallback for when no user is logged in
@@ -193,14 +190,14 @@ export const clearPendingActions = () => {
   }
 };
 
-
-
 // Clear all offline data
 export const clearOfflineData = () => {
   try {
     localStorage.removeItem(getOfflineNotesKey());
     localStorage.removeItem(getPendingActionsKey());
     localStorage.removeItem(getCachedNotesKey());
+    localStorage.removeItem('gemini_api_key');
+    localStorage.removeItem('theme');
     return true;
   } catch (error) {
     console.error('Error clearing offline data:', error);

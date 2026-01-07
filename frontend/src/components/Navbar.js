@@ -17,9 +17,8 @@ function NavbarComponents({ searchQuery, setSearchQuery }) {
   let navigate = useNavigate();
   
   const handleLogOut = () => {
-    localStorage.removeItem('token');
-    // Clear all user-specific offline data on logout
     clearOfflineData();
+    localStorage.removeItem('token');
     navigate('/');
   }
 
