@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v2.0.8'; 
+const CACHE_VERSION = 'v2.1.0'; 
 const CACHE_NAME = `inotebook-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `inotebook-data-${CACHE_VERSION}`;
 

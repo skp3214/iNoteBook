@@ -41,14 +41,12 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
   const [viewMode, setViewMode] = useState('grid');
   const [sortOrder, setSortOrder] = useState('date');
 
-  const [isLoading, setIsLoading] = useState(true);
 
   const activeSearchQuery = externalSearchQuery !== undefined ? externalSearchQuery : searchQuery;
 
   // Fetch notes with loading control
   useEffect(() => {
     const fetchNotes = async () => {
-      setIsLoading(true); // Start loading
 
       if (localStorage.getItem('token')) {
         await getNotes();
@@ -56,7 +54,6 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
         navigate('/login');
       }
 
-      setIsLoading(false); // Done loading
     };
 
     fetchNotes();
