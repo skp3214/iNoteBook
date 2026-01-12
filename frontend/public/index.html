@@ -7,8 +7,7 @@
     <meta name="theme-color" content="#000000" />
     
     <!-- Resource Hints for Performance -->
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     
     <meta
@@ -32,21 +31,36 @@
     -->
     <title>inotebook - Your Personal Note Manager</title>
     
-    <!-- Load Google Fonts asynchronously with display=swap for performance -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'" fetchpriority="low" />
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" /></noscript>
+    <!-- Optimize font loading: use font-display swap and async loading -->
+    <link 
+      rel="preload" 
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" 
+      as="style" 
+      onload="this.onload=null;this.rel='stylesheet'" 
+    />
+    <noscript>
+      <link 
+        rel="stylesheet" 
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" 
+      />
+    </noscript>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root">
-      <!-- Loading skeleton for faster perceived performance -->
-      <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #ffffff;">
-        <div style="width: 3.5rem; height: 3.5rem; border: 5px solid #f8fafc; border-top: 5px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+      <!-- Optimized loading skeleton with fixed dimensions to prevent CLS -->
+      <div style="display: flex; justify-content: center; align-items: center; height: 100vh; width: 100%; background: #ffffff; position: fixed; top: 0; left: 0;">
+        <div style="width: 3.5rem; height: 3.5rem; border: 5px solid #f8fafc; border-top: 5px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; will-change: transform;"></div>
       </div>
       <style>
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+        /* Prevent FOUC (Flash of Unstyled Content) */
+        #root > div:first-child {
+          opacity: 1;
+          transition: opacity 0.3s ease-out;
         }
       </style>
     </div>

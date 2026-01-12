@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v2.1.0'; 
+const CACHE_VERSION = 'v2.1.1'; 
 const CACHE_NAME = `inotebook-${CACHE_VERSION}`;
 const DATA_CACHE_NAME = `inotebook-data-${CACHE_VERSION}`;
 
@@ -15,7 +15,6 @@ self.addEventListener('install', function(event) {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(function(cache) {
-        console.log('Caching app shell');
         return cache.addAll(urlsToCache);
       })
       .catch(function(error) {
@@ -33,7 +32,6 @@ self.addEventListener('activate', function(event) {
           if (cacheName.startsWith('inotebook-') && 
               cacheName !== CACHE_NAME && 
               cacheName !== DATA_CACHE_NAME) {
-            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -55,7 +53,14 @@ self.addEventListener('fetch', function(event) {
         .then(function(response) {
           if (response.status === 200 && event.request.method === 'GET') {
             const responseClone = response.clone();
-            caches.open(DATA_CACHE_NAME).then(cache => cache.put(event.request, responseClone));
+            // Use requestIdleCallback for non-critical caching
+            if ('requestIdleCallback' in self) {
+              self.requestIdleCallback(() => {
+                caches.open(DATA_CACHE_NAME).then(cache => cache.put(event.request, responseClone));
+              });
+            } else {
+              caches.open(DATA_CACHE_NAME).then(cache => cache.put(event.request, responseClone));
+            }
           }
           return response;
         })
@@ -90,9 +95,18 @@ self.addEventListener('fetch', function(event) {
 
               // Don't cache external domains or huge files
               if (requestUrl.origin === location.origin) {
-                caches.open(CACHE_NAME).then(cache => {
-                  cache.put(event.request, responseToCache);
-                });
+                // Use requestIdleCallback for non-critical caching
+                if ('requestIdleCallback' in self) {
+                  self.requestIdleCallback(() => {
+                    caches.open(CACHE_NAME).then(cache => {
+                      cache.put(event.request, responseToCache);
+                    });
+                  });
+                } else {
+                  caches.open(CACHE_NAME).then(cache => {
+                    cache.put(event.request, responseToCache);
+                  });
+                }
               }
             }
             return response;

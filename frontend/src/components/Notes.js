@@ -324,8 +324,8 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
               {/* Notes Content with Loading Spinner */}
               <div className="position-relative" style={{ minHeight: '400px' }}>
                 {filteredNotes.length === 0 ? (
-                  <div className="text-center py-5">
-                    <div className="mb-3" style={{ fontSize: '4rem', opacity: 0.3 }}>📝</div>
+                  <div className="text-center py-5" style={{ minHeight: '300px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div className="mb-3" style={{ fontSize: '4rem', opacity: 0.3, lineHeight: 1 }}>📝</div>
                     <h5 style={{ color: 'var(--text-secondary)', fontWeight: 600 }}>No Notes Found</h5>
                     <p style={{ color: 'var(--text-muted)' }}>
                       {searchQuery || filterTag ? 'Try adjusting your search or filter' : 'Create your first note to get started'}

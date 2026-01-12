@@ -22,8 +22,6 @@ if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
-        console.log('Service Worker registered');
-
         // Check for updates periodically
         setInterval(() => {
           registration.update();
@@ -32,26 +30,19 @@ if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
         // Listen for updates
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
-          console.log('New Service Worker found, updating...');
 
           newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed') {
-              if (navigator.serviceWorker.controller) {
-                // New service worker available, activate it
-                newWorker.postMessage({ type: 'SKIP_WAITING' });
-                console.log('New content available, reloading...');
-                // Reload to get new content
-                window.location.reload();
-              } else {
-                // First time installation
-                console.log('Content cached for offline use');
-              }
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New service worker available, activate it
+              newWorker.postMessage({ type: 'SKIP_WAITING' });
+              // Reload to get new content
+              window.location.reload();
             }
           });
         });
       })
       .catch((error) => {
-        console.log('Service Worker registration failed:', error);
+        console.error('Service Worker registration failed:', error);
       });
 
     // Reload when new service worker takes control
@@ -68,7 +59,6 @@ if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
   navigator.serviceWorker.getRegistrations().then(registrations => {
     registrations.forEach(registration => {
       registration.unregister();
-      console.log('Service Worker unregistered for development');
     });
   });
 }
