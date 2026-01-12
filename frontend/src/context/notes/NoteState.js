@@ -205,7 +205,6 @@ const NoteState = (props) => {
         const offlineNotes = getOfflineNotes();
         const cachedNotes = getCachedNotes();
         const instantNotes = mergeNotes(cachedNotes, offlineNotes);
-        console.log('Displaying instant notes from cache and offline storage:', instantNotes);
         setNotes(instantNotes); 
 
         if (isOnline) {
@@ -228,7 +227,6 @@ const NoteState = (props) => {
 
                     const mergedNotes = mergeNotes(onlineNotes, offlineNotes);
 
-                    console.log('Fetched online notes and merged with offline notes:', mergedNotes);
                     setNotes(prev => {
                         if (JSON.stringify(prev) === JSON.stringify(mergedNotes)) {
                             return prev;

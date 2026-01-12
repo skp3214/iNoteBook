@@ -85,7 +85,7 @@ self.addEventListener('fetch', function(event) {
         // Otherwise fetch from network
         return fetch(event.request)
           .then(function(response) {
-            if (response.status === 200) {
+            if (response.status === 200 && event.request.method === 'GET') {
               const responseToCache = response.clone();
 
               // Don't cache external domains or huge files
