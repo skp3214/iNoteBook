@@ -1620,6 +1620,14 @@ body {
   }
 }
 
+/* Ensure FAB always floats */
+.ai-fab {
+  position: fixed !important;
+  bottom: 2rem !important;
+  right: 2rem !important;
+  z-index: 99999 !important;
+}
+
 /* Notes Grid Responsive */
 .notes-grid {
   display: grid;
