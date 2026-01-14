@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUndo, faTimes } from '@fortawesome/free-solid-svg-icons';
 
@@ -14,12 +15,12 @@ const Snackbar = ({ show, message, onUndo, onClose, duration = 4000 }) => {
 
   if (!show) return null;
 
-  return (
+  const snackbarContent = (
     <div 
       className="modern-snackbar"
       style={{
         position: 'fixed',
-        bottom: '20px',
+        bottom: '100px',
         left: '50%',
         transform: 'translateX(-50%)',
         background: 'var(--bg-elevated)',
@@ -31,7 +32,7 @@ const Snackbar = ({ show, message, onUndo, onClose, duration = 4000 }) => {
         alignItems: 'center',
         justifyContent: 'space-between',
         gap: '16px',
-        zIndex: 9999,
+        zIndex: 99999,
         boxShadow: 'var(--shadow-xl)',
         animation: 'slideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
         backdropFilter: 'blur(20px)',
@@ -83,12 +84,12 @@ const Snackbar = ({ show, message, onUndo, onClose, duration = 4000 }) => {
             minHeight: '36px'
           }}
           onMouseEnter={(e) => {
-            e.target.style.background = 'var(--accent-hover)';
-            e.target.style.transform = 'translateY(-1px)';
+            e.currentTarget.style.background = 'var(--accent-hover)';
+            e.currentTarget.style.transform = 'translateY(-1px)';
           }}
           onMouseLeave={(e) => {
-            e.target.style.background = 'var(--accent-primary)';
-            e.target.style.transform = 'translateY(0)';
+            e.currentTarget.style.background = 'var(--accent-primary)';
+            e.currentTarget.style.transform = 'translateY(0)';
           }}
         >
           <FontAwesomeIcon icon={faUndo} style={{ fontSize: '0.8rem' }} />
@@ -114,12 +115,12 @@ const Snackbar = ({ show, message, onUndo, onClose, duration = 4000 }) => {
             height: '36px'
           }}
           onMouseEnter={(e) => {
-            e.target.style.background = 'var(--bg-secondary)';
-            e.target.style.color = 'var(--text-primary)';
+            e.currentTarget.style.background = 'var(--bg-secondary)';
+            e.currentTarget.style.color = 'var(--text-primary)';
           }}
           onMouseLeave={(e) => {
-            e.target.style.background = 'transparent';
-            e.target.style.color = 'var(--text-muted)';
+            e.currentTarget.style.background = 'transparent';
+            e.currentTarget.style.color = 'var(--text-muted)';
           }}
         >
           <FontAwesomeIcon icon={faTimes} />
@@ -127,6 +128,8 @@ const Snackbar = ({ show, message, onUndo, onClose, duration = 4000 }) => {
       </div>
     </div>
   );
+
+  return createPortal(snackbarContent, document.body);
 };
 
 export default Snackbar;

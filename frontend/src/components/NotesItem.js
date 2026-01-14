@@ -15,7 +15,11 @@ const NotesItem = (props) => {
   const currentX = useRef(0);
 
   const handleDeleteClick = () => {
-    deleteNote(note._id);
+    if (onShowSnackbar) {
+      onShowSnackbar(note, () => deleteNote(note._id));
+    } else {
+      deleteNote(note._id);
+    }
   };
 
   const handleSwipeDelete = () => {
