@@ -33,7 +33,10 @@ const MobileHeader = ({
                 <div className="d-flex align-items-center gap-2">
                     {/* View Toggle + Sort + Add Button - Mobile */}
                     <button
-                        onClick={() => setViewMode('grid')}
+                        onClick={() => {
+                            localStorage.setItem("viewmode", "grid");
+                            setViewMode("grid");
+                        }}
                         className={`btn btn-sm ${viewMode === 'grid' ? 'btn-primary' : 'btn-outline-secondary'}`}
                         style={{
                             width: '40px',
@@ -49,7 +52,10 @@ const MobileHeader = ({
                         ▦
                     </button>
                     <button
-                        onClick={() => setViewMode('list')}
+                        onClick={() => {
+                            localStorage.setItem("viewmode", "list");
+                            setViewMode('list');
+                        }}
                         className={`btn btn-sm ${viewMode === 'list' ? 'btn-primary' : 'btn-outline-secondary'}`}
                         style={{
                             width: '40px',

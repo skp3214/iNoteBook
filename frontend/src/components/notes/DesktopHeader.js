@@ -22,7 +22,10 @@ const DesktopHeader = ({sortOrder,viewMode,toggleSortOrder,setViewMode,filteredN
 
             <div className="d-flex gap-2">
                 <button
-                    onClick={() => setViewMode('grid')}
+                    onClick={() => {
+                        localStorage.setItem("viewmode","grid");
+                        setViewMode('grid');
+                    }}
                     className={`btn btn-sm ${viewMode === 'grid' ? 'btn-primary' : 'btn-outline-secondary'}`}
                     style={{
                         width: '44px',
@@ -39,7 +42,10 @@ const DesktopHeader = ({sortOrder,viewMode,toggleSortOrder,setViewMode,filteredN
                     ▦
                 </button>
                 <button
-                    onClick={() => setViewMode('list')}
+                    onClick={() => {
+                        localStorage.setItem("viewmode","list");
+                        setViewMode('list');
+                    }}
                     className={`btn btn-sm ${viewMode === 'list' ? 'btn-primary' : 'btn-outline-secondary'}`}
                     style={{
                         width: '44px',

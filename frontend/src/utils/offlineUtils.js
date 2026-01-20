@@ -198,6 +198,7 @@ export const clearOfflineData = () => {
     localStorage.removeItem(getCachedNotesKey());
     localStorage.removeItem('gemini_api_key');
     localStorage.removeItem('theme');
+    localStorage.removeItem("viewmode");
     return true;
   } catch (error) {
     console.error('Error clearing offline data:', error);

@@ -46,6 +46,11 @@ const Notes = ({ searchQuery: externalSearchQuery, setSearchQuery: externalSetSe
 
   // Fetch notes with loading control
   useEffect(() => {
+    
+    if(localStorage.getItem("viewmode")){
+      setViewMode(localStorage.getItem("viewmode"))
+    }
+
     const fetchNotes = async () => {
 
       if (localStorage.getItem('token')) {
