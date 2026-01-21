@@ -78,9 +78,14 @@ const NotesItem = (props) => {
       gradient: 'linear-gradient(135deg, #92400e 0%, #d97706 50%, #f59e0b 100%)'
     },
     Personal: {
-      borderColor: '#06b6d4',
+      borderColor: '#8b5cf6',
       badgeVariant: 'info',
-      gradient: 'linear-gradient(135deg, #0e7490 0%, #0891b2 50%, #06b6d4 100%)'
+      gradient: 'linear-gradient(135deg,  #2e1065 0%, #6d28d9 50%, #8b5cf6 100%)'
+    },
+    Default: {
+      borderColor: '#444444',
+      badgeVariant: 'info',
+      gradient: 'linear-gradient(135deg, #111111 0%, #2a2a2a 50%, #444444 100%)'
     },
   };
 
