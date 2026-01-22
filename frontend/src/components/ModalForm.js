@@ -11,11 +11,11 @@ const ModalForm = ({
   isEditMode = false
 }) => {
   const tagOptions = [
-    { value: 'Work', label: 'Work', variant: 'primary' },
-    { value: 'Urgent', label: 'Urgent', variant: 'danger' },
-    { value: 'Completed', label: 'Completed', variant: 'success' },
-    { value: 'Important', label: 'Important', variant: 'warning' },
-    { value: 'Personal', label: 'Personal', variant: 'info' },
+    { value: 'Work', label: 'Work', variant: 'primary', color:'#2563eb' },
+    { value: 'Urgent', label: 'Urgent', variant: 'danger', color:'#ef4444' },
+    { value: 'Completed', label: 'Completed', variant: 'success', color:'#22c55e' },
+    { value: 'Important', label: 'Important', variant: 'warning', color:'#eab308' },
+    { value: 'Personal', label: 'Personal', variant: 'info', color:'#8b5cf6' },
   ];
 
   return (
@@ -83,7 +83,8 @@ const ModalForm = ({
                   value={option.value}
                   style={{ 
                     fontWeight: '500',
-                    padding: '0.5rem'
+                    padding: '0.5rem',
+                    color: option.color
                   }}
                 >
                   {option.label}
