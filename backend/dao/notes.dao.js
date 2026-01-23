@@ -1,8 +1,7 @@
 const Notes = require('../models/Notes');
 
 exports.findNotesByUser = async (userId) => {
-    const notes = await Notes.find({ user: userId }).populate('user');
-    // Optional: Log only when there's useful debug info
+    const notes = await Notes.find({ user: userId });
     if (process.env.NODE_ENV === 'development' && notes.length === 0) {
         console.log(`No notes found for user: ${userId}`);
     }

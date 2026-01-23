@@ -16,6 +16,7 @@ const ModalForm = ({
     { value: 'Completed', label: 'Completed', variant: 'success', color:'#22c55e' },
     { value: 'Important', label: 'Important', variant: 'warning', color:'#eab308' },
     { value: 'Personal', label: 'Personal', variant: 'info', color:'#8b5cf6' },
+    { value: 'Miscellaneous', label: 'Miscellaneous', variant: 'miscellaneous', color:'#444444' },
   ];
 
   return (

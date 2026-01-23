@@ -11,6 +11,7 @@ const Sidebar = ({ notes, filterTag, setFilterTag, showSidebar, setShowSidebar, 
     { name: 'Personal', icon: <FontAwesomeIcon icon={faUser} style={{color:'#06b6d4'}} />, color: '#06b6d4', count: notes.filter(n => n.tag === 'Personal').length },
     { name: 'Important', icon: <FontAwesomeIcon icon={faStar} style={{color:'#f59e0b'}} />, color: '#f59e0b', count: notes.filter(n => n.tag === 'Important').length },
     { name: 'Completed', icon: <FontAwesomeIcon icon={faCheck} style={{color:'#10b981'}} />, color: '#10b981', count: notes.filter(n => n.tag === 'Completed').length },
+    { name: 'Miscellaneous', icon: <FontAwesomeIcon icon={faClipboardList} style={{color:'#444444'}} />, color: '#444444', count: notes.filter(n => n.tag === 'Miscellaneous').length },
   ];
 
   const handleTagClick = (tagName) => {
