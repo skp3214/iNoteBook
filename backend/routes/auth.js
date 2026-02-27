@@ -15,6 +15,10 @@ router.post('/login', [
     body('password', 'Password cannot be blank').exists()
 ], authController.loginUser);
 
+router.post('/refresh-token', authController.refreshToken);
+
+router.post('/logout', authController.logoutUser);
+
 router.post('/getuser', fetchuser, authController.getUser);
 
 router.post('/forgot-password', [

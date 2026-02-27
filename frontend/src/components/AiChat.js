@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import noteContext from '../context/notes/noteContext';
-import { handleAuthResponse } from '../utils/authUtils';
+import { authenticatedFetch, handleAuthResponse } from '../utils/authUtils';
 import SpeechModal from './ai-chat/SpeechModal';
 import AutoExpandingInputField from './ai-chat/AutoExpandingInputField';
 import LoadingSpinner from './ai-chat/LoadingSpinner';
@@ -62,7 +62,7 @@ const AiChat = () => {
         try {
             const userApiKey = localStorage.getItem('gemini_api_key');
 
-            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/ai-agent/chat`, {
+            const response = await authenticatedFetch(`${process.env.REACT_APP_API_BASE_URL}/api/ai-agent/chat`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ const AiChat = () => {
                     message: messageText,
                     ...(userApiKey && { apiKey: userApiKey })
                 })
-            });
+            }, navigate);
 
             // This now returns parsed data + auth info
             const authResult = await handleAuthResponse(response, navigate);

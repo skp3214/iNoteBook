@@ -30,6 +30,7 @@ const SignUpForm = () => {
     const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
     const response = await fetch(`${apiBaseUrl}/api/auth/createuser`, {
       method: "POST",
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
       },

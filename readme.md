@@ -133,12 +133,17 @@ https://github.com/user-attachments/assets/e08d49a7-bc7f-43e6-87a3-3f56f9650d5e
 3. **Configure environment variables**
    ```bash
    # Create .env file with the following configuration
-   MONGODB_URI=your_mongodb_connection_string
-   JWT_SECRET=your_super_secret_jwt_key
-   GOOGLE_AI_API_KEY=your_google_ai_api_key
+   MONGODB_URI=mongodb://localhost:27017/inotebook
    PORT=5000
    NODE_ENV=development
    ALLOWED_ORIGINS=http://localhost:3000
+   FRONTEND_URL=http://localhost:3000
+   ACCESS_TOKEN_SECRET=replace_with_strong_access_secret
+   REFRESH_TOKEN_SECRET=replace_with_strong_refresh_secret
+   JWT_SECRET=replace_with_legacy_jwt_secret
+   GOOGLE_AI_API_KEY=replace_with_google_ai_api_key
+   EMAIL_USER=your_gmail_address@gmail.com
+   EMAIL_PASS=your_gmail_app_password
    ```
 
 4. **Start the development server**

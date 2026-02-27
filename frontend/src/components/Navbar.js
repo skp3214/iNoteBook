@@ -16,7 +16,20 @@ function NavbarComponents({ searchQuery, setSearchQuery }) {
 
   let navigate = useNavigate();
   
-  const handleLogOut = () => {
+  const handleLogOut = async () => {
+    try {
+      await fetch(`${process.env.REACT_APP_API_BASE_URL}/api/auth/logout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'authtoken': localStorage.getItem('token') || ''
+        },
+        credentials: 'include'
+      });
+    } catch (error) {
+      console.error('Logout request failed:', error);
+    }
+
     clearOfflineData();
     localStorage.removeItem('token');
     navigate('/');

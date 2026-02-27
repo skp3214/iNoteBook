@@ -9,7 +9,11 @@ exports.createUser = async (userData) => {
 };
 
 exports.findUserById = async (userId) => {
-    return await User.findById(userId).select("-password");
+    return await User.findById(userId).select("-password -refreshTokenHash -refreshTokenExpires");
+};
+
+exports.findUserByIdWithSecrets = async (userId) => {
+    return await User.findById(userId);
 };
 
 exports.updateUser = async (userId, updateData) => {

@@ -1,13 +1,24 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET || "default-secret-key";
-const fetchuser = (req, res, next) => {
+const authService = require('../services/auth.service');
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || process.env.JWT_SECRET || "default-access-secret-key";
+const fetchuser = async (req, res, next) => {
     // Get the user from the jwt token and add id to req id
     const token=req.header('authtoken');
     if(!token){
         return res.status(401).send({error:"please authenticate using a valid token"})
     }
     try{
-        const data=jwt.verify(token,JWT_SECRET);
+        const data=jwt.verify(token,ACCESS_TOKEN_SECRET);
+        const refreshToken = req.cookies?.refreshToken;
+        if (!refreshToken) {
+            return res.status(401).send({error:"Session invalid. Please login again."});
+        }
+
+        const sessionValid = await authService.verifySession(data.user.id, refreshToken);
+        if (!sessionValid) {
+            return res.status(401).send({error:"Session invalid. Please login again."});
+        }
+
         req.user=data.user;
         next()
     }

@@ -19,7 +19,7 @@ import {
     cleanupPendingActions,
     removeOfflineNoteByContent
 } from '../../utils/offlineUtils';
-import { handleAuthResponse } from '../../utils/authUtils';
+import { authenticatedFetch, handleAuthResponse } from '../../utils/authUtils';
 
 const NoteState = (props) => {
     const host = process.env.REACT_APP_API_BASE_URL;
@@ -51,14 +51,14 @@ const NoteState = (props) => {
 
                 switch (action.type) {
                     case 'ADD_NOTE':
-                        response = await fetch(`${host}/api/notes/addnotes`, {
+                        response = await authenticatedFetch(`${host}/api/notes/addnotes`, {
                             method: "POST",
                             headers: {
                                 'Content-Type': 'application/json',
                                 'authtoken': localStorage.getItem('token')
                             },
                             body: JSON.stringify(action.data)
-                        });
+                        }, navigate);
 
                         authResult = await handleAuthResponse(response, navigate);
                         if (!authResult.isValid) {
@@ -73,7 +73,7 @@ const NoteState = (props) => {
                         break;
 
                     case 'UPDATE_NOTE':
-                        response = await fetch(`${host}/api/notes/updatenotes/${action.data.id}`, {
+                        response = await authenticatedFetch(`${host}/api/notes/updatenotes/${action.data.id}`, {
                             method: "PUT",
                             headers: {
                                 'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ const NoteState = (props) => {
                                 description: action.data.description,
                                 tag: action.data.tag
                             })
-                        });
+                        }, navigate);
 
                         authResult = await handleAuthResponse(response, navigate);
                         if (!authResult.isValid) {
@@ -95,13 +95,13 @@ const NoteState = (props) => {
                         break;
 
                     case 'DELETE_NOTE':
-                        response = await fetch(`${host}/api/notes/deletenotes/${action.data.id}`, {
+                        response = await authenticatedFetch(`${host}/api/notes/deletenotes/${action.data.id}`, {
                             method: "DELETE",
                             headers: {
                                 'Content-Type': 'application/json',
                                 'authtoken': localStorage.getItem('token')
                             }
-                        });
+                        }, navigate);
 
                         authResult = await handleAuthResponse(response, navigate);
                         if (!authResult.isValid) {
@@ -125,13 +125,13 @@ const NoteState = (props) => {
         try {
             const token = localStorage.getItem('token');
             if (token) {
-                const response = await fetch(`${host}/api/notes/fetchallnotes`, {
+                const response = await authenticatedFetch(`${host}/api/notes/fetchallnotes`, {
                     method: "GET",
                     headers: {
                         'Content-Type': 'application/json',
                         'authtoken': token
                     },
-                });
+                }, navigate);
 
                 const authResult = await handleAuthResponse(response, navigate);
                 if (!authResult.isValid) {
@@ -209,13 +209,13 @@ const NoteState = (props) => {
 
         if (isOnline) {
             try {
-                const response = await fetch(`${host}/api/notes/fetchallnotes`, {
+                const response = await authenticatedFetch(`${host}/api/notes/fetchallnotes`, {
                     method: "GET",
                     headers: {
                         'Content-Type': 'application/json',
                         'authtoken': token
                     },
-                });
+                }, navigate);
 
                 const authResult = await handleAuthResponse(response, navigate);
                 if (!authResult.isValid) {
@@ -247,14 +247,14 @@ const NoteState = (props) => {
 
         try {
             if (isOnline) {
-                const response = await fetch(`${host}/api/notes/addnotes`, {
+                const response = await authenticatedFetch(`${host}/api/notes/addnotes`, {
                     method: "POST",
                     headers: {
                         'Content-Type': 'application/json',
                         'authtoken': localStorage.getItem('token')
                     },
                     body: JSON.stringify(noteData)
-                });
+                }, navigate);
 
                 const authResult = await handleAuthResponse(response, navigate);
                 if (!authResult.isValid) return;
@@ -283,13 +283,13 @@ const NoteState = (props) => {
     const deleteNote = async (id) => {
         try {
             if (isOnline && !id.startsWith('offline_')) {
-                const response = await fetch(`${host}/api/notes/deletenotes/${id}`, {
+                const response = await authenticatedFetch(`${host}/api/notes/deletenotes/${id}`, {
                     method: "DELETE",
                     headers: {
                         'Content-Type': 'application/json',
                         'authtoken': localStorage.getItem('token')
                     }
-                });
+                }, navigate);
 
                 const authResult = await handleAuthResponse(response, navigate);
                 if (!authResult.isValid) return;
@@ -321,14 +321,14 @@ const NoteState = (props) => {
 
         try {
             if (isOnline && !id.startsWith('offline_')) {
-                const response = await fetch(`${host}/api/notes/updatenotes/${id}`, {
+                const response = await authenticatedFetch(`${host}/api/notes/updatenotes/${id}`, {
                     method: "PUT",
                     headers: {
                         'Content-Type': 'application/json',
                         'authtoken': localStorage.getItem('token')
                     },
                     body: JSON.stringify(updateData)
-                });
+                }, navigate);
 
                 const authResult = await handleAuthResponse(response, navigate);
                 if (!authResult.isValid) return;
